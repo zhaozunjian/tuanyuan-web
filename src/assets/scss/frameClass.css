@@ -1,0 +1,13 @@
+/*弹出框的样式*/
+.frameBtn {
+  width: 100%;
+  text-align: center;
+}
+/*弹出框的确定样式*/
+.frameConfirm {
+  width: 80px;
+}
+/*弹出框的取消样式*/
+.frameCancel {
+  margin-left: 20%;width: 80px;
+}

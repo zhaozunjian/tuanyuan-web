@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="25px" height="25px" viewBox="0 0 25 25" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 51 (57462) - http://www.bohemiancoding.com/sketch -->
+    <title>icon-baobiao</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <rect id="path-1" x="0" y="0.502114026" width="18" height="18"></rect>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="icon-new" transform="translate(-56.000000, -513.000000)">
+            <rect x="0" y="0" width="865" height="654"></rect>
+            <g id="日常事务" transform="translate(56.033409, 72.494434)">
+                <g id="baobiao" transform="translate(0.000000, 441.410052)">
+                    <g transform="translate(3.000000, 2.500000)">
+                        <mask id="mask-2" fill="white">
+                            <use xlink:href="#path-1"></use>
+                        </mask>
+                        <g id="Rectangle-13"></g>
+                        <path d="M7,4.50211403 C3.6862915,4.50211403 1,7.18840553 1,10.502114 C1,13.8158225 3.6862915,16.502114 7,16.502114 C10.3137085,16.502114 13,13.8158225 13,10.502114" id="Oval-12" stroke="#333333" stroke-width="1.8" stroke-linecap="round" mask="url(#mask-2)"></path>
+                        <path d="M16.0434993,7.60211403 C15.6385062,4.40056489 13.1015491,1.86360787 9.9,1.45861472 L9.9,7.50211403 C9.9,7.5573425 9.94477153,7.60211403 10,7.60211403 C11.75,7.60211403 11.75,7.60211403 13.5,7.60211403 C14.8556537,7.60211403 15.1611377,7.60211403 16.0434993,7.60211403 Z" id="Oval-4" stroke="#333333" stroke-width="1.8" mask="url(#mask-2)"></path>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

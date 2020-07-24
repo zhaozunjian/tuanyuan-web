@@ -1,0 +1,27 @@
+.view-dialog .dialog-row{
+  display:flex;
+  align-items:center;
+  margin-bottom: 12px;
+  font-size: 15px;
+}
+.view-dialog .dialog-row div:first-child{
+  font-weight: 700;
+  padding-right: 15px;
+  text-align: right;
+}
+
+.dialog-form .el-form-item{
+  margin-bottom:17px;
+}
+.dialog-form .el-radio-group{
+  vertical-align:baseline !important;
+}
+.dialog-form .dialog-button-container {
+  padding-left: 25%;
+}
+.dialog-form .dialog-button-container button:last-child{
+  margin-left: 35px;
+}
+.dialog-form >>> .el-input-number .el-input__inner{
+  text-align: left;
+}

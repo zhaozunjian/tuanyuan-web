@@ -1,0 +1,47 @@
+@charset "UTF-8";
+.row-search{
+  margin-top:0px;
+  padding-bottom: 15px
+}
+.row-search .search{
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+}
+.row-search .search .el-select{
+  width: 150px;
+  min-width: 120px;
+  /*max-width: 180px;*/
+  margin-right: 10px;
+}
+.row-search .search .el-input {
+  width: 150px;
+  min-width: 120px;
+  /*max-width: 180px;*/
+  margin-right: 10px;
+}
+.row-search .search  .el-date-editor{
+  min-width: 140px;
+  /*max-width: 230px;*/
+  margin-right: 10px;
+}
+.operation-bottom{
+  padding-top: 15px;
+  display: flex;
+}
+.operation-bottom .pager{
+  padding-top: 5px;
+  margin-left: auto;
+}
+.operation-bottom button{
+  width: auto;
+  height: 32px;
+}
+a{
+  color:#409EFF;
+}
+
+.row-search .search > div {
+  margin-top: 5px;
+  margin-bottom: 3px;
+}
