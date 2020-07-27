@@ -19,7 +19,7 @@
       </table-tree-column>
       <el-table-column
         prop="parentName"
-        width="250"
+        width="230"
         label="上级菜单">
       </el-table-column>
       <el-table-column
@@ -92,7 +92,7 @@
         dataList: [],
         dataListLoading: false,
         addOrUpdateVisible: false,
-        tableHeight: this.$GlobalApi.getWinHeight() - 180,
+        tableHeight: this.$GlobalApi.getWinHeight() - 200,
       }
     },
     components: {

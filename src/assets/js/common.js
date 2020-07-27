@@ -512,7 +512,7 @@ const Constants = {
   DIALOG_WIDTH:'30%',
   DICT: {
     PAGE: 1,
-    LIMIT: 50,
+    LIMIT: 10,
     TOTAL: null,
   }
 }

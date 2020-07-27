@@ -36,8 +36,8 @@
   export default {
     data() {
       var validatePassword = (rule, value, callback) => {
-        if (!this.dataForm.pwd && !/\S/.test(value)) {
-          callback(new Error('密码不能为空'))
+        if (!value) {
+          return callback(new Error('密码不能为空'));
         } else {
           callback()
         }
@@ -51,7 +51,6 @@
           accId: '',
           userId: '',
           passport: '',
-          acctype: '0',
           adminlv: 0,
           isuse: 1,
           pwd: '',
@@ -62,12 +61,9 @@
             {required: true, trigger: 'submit'}
           ],
           pwd: [
-            {required: true, validator: validatePassword, trigger: 'blur'}
+            {validator: validatePassword, trigger: 'blur'}
           ],
           passport: [
-            {required: true, trigger: 'blur'},
-          ],
-          acctype: [
             {required: true, trigger: 'blur'},
           ]
         },

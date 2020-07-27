@@ -167,9 +167,9 @@
               clearLoginInfo()
               this.dictionariesData.clear()
               this.$router.push({name: 'login'})
-              if (this.$cookie.isKey("token")) {
-                this.$cookie.remove('token')
-              }
+              // if (this.$cookie.isKey("token")) {
+              //   this.$cookie.remove('token')
+              // }
             }
           })
         }).catch(() => {

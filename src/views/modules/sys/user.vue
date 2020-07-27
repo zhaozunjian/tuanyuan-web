@@ -13,11 +13,10 @@
       :header-cell-style="$GlobalApi.rowClass"
       :max-height="tableHeight"
       border
-      highlight-current-row
-      id="personnel-table"
+      highlight-current-row @selection-change="selectionChangeHandle"
       size="small"
       stripe>
-      <el-table-column type="selection" width="35"/>
+      <el-table-column type="selection" width="50"/>
       <el-table-column label="头像" prop="avatarUrl" width="100px">
         <template slot-scope="scope">
           <el-popover
@@ -57,14 +56,19 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-row>
-      <el-col class="operation-bottom">
-        <el-button @click="detail(null,3)" icon="el-icon-plus" size="small" type="primary">新增</el-button>
-        <pager :current-page="page" :page-size="size"
-               :total="total"
-               @current-change="pesCurrentPage" @handle-size-change="pesPageSize" background/>
-      </el-col>
-    </el-row>
+    <div class="sd-leftbutton">
+      <el-button @click="detail(null,3)" icon="el-icon-plus" size="small" type="primary"
+                 v-if="isAuth('sys:user:add')">新增
+      </el-button>
+      <el-select class="sd-others" placeholder="其他操作" size="small" value="其他操作">
+        <el-option :disabled="dataListSelections.length <= 0" @click.native="deleteHandle()"
+                   v-if="isAuth('sys:user:delete')" value="批量删除"></el-option>
+      </el-select>
+    </div>
+    <div class="sd-rightpage">
+      <pager :current-page="page" :page-size="size" :total="total"
+             @current-change="pesCurrentPage" @handle-size-change="pesPageSize" background/>
+    </div>
   </el-card>
 </template>
 
@@ -73,6 +77,7 @@
     name: 'user',
     data () {
       return {
+        dataListSelections:[],
         id:'',
         loading: false,
         phoneNumber:'',
@@ -99,6 +104,28 @@
           this.$router.push({name: 'userDetail', params: {flag: type}})
         }
       },
+      async deleteHandle () {
+        var ids = this.dataListSelections.map(item => {
+          return item.id
+        })
+        let type = await this.$GlobalApi.confirmMsg('此操作将永久删除当前记录, 是否继续?', '提示', 1)
+        if (type === true){
+          this.$http({
+            url: this.$http.adornUrl('/sys/user/delete'),
+            method: 'post',
+            params: this.$http.adornParams({ids:ids.join(',')})
+          }).then(({data}) => {
+            if (data && data.code === 0) {
+              this.$GlobalApi.alertMsg('成功', '删除成功', 1, 0)
+              this.userInfo();
+            } else {
+              this.$GlobalApi.alertMsg("错误", `${data.msg}`, 1, 3);
+            }
+          })
+        } else if (type === false) {
+          this.$GlobalApi.alertMsg('提示', '已取消删除', 1, 1)
+        }
+      },
       userInfo (type) {
         if (type === 1) {
           this.page = 1
@@ -122,6 +149,10 @@
             this.$GlobalApi.alertMsg('错误', `${data.msg}`, 1, 3)
           }
         })
+      },
+      selectionChangeHandle (val) {
+        console.log(val)
+        this.dataListSelections = val
       },
       pesPageSize (val) {
         this.size = val

@@ -26,7 +26,6 @@
           :max-height="tableHeight"
           border
           highlight-current-row
-          id="dept-personnel-table"
           size="small"
           stripe>
           <el-table-column label="用户编号" prop="userId"/>

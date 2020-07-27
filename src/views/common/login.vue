@@ -1,13 +1,12 @@
 <template>
   <div class="login-container">
-    <div style="width: 100%;height: 100%;">
+    <div style="width: 100%;height: 100%;float: left">
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" status-ico
                class="login-form" auto-complete="on" label-position="left">
         <div class="title-container">
           <img class="sd-float yzwl" src="../../assets/img/login/logo.png" alt="">
           <div class="sd-clear"></div>
         </div>
-        <span class="svg-container"><icon-svg name="user"></icon-svg></span>
         <el-form-item prop="userName" class="sd-pad">
           <el-input class="sd-pad" v-model="dataForm.userName" placeholder="帐号"/>
         </el-form-item>
@@ -42,11 +41,11 @@
         }
         setTimeout(() => {
           this.getCapcthVali();
-          console.log(this.captchflag)
-          if (this.captchflag) {
-            callback();
-          } else {
+          if (!this.captchflag) {
+            this.captchflag = false
             callback(new Error("验证码不正确"));
+          } else {
+            callback();
           }
         }, 1000);
       };
@@ -89,7 +88,6 @@
           if (data && data.code === 0) {
             this.captchflag = true
           } else {
-            this.captchflag = false
             this.getCaptcha()
           }
         })
@@ -143,7 +141,7 @@
   }
 </style>
 <style rel="stylesheet/scss" lang="scss" scoped>
-  $bg: #2d3a4b;
+  $bg: #c6c6c6;
   $dark_gray: #889aa4;
   $light_gray: #889aa4;
   .login-container {
@@ -151,6 +149,7 @@
     height: 100%;
     width: 100%;
     background-color: $bg;
+    /*background: url("https://dss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=2254689817,4131166717&fm=26&gp=0.jpg");*/
     .login-form {
       width: 520px;
       max-width: 100%;
@@ -162,7 +161,6 @@
       top: 29px;
       left: 10px;
       z-index: 9999;
-      /*padding: 6px 5px 6px 15px;*/
       color: $dark_gray;
       vertical-align: middle;
       display: inline;

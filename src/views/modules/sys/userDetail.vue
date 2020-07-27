@@ -89,7 +89,7 @@
           avatarUrl:'',
           invitationCode:'',
         },
-        formType:'',
+        formType:'3',
         files:[]
       }
     },
@@ -111,6 +111,10 @@
           }
           this.getUserInfo()
         }
+      }else {
+        this.lookOver = false
+        this.formType = 3
+          this.$refs['formData'].resetFields();
       }
     },
     methods: {
@@ -119,15 +123,16 @@
           let type = await this.$GlobalApi.confirmMsg('此操作将永久删除当前记录, 是否继续?', '提示', 1)
           if (type == true) {
             this.$http({
-              url: this.$http.adornUrl(`/sys/user/delete/}` + this.formData.id),
+              url: this.$http.adornUrl('/sys/user/delete'),
               method: 'post',
-              params: this.$http.adornParams()
+              params: this.$http.adornParams({ids:this.formData.id})
             }).then(({data}) => {
               if (data && data.code === 0) {
                 this.$GlobalApi.alertMsg('成功', '删除成功', 1, 0)
                 this.formType = 3
+                this.$router.go(-1);
               } else {
-                this.$GlobalApi.alertMsg('错误', `${data.msg}`, 1, 3)
+                this.$GlobalApi.alertMsg("错误", `${data.msg}`, 1, 3);
               }
             })
           } else if (type == false) {
