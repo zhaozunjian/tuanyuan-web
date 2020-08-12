@@ -198,7 +198,7 @@
         this.getRoleInfo(val.roleId);
       }
     },
-    mounted () {
+    activated () {
       this.dept()
     },
     computed: {
