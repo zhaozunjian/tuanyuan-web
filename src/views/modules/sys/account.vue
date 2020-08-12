@@ -22,16 +22,16 @@
           width="50">
         </el-table-column>
         <el-table-column
-          label="用户ID"
+          label="账号ID"
           prop="accId"
         ></el-table-column>
         <el-table-column
-          label="用户帐号"
+          label="帐号名称"
           prop="passport"
         >
         </el-table-column>
         <el-table-column
-          label="用户姓名"
+          label="用户名称"
           prop="userName"
         >
         </el-table-column>
