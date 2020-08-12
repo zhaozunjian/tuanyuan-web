@@ -230,7 +230,7 @@
             }
           }
           this.selMenus = this.$GlobalApi.unrepet(this.selMenus)
-          this.$GlobalApi.log('aaaaaaaaaaaaaaaaaaaaaaaaaa', this.selMenus)
+          // this.$GlobalApi.log('aaaaaaaaaaaaaaaaaaaaaaaaaa', this.selMenus)
         }
       },
       getSelectRecords ({selection, checked, row, rowIndex, $rowIndex, column, columnIndex, $columnIndex, cell}) {
@@ -279,9 +279,8 @@
               Object.assign(this.dataForm, data.role)
               this.depLoading = false
               this.editDatas = data.role
-              this.$GlobalApi.log(data.role)
             } else {
-              this.$GlobalApi.alertMsg('错误', `${data.msg}`, 1, 3)
+              this.$message.error(data.msg)
             }
           })
         } else {
@@ -311,10 +310,10 @@
             }).then(({data}) => {
               if (data && data.code === 0) {
                 this.visible = false
-                this.$GlobalApi.alertMsg('成功', `${this.isEdit ? '修改成功' : '新增成功'}`, 1, 0)
+                this.$message.success(this.isEdit ? '修改成功' : '新增成功')
                 this.$emit('refreshDataList')
               } else {
-                this.$GlobalApi.alertMsg('错误', `${data.msg}`, 1, 3)
+                this.$message.error(data.msg)
               }
             })
           }

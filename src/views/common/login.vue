@@ -1,11 +1,11 @@
 <template>
-  <div class="login-container">
+  <div class="login-container" v-loading="loging">
     <div style="width: 100%;height: 100%;float: left">
       <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" status-ico
                class="login-form" auto-complete="on" label-position="left">
         <div class="title-container">
-          <img class="sd-float yzwl" src="../../assets/img/login/logo.png" alt="">
-          <div class="sd-clear"></div>
+          <!--<img class="sd-float yzwl" src="../../assets/img/login/logo.png" alt="">-->
+          <div class="totle">团猿后台管理系统</div>
         </div>
         <el-form-item prop="userName" class="sd-pad">
           <el-input class="sd-pad" v-model="dataForm.userName" placeholder="帐号"/>
@@ -35,21 +35,8 @@
 
   export default {
     data() {
-      var checkCaptch = (rule, value, callback) => {
-        if (!value) {
-          return callback(new Error('验证码不能为空'));
-        }
-        setTimeout(() => {
-          this.getCapcthVali();
-          if (!this.captchflag) {
-            this.captchflag = false
-            callback(new Error("验证码不正确"));
-          } else {
-            callback();
-          }
-        }, 1000);
-      };
       return {
+        loging:false,
         dataForm: {
           userName: '',
           password: '',
@@ -64,7 +51,7 @@
             {required: true, message: '密码不能为空', trigger: 'blur'}
           ],
           captcha: [
-            {validator: checkCaptch,trigger: 'blur'}
+            {required: true, message: '验证码不能为空', trigger: 'blur'}
           ]
         },
         captchaPath: '',
@@ -76,26 +63,11 @@
       this.getCaptcha()
     },
     methods: {
-      getCapcthVali(){
-        this.$http({
-          url: this.$http.adornUrl('/sys/verification'),
-          method: 'post',
-          params: this.$http.adornParams({
-            'uuid': this.dataForm.uuid,
-            'code':this.dataForm.captcha,
-          })
-        }).then(({data}) => {
-          if (data && data.code === 0) {
-            this.captchflag = true
-          } else {
-            this.getCaptcha()
-          }
-        })
-      },
       // 提交表单
       dataFormSubmit() {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
+            this.loging = true
             this.$http({
               url: this.$http.adornUrl('/sys/login'),
               method: 'post',
@@ -103,14 +75,16 @@
                 'passport': this.dataForm.userName,
                 'password': this.dataForm.password,
                 'uuid': this.dataForm.uuid,
-                'captcha': this.dataForm.captcha
+                'captcha': this.dataForm.captcha,
               })
             }).then(({data}) => {
               if (data && data.code === 0) {
                 this.dictionariesData.set('userInfo', data.account)
                 this.$cookie.set('token', data.token)
-                this.$router.replace({name: 'home-homepage'})
+                this.$router.replace({name: 'report-GeneralSituation'})
+                this.loging = false
               } else {
+                this.loging = false
                 this.getCaptcha()
                 this.$message.error(data.msg)
               }
@@ -141,19 +115,17 @@
   }
 </style>
 <style rel="stylesheet/scss" lang="scss" scoped>
-  $bg: #c6c6c6;
   $dark_gray: #889aa4;
   $light_gray: #889aa4;
   .login-container {
     position: fixed;
     height: 100%;
     width: 100%;
-    background-color: $bg;
-    /*background: url("https://dss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=2254689817,4131166717&fm=26&gp=0.jpg");*/
+    background-image: url("../../assets/img/login/login_bg.png");
     .login-form {
       width: 520px;
       max-width: 100%;
-      padding: 35px 35px 15px 35px;
+      padding: 120px 35px 15px 35px;
       margin: auto;
     }
     .svg-container {
@@ -181,8 +153,12 @@
     height: 50%;
   }
 
-  .sd-clear {
+  .totle {
     clear: both;
+    font-size: xx-large;
+    color: white;
+    padding-bottom: 80px;
+    text-align: center;
   }
 
   .yzwl {

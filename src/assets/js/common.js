@@ -223,65 +223,6 @@ function dateToString(date = new Date(), pattern = 'yyyy-MM-dd HH:mm:ss') {
 }
 
 /**
- * 消息提示框
- * @param title 提示框标题
- * @param msg 提示框内容
- * @param seat 提示框显示位置 0:右上角,1:右下角,2:左下角,3:左上角
- * @param type 提示框样式 0:成功,1:警告,2:信息,3:失败
- * @param time 提示框关闭时间
- * */
-function alertMsg(title, msg, seat, type, time) {
-  switch (seat) {
-    case 0: {
-      seat = 'top-right'
-      break
-    }
-    case 1: {
-      seat = 'bottom-right'
-      break
-    }
-    case 2: {
-      seat = 'bottom-left'
-      break
-    }
-    case 3: {
-      seat = 'top-left'
-      break
-    }
-  }
-  switch (type) {
-    case 0: {
-      type = 'success'
-      break
-    }
-    case 1: {
-      type = 'warning'
-      break
-    }
-    case 2: {
-      type = 'info'
-      break
-    }
-    case 3: {
-      type = 'error'
-      break
-    }
-  }
-  !time ? time = 4500 : time = time
-  !seat ? seat = 'bottom-right' : seat = seat
-  !type ? type = 'success' : type = type
-  Notification({
-    dangerouslyUseHTMLString: true,//解析html标签
-    title: title,
-    message: msg,
-    position: seat,
-    type: type,
-    duration: time
-  })
-}
-
-
-/**
  * 获取时间
  * fortime(nowtime(0))  现在的时间
  * fortime(nowtime(1))  半小时前
@@ -520,6 +461,7 @@ const Constants = {
 export default {
 
   Constants: Constants,
+  toNumber,
   rowClass,
   cellClass,
   jsGetAge,
@@ -527,10 +469,13 @@ export default {
   isEmpty,
   isObject,
   log,
+  isEmptyObj,
   confirmMsg,
-  alertMsg,
   add,
-    fordate,
+  fortime,
+  fordate,
+  forhour,
+  nowtime,
   parseDate,
   getthisweekdate,
   getthismonthdate,
@@ -542,6 +487,10 @@ export default {
   getWinHeight,
   getCascadeData,
   getUserInfo,
+  getCascadeNode,
+  getFormatData,
   unrepet,
+  isUndefined,
+  isNull,
 }
 

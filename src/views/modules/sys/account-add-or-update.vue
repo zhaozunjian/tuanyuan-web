@@ -15,7 +15,7 @@
           <el-input v-model="dataForm.pwd" placeholder="请输入密码" maxlength="16"></el-input>
         </el-form-item>
         <el-form-item label="用户" prop="userName">
-          <el-input v-model="dataForm.userName" placeholder="用户" @focus="coachDialog = true"></el-input>
+          <el-input v-model="dataForm.userName" placeholder="用户" @click.native="coachDialog = true"></el-input>
         </el-form-item>
         <el-form-item label="管理员" size="mini" prop="adminlv">
             <el-switch :active-value="1" :inactive-value="0" v-model="dataForm.adminlv"></el-switch>
@@ -58,7 +58,7 @@
         },
         dataRule: {
           userName: [
-            {required: true, trigger: 'submit'}
+            {required: true, trigger: 'change'}
           ],
           pwd: [
             {validator: validatePassword, trigger: 'blur'}
@@ -103,7 +103,7 @@
               this.dataForm.adminlv = data.account.adminlv
               this.dataForm.isuse = data.account.isuse
             } else {
-              this.$GlobalApi.alertMsg("错误", `${data.msg}`, 1, 3);
+              this.$message.error(data.msg)
             }
           })
         }
@@ -128,14 +128,14 @@
             }).then(({data}) => {
               if (data && data.code === 0) {
                 if (!this.isEdit) {
-                  this.$GlobalApi.alertMsg('成功', '新增成功', 1, 0)
+                  this.$message.success("新增成功")
                 } else {
-                  this.$GlobalApi.alertMsg('成功', '修改成功', 1, 0)
+                  this.$message.success("修改成功")
                 }
                 this.visibleFlag = false
                 this.$emit('refreshDataList')
               } else {
-                this.$GlobalApi.alertMsg("错误", `${data.msg}`, 1, 3);
+                this.$message.error(data.msg)
               }
             })
           }

@@ -2,16 +2,19 @@
   <el-card>
     <el-row class="row-search sd-nopadding" slot="header">
       <el-col class="search">
-        <el-input class="sd-input-150" placeholder="用户名称" size="small" v-model="nickName"/>
-        <el-input class="sd-input-150" placeholder="手机号" size="small" v-model="phoneNumber"/>
+        <el-input class="sd-input-150" clearable placeholder="用户名称" size="small" v-model="nickName"/>
+        <el-input class="sd-input-150" clearable placeholder="手机号" size="small" v-model="phoneNumber"/>
+        <el-select size="small" clearable v-model="userType" placeholder="用户类型" class="sd-width-150">
+          <el-option v-for="item in userTypeArr" :key="item.code" :label="item.name" :value="item.code"/>
+        </el-select>
         <el-button @click="userInfo(1)" class="sd-mag-l-10" icon="el-icon-search" size="small" type="primary">查询</el-button>
       </el-col>
     </el-row>
     <el-table
       :cell-style="$GlobalApi.cellClass"
-      :data="userData"
+      :data="userData" v-loading="userLoading"
       :header-cell-style="$GlobalApi.rowClass"
-      :max-height="tableHeight"
+      :height="tableHeight"
       border
       highlight-current-row @selection-change="selectionChangeHandle"
       size="small"
@@ -23,12 +26,12 @@
             placement="right"
             popper-class="member-popover"
             trigger="hover">
-            <img :src="scope.row.avatarUrl" class="tcimg"/>
-            <img :src="scope.row.avatarUrl" class="img" slot="reference"/>
+            <img :src="imageServerUrl + scope.row.avatarUrl" class="tcimg"/>
+            <img :src="imageServerUrl + scope.row.avatarUrl" class="img" slot="reference"/>
           </el-popover>
         </template>
       </el-table-column>
-      <el-table-column label="用户编号" prop="id" width="100px"/>
+      <el-table-column label="用户编号" prop="id" width="150px"/>
       <el-table-column label="用户名称" prop="nickName"/>
       <el-table-column label="年龄" prop="birthday">
         <template slot-scope="scope">
@@ -38,18 +41,22 @@
       <el-table-column label="性别" prop="gender">
         <template slot-scope="scope">{{scope.row.gender === 1 ? '男' : '女' }}</template>
       </el-table-column>
-      <el-table-column label="手机号码" prop="phoneNumber"/>
-      <el-table-column label="用户邀请码" prop="invitationCode">
+      <el-table-column label="手机号码" prop="phoneNumber" width="120px"/>
+      <el-table-column label="用户类型" prop="userType" width="100px">
+        <template slot-scope="scope">
+          {{scope.row.userType === '10' ? '管理' : '运营'}}
+        </template>
       </el-table-column>
-      <el-table-column label="是否绑定手机号" prop="bindingPhone">
+      <el-table-column label="用户邀请码" prop="invitationCode" width="120px"/>
+      <el-table-column label="是否绑定手机号" prop="bindingPhone" width="120px">
         <template slot-scope="scope">
           <el-tag size="mini" :type="scope.row.bindingPhone == 1 ? 'success' : 'danger'" effect="dark" >
             {{scope.row.bindingPhone == 1 ? '是' : '否'}}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="创建时间" prop="createTime"/>
-      <el-table-column fixed="right" label="操作" width="150px">
+      <el-table-column label="创建时间" prop="createTime" width="150px"/>
+      <el-table-column fixed="right" label="操作" width="120px">
         <template slot-scope="scope">
           <el-button @click="detail(scope.row,1)" size="small" type="text">编辑</el-button>
           <el-button @click="detail(scope.row,2)" size="small" type="text">查看</el-button>
@@ -58,11 +65,11 @@
     </el-table>
     <div class="sd-leftbutton">
       <el-button @click="detail(null,3)" icon="el-icon-plus" size="small" type="primary"
-                 v-if="isAuth('sys:user:add')">新增
+                 >新增
       </el-button>
       <el-select class="sd-others" placeholder="其他操作" size="small" value="其他操作">
         <el-option :disabled="dataListSelections.length <= 0" @click.native="deleteHandle()"
-                   v-if="isAuth('sys:user:delete')" value="批量删除"></el-option>
+                    value="批量删除"></el-option>
       </el-select>
     </div>
     <div class="sd-rightpage">
@@ -73,18 +80,30 @@
 </template>
 
 <script>
+  import * as SERVER_CONSTANT from "@/assets/js/serverConstant";
+
   export default {
     name: 'user',
     data () {
       return {
+        imageServerUrl: SERVER_CONSTANT.imageServerUrl,
         dataListSelections:[],
         id:'',
         loading: false,
         phoneNumber:'',
+        userType:'',
+        userTypeArr:[{
+          code:'10',
+          name:'管理'
+        },{
+          code:'20',
+          name:'运营'
+        }],
         nickName:'',
         userData: [],
-        tableHeight: this.$GlobalApi.getWinHeight() - 320,
+        tableHeight: this.$GlobalApi.getWinHeight() - 280,
         permissions: [],//权限
+        userLoading:false,
 
         page: this.$GlobalApi.Constants.DICT.PAGE,
         size: this.$GlobalApi.Constants.DICT.LIMIT,
@@ -116,14 +135,14 @@
             params: this.$http.adornParams({ids:ids.join(',')})
           }).then(({data}) => {
             if (data && data.code === 0) {
-              this.$GlobalApi.alertMsg('成功', '删除成功', 1, 0)
+              this.$message.success("删除成功")
               this.userInfo();
             } else {
-              this.$GlobalApi.alertMsg("错误", `${data.msg}`, 1, 3);
+              this.$message.error(data.msg)
             }
           })
         } else if (type === false) {
-          this.$GlobalApi.alertMsg('提示', '已取消删除', 1, 1)
+          this.$message.warning("已取消删除")
         }
       },
       userInfo (type) {
@@ -131,6 +150,7 @@
           this.page = 1
           this.size= 50
         }
+        this.userLoading = true
         this.$http({
           url: this.$http.adornUrl('/sys/user/list'),
           isLoading: true,
@@ -139,19 +159,21 @@
             page: this.page,
             size: this.size,
             nickName: this.nickName,
-            phoneNumber: this.phoneNumber
+            phoneNumber: this.phoneNumber,
+            userType: this.userType
           })
         }).then(({data}) => {
           if (data && data.code === 0) {
             this.userData = data.page.list
             this.total = data.page.totalCount
+            this.userLoading = false
           } else {
-            this.$GlobalApi.alertMsg('错误', `${data.msg}`, 1, 3)
+            this.$message.error(data.msg)
+            this.userLoading = false
           }
         })
       },
       selectionChangeHandle (val) {
-        console.log(val)
         this.dataListSelections = val
       },
       pesPageSize (val) {

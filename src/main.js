@@ -16,8 +16,12 @@ import '@/assets/scss/search-bottom.css'
 import GlobalApi from './assets/js/common.js'
 import TableTreeColumn from '@/components/table-tree-column'
 import SelectUsers from '@/components/SelectUsers'
+import ChooseAddress from '@/components/ChooseAddress'
 import pager from './components/Pager'
 import { Calendar } from 'element-ui';
+import Amap from 'vue-amap'
+import less from 'less'
+Vue.use(less)
 
 import 'xe-utils'
 import VXETable from 'vxe-table' //可编辑表格
@@ -28,6 +32,9 @@ import hljs from 'highlight.js';
 import 'highlight.js/styles/darcula.css'
 import Utils from './utils/validate.js';
 import storage from 'good-storage'
+import { imageServerUrl,imageHttpsServerUrl } from './assets/js/serverConstant'
+Vue.prototype.imageServerUrl = imageServerUrl
+Vue.prototype.imageHttpsServerUrl = imageHttpsServerUrl
 
 import Vuex from 'vuex'
 Vue.use(Vuex);
@@ -36,6 +43,7 @@ Vue.use(Timeline);
 Vue.use(TimelineItem)
 Vue.use(VXETable)
 Vue.use(Calendar)
+Vue.use(Amap);
 Vue.directive('highlight',function (el) {
   let blocks = el.querySelectorAll('pre code');
   setTimeout(() =>{
@@ -59,11 +67,15 @@ Vue.prototype.isAuth = isAuth;     // 权限方法
 Vue.prototype.$GlobalApi = GlobalApi; //公用方法
 Vue.prototype.dictionariesData = storage; //缓存方法
 Vue.prototype.$Utils = Utils;
+import filters  from './assets/js/filters'
+//全局挂载过滤器
+Object.keys(filters).forEach(key=>{Vue.filter(key,filters[key])})
 // 保存整站vuex本地储存初始状态
 window.SITE_CONFIG['storeState'] = cloneDeep(store.state);
 
 Vue.component("pager",pager);
 Vue.component("SelectUsers",SelectUsers);
+Vue.component("ChooseAddress",ChooseAddress);
 Vue.component("TableTreeColumn",TableTreeColumn);
 
 Date.prototype.Format = function(fmt)

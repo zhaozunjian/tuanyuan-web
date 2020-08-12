@@ -60,7 +60,7 @@
             <el-input disabled placeholder="用户编号" size="small" v-model="formData.userId"></el-input>
           </el-form-item>
           <el-form-item label="用户名称" prop="userName">
-            <el-input @focus="codeDialog1 = true" placeholder="用户名称" size="small" v-model="formData.userName"></el-input>
+            <el-input @click.native="codeDialog1 = true" placeholder="用户名称" size="small" v-model="formData.userName"></el-input>
           </el-form-item>
           <el-form-item label="岗位名称" prop="roleName">
             <el-input disabled placeholder="岗位名称" size="small" v-model="formData.roleName"></el-input>
@@ -96,7 +96,7 @@
           roleName: ''
         },
         rule: {
-          userName: [{required: true, message: '请选择用户', trigger: 'blur'}]
+          userName: [{required: true, message: '请选择用户', trigger: 'change'}]
         },
         deptData: [],//部门数据
       }
@@ -119,14 +119,14 @@
             })
           }).then(({data}) => {
             if (data && data.code === 0) {
-              this.$GlobalApi.alertMsg('成功', '删除成功', 1, 0)
+              this.$message.success("删除成功")
               this.getRoleInfo(this.formData.roleId)
             } else {
-              this.$GlobalApi.alertMsg('错误', `${data.msg}`, 1, 3)
+              this.$message.error(data.msg)
             }
           })
         } else {
-          this.$GlobalApi.alertMsg('提示', '已取消删除', 1, 1)
+          this.$message.warning("已取消删除")
         }
       },
       viewDialog () {
@@ -137,6 +137,11 @@
         this.formData.userName = ''
       },
       confirm () {
+        if (this.formData.roleId == null || this.formData.roleId == ''){
+          this.deptDialog = false
+          this.$message.warning("请先选择岗位")
+          return;
+        }
         this.$refs['formData'].validate(value => {
           if (value) {
             this.$http({
@@ -148,10 +153,10 @@
               })
             }).then(({data}) => {
               if (data && data.code === 0) {
-                this.$GlobalApi.alertMsg('提示', '新增成功', 1, 0)
+                this.$message.success("新增成功")
                 this.getRoleInfo(this.formData.roleId)
               } else {
-                this.$GlobalApi.alertMsg('错误', `${data.msg}`, 1, 3)
+                this.$message.error(data.msg)
               }
             })
             this.deptDialog = false
@@ -167,7 +172,7 @@
           if (data && data.code === 0) {
             this.deptData = data.info
           } else {
-            this.$GlobalApi.alertMsg('错误', `${data.msg}`, 1, 3)
+            this.$message.error(data.msg)
           }
         })
       },
@@ -182,7 +187,7 @@
           if (data && data.code === 0) {
             this.userData = data.list
           } else {
-            this.$GlobalApi.alertMsg('错误', `${data.msg}`, 1, 3)
+            this.$message.error(data.msg)
           }
         })
       },

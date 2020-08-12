@@ -40,8 +40,8 @@
                   popper-class="member-popover"
                   placement="right"
                   trigger="hover">
-                  <img :src="scope.row.avatarUrl" class="tcimg"/>
-                  <img slot="reference" :src="scope.row.avatarUrl" class="img"/>
+                  <img :src="serverImage + scope.row.avatarUrl" class="tcimg"/>
+                  <img slot="reference" :src="serverImage + scope.row.avatarUrl" class="img"/>
                 </el-popover>
               </template>
             </el-table-column>
@@ -75,6 +75,7 @@
 </template>
 
 <script>
+  import * as SERVER_CONSTANT from "@/assets/js/serverConstant";
   export default {
     name: 'SelectUsers',
     props: {
@@ -116,6 +117,7 @@
     },
     data() {
       return {
+        serverImage:SERVER_CONSTANT.imageServerUrl,
         totalCount: this.$GlobalApi.Constants.DICT.TOTAL,
         tableHeight: this.$GlobalApi.getWinHeight() - 300,
         page: this.$GlobalApi.Constants.DICT.PAGE,
@@ -162,7 +164,7 @@
             this.totalCount = data.page.totalCount
             this.userDatas = data.page.list
           } else {
-            this.$GlobalApi.alertMsg('错误', `${data.msg}`, 1, 3)
+            this.$message.error(data.msg)
           }
         });
         if (this.checked.length > 0)
@@ -190,13 +192,6 @@
             this.$refs.clubRoomTable.toggleRowSelection(this.currentData);
           this.isClearAll = false;
         }
-        // if(this.multiSelectCount <= val.length){
-        //   this.isClearAll = true;
-        //   if (this.currentData)
-        //     this.$refs.clubRoomTable.toggleRowSelection(this.currentData);
-        //   this.isClearAll = false;
-        //   this.$GlobalApi.alertMsg('只允许选择5条数据', `${data.msg}`, 1, 3)
-        // }
       },
       selectInstance(val) {
         this.$refs.clubRoomTable.toggleRowSelection(val);

@@ -42,6 +42,12 @@
             <el-form-item class="inline" label="用户邀请码" label-width="80px" prop="invitationCode">
               <el-input :disabled="lookOver" clearable placeholder="用户邀请码" v-model="formData.invitationCode" maxlength="100"/>
             </el-form-item>
+
+            <el-form-item class="inline" label="用户类型" label-width="80px" prop="userType">
+              <el-select :disabled="lookOver" v-model="formData.userType" placeholder="用户类型" class="sd-width-150">
+                <el-option v-for="item in userTypeArr" :key="item.code" :label="item.name" :value="item.code"/>
+              </el-select>
+            </el-form-item>
           </el-form>
         </div>
       </div>
@@ -49,14 +55,14 @@
     <el-dialog :visible.sync="digImage" title="图片上传" width="20%">
       <div style="margin-left: 20%">
         <el-upload
-          :action="$GlobalApi.getServerUrl('/system/file/upload')"
+          :action="$GlobalApi.getServerUrl('/system/file/user/upload')"
           :before-upload="beforeUpImg"
           :headers="$GlobalApi.getUserToken()"
           :on-error="upImgError"
           :on-success="upImgSuccess"
           :show-file-list="false"
           class="avatar-uploader">
-          <img :src="formData.avatarUrl" class="avatar" v-if="formData.avatarUrl">
+          <img :src="imageServerUrl + formData.avatarUrl" class="avatar" v-if="formData.avatarUrl">
           <i class="el-icon-plus avatar-uploader-icon" v-else></i>
         </el-upload>
       </div>
@@ -65,29 +71,41 @@
 </template>
 
 <script>
+  import * as SERVER_CONSTANT from "@/assets/js/serverConstant";
 
   export default {
     name: 'userDetail',
     data () {
       return {
+        fileList:[],
+        imageServerUrl: SERVER_CONSTANT.imageServerUrl,
         userRules: {
           nickName: [{required: true, trigger: 'change'}],
           gender: [{required: true, trigger: 'change'}],
           phoneNumber: [{validator: this.$Utils.validPhone, required: true, trigger: 'change'}],
           birthday: [{required: true, trigger: 'change'}],
           avatarUrl: [{required: true, trigger: 'change'}],
-          invitationCode: [{required: true, trigger: 'change'}]
+          invitationCode: [{required: true, trigger: 'change'}],
+          userType: [{required: true, trigger: 'change'}],
         },
         digImage:false,
         lookOver:false,
+        userTypeArr:[{
+          code:'10',
+          name:'管理'
+        },{
+          code:'20',
+          name:'运营'
+        }],
         formData:{
           id:'',
           nickName:'',
           phoneNumber:'',
           birthday:'',
-          gender:"1",
+          gender:"",
           avatarUrl:'',
           invitationCode:'',
+          userType:''
         },
         formType:'3',
         files:[]
@@ -128,15 +146,15 @@
               params: this.$http.adornParams({ids:this.formData.id})
             }).then(({data}) => {
               if (data && data.code === 0) {
-                this.$GlobalApi.alertMsg('成功', '删除成功', 1, 0)
+                this.$message.success("删除成功")
                 this.formType = 3
                 this.$router.go(-1);
               } else {
-                this.$GlobalApi.alertMsg("错误", `${data.msg}`, 1, 3);
+                this.$message.error(data.msg)
               }
             })
           } else if (type == false) {
-            this.$GlobalApi.alertMsg('提示', '已取消删除', 1, 1)
+            this.$message.warning("已取消")
           }
         } else {
           this.$refs['formData'].validate((valid) => {
@@ -146,6 +164,7 @@
                 nickName: this.formData.nickName,
                 avatarUrl: this.formData.avatarUrl,
                 birthday: this.formData.birthday,
+                userType: this.formData.userType,
                 gender: this.formData.gender,
                 invitationCode: this.formData.invitationCode,
                 phoneNumber: this.formData.phoneNumber,
@@ -158,7 +177,7 @@
                 data: this.$http.adornData(params)
               }).then(({data}) => {
                 if (data && data.code === 0) {
-                  this.$GlobalApi.alertMsg('成功', `${this.formType === 3 ? '新增成功' : '修改成功'}`, 1, 0)
+                  this.$message.success(this.formType === 3 ? '新增成功' : '修改成功')
                   if (this.formType === 3) {
                     this.$http({
                       url: this.$http.adornUrl('/sys/user/get/' + data.id),
@@ -169,12 +188,12 @@
                         this.formData = data.user
                         this.formType = 1
                       } else {
-                        this.$GlobalApi.alertMsg('错误', `${data.msg}`, 1, 3)
+                        this.$message.error(data.msg)
                       }
                     })
                   }
                 } else {
-                  this.$GlobalApi.alertMsg('错误', `${data.msg}`, 1, 3)
+                  this.$message.error(data.msg)
                 }
               })
             } else {
@@ -184,16 +203,6 @@
         }
       },
 
-      upImgSuccess (res, file) {
-        if (res && res.code === 0) {
-          // this.files += res.files[0].id + ','
-          this.formData.avatarUrl = res.url
-        } else {
-          this.$GlobalApi.alertMsg('错误', `${res.msg}`, 1, 3)
-        }
-        // this.files = this.files.substring(0, this.files.length - 1)
-        this.$GlobalApi.log(this.files)
-      },
       beforeUpImg (file) {
         const isJPG = file.type === 'image/jpeg'
         const isGIF = file.type === 'image/gif'
@@ -207,6 +216,15 @@
           this.$message.error('上传图片大小不能超过 20MB!')
         }
         return (isJPG || isGIF || isPNG || isBMP) && isLt20M
+      },
+      upImgSuccess (res, file) {
+        if (res && res.code === 0) {
+          // this.files += res.files[0].id + ','
+          this.formData.avatarUrl = res.url
+        } else {
+          this.$message.error(data.msg)
+        }
+        // this.files = this.files.substring(0, this.files.length - 1)
       },
       upImgError (err, file, fileList) {
         this.formData.avatarUrl = './src/assets/img/img_err.png';
@@ -223,10 +241,9 @@
             params: this.$http.adornParams({})
           }).then(({data}) => {
             if (data && data.code === 0) {
-              console.log(data)
               this.formData = data.user
             } else {
-              this.$GlobalApi.alertMsg('错误', `${data.msg}`, 1, 3)
+              this.$message.error(data.msg)
             }
           })
         }

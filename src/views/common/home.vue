@@ -4,7 +4,7 @@
   </div>
 </template>
 <script>
-  import kuaik from '../modules/home/HomePage'
+  import kuaik from '../modules/report/GeneralSituation'
   export default {
     components: {
       'kuaik': kuaik,

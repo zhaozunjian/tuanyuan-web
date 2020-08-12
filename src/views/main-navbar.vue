@@ -1,7 +1,7 @@
 <template>
   <nav :class="'site-navbar--' + navbarLayoutType" class="site-navbar">
     <div class="site-navbar__header">
-      <h1 @click="$router.push({ name: 'home-homepage' })" class="site-navbar__brand">
+      <h1 @click="$router.push({ name: 'report-GeneralSituation' })" class="site-navbar__brand">
         <a class="site-navbar__brand-lg" href="javascript:;">
           <img alt="团猿" src="../assets/img/logo_new.png" width="70%"/>
         </a>
@@ -26,11 +26,18 @@
         </div>
       </el-menu>
 
+
       <el-menu class="site-navbar__menu site-navbar__menu--right" mode="horizontal">
         <el-menu-item class="site-navbar__avatar sd-sizes" index="3">
+          <el-badge :value="$GlobalApi.getUserInfo().usermsg" class="item">
+            <el-button @click="userSubmit" icon="el-icon-chat-dot-round" size="small" type="text"></el-button>
+          </el-badge>
+          <el-badge :value="$GlobalApi.getUserInfo().machmsg" class="item">
+            <el-button @click="merchanSubmit" icon="el-icon-chat-dot-round" size="small" type="text"></el-button>
+          </el-badge>
           <el-dropdown :show-timeout="0" placement="bottom">
             <span class="el-dropdown-link">
-              <img :alt="$GlobalApi.getUserInfo().userName" :src="$GlobalApi.getUserInfo().avatarUrl">
+              <img :alt="$GlobalApi.getUserInfo().userName" :src="imageServerUrl + $GlobalApi.getUserInfo().avatarUrl">
               <span class="sd-name">{{ $GlobalApi.getUserInfo().userName }}<i class="el-icon-caret-bottom"></i></span>
             </span>
             <el-dropdown-menu slot="dropdown">
@@ -38,7 +45,7 @@
                 <div class="admin-pop">
                   <div class="thumb">
                     <div class="el-dropdown-link">
-                      <img :src="$GlobalApi.getUserInfo().avatarUrl">
+                      <img :src="imageServerUrl + $GlobalApi.getUserInfo().avatarUrl">
                     </div>
                   </div>
                   <ul class="info">
@@ -81,11 +88,13 @@
 <script>
   import UpdatePassword from './main-navbar-update-password'
   import {clearLoginInfo} from '@/utils'
+  import * as SERVER_CONSTANT from "@/assets/js/serverConstant";
 
   export default {
     components: {UpdatePassword},
     data () {
       return {
+        imageServerUrl: SERVER_CONSTANT.imageServerUrl,
         input: '',
         updatePassowrdVisible: false,
         clubName: '',
@@ -144,6 +153,12 @@
       }
     },
     methods: {
+      userSubmit(){
+        this.$router.push({name:'apply-applyUserWithdraw'})
+      },
+      merchanSubmit(){
+        this.$router.push({name:'apply-applyMerchantWithdraw'})
+      },
       // 修改密码
       updatePasswordHandle () {
         this.updatePassowrdVisible = true
@@ -179,14 +194,11 @@
         let UserInfo = this.$GlobalApi.getUserInfo()
         let type = await this.$GlobalApi.confirmMsg('此操作将永久删除当前记录, 是否继续?', '提示', 1)
         if (type == true) {
-          this.$GlobalApi.log('this.dictionariesData.getAll()e', this.dictionariesData.getAll())
           this.dictionariesData.clear()
-          this.$GlobalApi.log('this.dictionariesData.getAll()d', this.dictionariesData.getAll())
           this.dictionariesData.set('userInfo', UserInfo)
-          this.$GlobalApi.log('this.dictionariesData.getAll()h', this.dictionariesData.getAll())
-          this.$GlobalApi.alertMsg('成功', '清除成功！', 1, 0)
+          this.$message.success("清除成功")
         } else {
-          this.$GlobalApi.alertMsg('提示', `已取消清除！`, 1, 1)
+          this.$message.warning("已取消清除")
         }
       },
       setchangeinfo: function (index, menuid) {
@@ -209,6 +221,10 @@
 <style lang="scss" rel="stylesheet/scss" scoped>
   .chosehs .el-dialog__body {
     padding: 30px 20px !important;
+  }
+
+  .el-menu.el-menu--horizontal{
+    border-bottom: none;
   }
 
   .alert {

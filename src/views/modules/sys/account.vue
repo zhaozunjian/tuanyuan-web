@@ -12,7 +12,7 @@
         :header-cell-style="$GlobalApi.rowClass"
         :height="$GlobalApi.getWinHeight() - 260"
         @selection-change="selectionChangeHandle"
-        border
+        border v-loading="accountLoading"
         highlight-current-row
         size="small"
         stripe
@@ -60,7 +60,7 @@
           width="160">
           <template slot-scope="scope">
             <el-button @click="addOrUpdateHandle(scope.row.accId)" size="small" type="text"
-                       v-if="isAuth('sys:account:update')">编辑
+                      v-if="isAuth('sys:account:update')">编辑
             </el-button>
             <el-button @click="deleteHandle(scope.row.accId)" class="sd-delcolor" size="small" type="text"
                        v-if="isAuth('sys:account:delete')">删除
@@ -96,6 +96,7 @@
         dataForm: {
           passport: '',
         },
+        accountLoading:false,
         accountList:[],
         pageIndex: this.$GlobalApi.Constants.DICT.PAGE,
         pageSize: this.$GlobalApi.Constants.DICT.LIMIT,
@@ -113,6 +114,7 @@
     methods: {
       // 获取数据列表
       getDataList () {
+        this.accountLoading =true
         this.$http({
           url: this.$http.adornUrl('/sys/account/list'),
           method: 'get',
@@ -125,9 +127,11 @@
           if (data && data.code === 0) {
             this.accountList = data.page.list
             this.totalPage = data.page.totalCount
+            this.accountLoading =false
           } else {
             this.accountList = []
             this.totalPage = 0
+            this.accountLoading =false
           }
         })
       },
@@ -168,10 +172,10 @@
             data: this.$http.adornParams()
           }).then(({data}) => {
             if (data && data.code === 0) {
-              this.$GlobalApi.alertMsg('成功', '删除成功', 1, 0)
+              this.$message.success("删除成功")
               this.getDataList()
             } else {
-              this.$GlobalApi.alertMsg("错误",`${data.msg}`,1,3);
+              this.$message.error(data.msg)
             }
           })
         })

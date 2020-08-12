@@ -52,6 +52,10 @@ module.exports = {
         include: [resolve('src'), resolve('test')]
       },
       {
+        test: /\.less$/,
+        loader: "style-loader!css-loader!less-loader"
+      },
+      {
         test: /\.svg$/,
         loader: 'svg-sprite-loader',
         include: [resolve('src/icons')]
@@ -99,6 +103,6 @@ module.exports = {
   externals: {
     mockjs: 'Mock',
     echarts: 'echarts',
-    ueditor: 'UE'
+    AMap:'AMap'
   }
 }

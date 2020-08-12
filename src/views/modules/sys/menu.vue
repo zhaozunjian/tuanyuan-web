@@ -135,10 +135,10 @@
             data: this.$http.adornData()
           }).then(({data}) => {
             if (data && data.code === 0) {
-              this.$GlobalApi.alertMsg('成功', `操作成功`, 1, 0)
+              this.$message.success("操作成功")
               this.getDataList()
             } else {
-              this.$GlobalApi.alertMsg('失败', data.msg, 1, 3)
+              this.$message.error(data.msg)
             }
           })
         }).catch(() => {})

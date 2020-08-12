@@ -118,12 +118,9 @@
                   }
                 })
               } else {
-                this.$GlobalApi.alertMsg("错误",`${data.msg}`,1,3);
+                this.$message.error(data.msg)
               }
               this.vloading = false
-            }).catch(e => {
-              this.vloading = false
-              this.$GlobalApi.alertMsg("错误",`修改失败：${e}`,1,3);
             })
           }
         })

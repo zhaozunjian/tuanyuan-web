@@ -6,6 +6,11 @@ const path = require('path')
 const devEnv = require('./dev.env')
 
 module.exports = {
+  configureWebpack: {
+    externals: {
+      AMap: 'AMap' // 高德地图配置
+    }
+  },
   dev: {
 
     // Paths
@@ -14,7 +19,7 @@ module.exports = {
     // 代理列表, 是否开启代理通过[./dev.env.js]配置
     proxyTable: devEnv.OPEN_PROXY === false ? {} : {
       '/proxyApi': {
-        target: 'http://127.0.0.1:8088',
+        target: 'http://192.168.2.128:8088',
         changeOrigin: true,
         pathRewrite: {
           '^/proxyApi': ''

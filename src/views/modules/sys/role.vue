@@ -116,7 +116,7 @@
             this.dataList = data.page.list
             this.totalPage = data.page.totalCount
           } else {
-            this.$GlobalApi.alertMsg('错误', `${data.msg}`, 1, 3)
+            this.$message.error(data.msg)
             this.dataList = []
             this.totalPage = 0
           }
@@ -160,14 +160,14 @@
             params: this.$http.adornParams({roleIds:ids})
           }).then(({data}) => {
             if (data && data.code === 0) {
-              this.$GlobalApi.alertMsg('成功', '删除成功', 1, 0)
+              this.$message.success("删除成功")
               this.getDataList()
             } else {
-              this.$GlobalApi.alertMsg("错误", `${data.msg}`, 1, 3);
+              this.$message.error(data.msg)
             }
           })
         } else if (type === false) {
-          this.$GlobalApi.alertMsg('提示', '已取消删除', 1, 1)
+          this.$message.warning("已取消")
         }
       }
     }

@@ -20,7 +20,7 @@
         :key="item.name"
         :label="item.title"
         :name="item.name"
-        :closable="item.name === 'home-homepage' ? false : true"
+        :closable="item.name === 'report-GeneralSituation' ? false : true"
         style="min-width: 200px"
         v-for="item in mainTabs">
         <el-card :body-style="siteContentViewHeight" class="indexcard">
@@ -108,7 +108,7 @@
       },
       // tabs, 删除tab
       removeTabHandle (tabName) {
-        if (tabName == 'home-homepage') {
+        if (tabName == 'report-GeneralSituation') {
           return false
         } else {
           this.mainTabs = this.mainTabs.filter(item => item.name !== tabName)
@@ -121,7 +121,7 @@
             }
           } else {
             this.menuActiveName = ''
-            this.$router.push({name: 'home-homepage'})
+            this.$router.push({name: 'report-GeneralSituation'})
           }
         }
       },
@@ -138,8 +138,8 @@
         if (this.mainTabs.length > 1){
           this.mainTabs = []
           this.menuActiveName = ''
-          this.$router.push({name: 'home-homepage'})
         }
+        this.$router.push({name: 'report-GeneralSituation'})
       },
       // tabs, 刷新当前
       tabsRefreshCurrentHandle (){

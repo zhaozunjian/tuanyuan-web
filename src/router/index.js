@@ -27,7 +27,7 @@ const mainRoutes = {
   path: '/',
   component: _import('main'),
   name: 'main',
-  redirect: {name: 'home-homepage'},
+  redirect: {name: 'report-GeneralSituation'},
   meta: {title: '主入口整体布局'},
   children: [
     // 通过meta对象设置路由展示方式
@@ -35,17 +35,124 @@ const mainRoutes = {
     // 2. iframeUrl: 是否通过iframe嵌套展示内容, '以http[s]://开头': 是, '': 否
     // 提示: 如需要通过iframe嵌套展示内容, 但不通过tab打开, 请自行创建组件使用iframe处理!
     {
-      path: '/homepage',
-      component: _import('modules/home/HomePage'),
-      name: 'home-homepage',
+      path: '/GeneralSituation',
+      component: _import('modules/report/GeneralSituation'),
+      name: 'report-GeneralSituation',
       meta: {title: '首页', isTab: true}
+      },
+    {
+      path: '/applyUserWithdraw',
+      component: _import('modules/apply/applyUserWithdraw'),
+      name: 'apply-applyUserWithdraw',
+      meta: {title: '用户提现', isTab: true}
+      },
+    {
+      path: '/applyMerchantWithdraw',
+      component: _import('modules/apply/applyMerchantWithdraw'),
+      name: 'apply-applyMerchantWithdraw',
+      meta: {title: '商户提现', isTab: true}
       },
     {
       path: '/userDetail',
       component: _import('modules/sys/userDetail'),
       name: 'userDetail',
       meta: {title: '用户详情', isTab: true}
-      },
+      },{
+      path: '/UpdateBusiness',
+      component: _import('modules/business/UpdateBusiness'),
+      name: 'updateBusiness',
+      meta: {title: '美食酒店商家详情', isTab: true}
+    }
+    ,{
+      path: '/UpdateBusinessCommodity',
+      component: _import('modules/businessCommodity/UpdateBusinessCommodity'),
+      name: 'UpdateBusinessCommodity',
+      meta: {title: '美食酒店商品详情', isTab: true}
+    }
+    ,{
+      path: '/SysOpertionUserBindBusinessList',
+      component: _import('modules/allocation/SysOpertionUserBindBusinessList'),
+      name: 'SysOpertionUserBindBusinessList',
+      meta: {title: '运营人员关联美食酒店商家', isTab: true}
+    }
+    ,{
+      path: '/addBusiness',
+      component: _import('modules/operation/business/addBusiness'),
+      name: 'addBusiness',
+      meta: {title: '添加商家', isTab: true}
+    },
+    {
+      path: '/updateBusinessOperation',
+      component: _import('modules/operation/business/updateBusiness'),
+      name: 'updateBusinessOperation',
+      meta: {title: '修改商家', isTab: true}
+    },
+    {
+      path: '/shoppingDistrictBindBusinessList',
+      component: _import('modules/operation/business/shoppingDistrictBindBusinessList'),
+      name: 'shoppingDistrictBindBusinessList',
+      meta: {title: '商圈列表', isTab: true}
+    },
+    {
+      path: '/BusinessCommodityTagBindBusinessCommodityList',
+      component: _import('modules/operation/business/BusinessCommodityTagBindBusinessCommodityList'),
+      name: 'BusinessCommodityTagBindBusinessCommodityList',
+      meta: {title: '商品标签', isTab: true}
+    },
+    {
+      path: '/BusinessCommodityDailyLimited',
+      component: _import('modules/operation/business/BusinessCommodityDailyLimited'),
+      name: 'BusinessCommodityDailyLimited',
+      meta: {title: '每日限量', isTab: true}
+    },
+    {
+      path: '/BusinessTagBindBusinessList',
+      component: _import('modules/operation/business/BusinessTagBindBusinessList'),
+      name: 'BusinessTagBindBusinessList',
+      meta: {title: '商家标签', isTab: true}
+    },
+    {
+      path: '/businessIncome',
+      component: _import('modules/operation/business/businessIncome'),
+      name: 'businessIncome',
+      meta: {title: '商家收益', isTab: true}
+    },
+    {
+      path: '/businessList',
+      component: _import('modules/operation/business/businessList'),
+      name: 'businessList',
+      meta: {title: '商家列表', isTab: true}
+    },
+    {
+      path: '/addBusinessCommodity',
+      component: _import('modules/operation/business/addBusinessCommodity'),
+      name: 'addBusinessCommodity',
+      meta: {title: '添加商家商品', isTab: true}
+    },
+    {
+      path: '/updateBusinessCommodityOperation',
+      component: _import('modules/operation/business/updateBusinessCommodity'),
+      name: 'updateBusinessCommodityOperation',
+      meta: {title: '修改商家商品', isTab: true}
+    },
+    {
+      path: '/updateBusinessCommodityBargain',
+      component: _import('modules/operation/business/updateBusinessCommodityBargain'),
+      name: 'updateBusinessCommodityBargain',
+      meta: {title: '砍价设置', isTab: true}
+    },
+    {
+      path: '/businessCommodityList',
+      component: _import('modules/operation/business/businessCommodityList'),
+      name: 'businessCommodityList',
+      meta: {title: '商品列表', isTab: true}
+    },
+    {
+      path: '/merchantBindMerchantUsersList',
+      component: _import('modules/merchant/merchantBindMerchantUsersList'),
+      name: 'merchantBindMerchantUsersList',
+      meta: {title: '店员列表', isTab: true}
+    },
   ],
   beforeEnter (to, from, next) {
     let token = Vue.cookie.get('token')
