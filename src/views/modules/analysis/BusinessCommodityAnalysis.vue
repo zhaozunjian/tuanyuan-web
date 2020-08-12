@@ -10,7 +10,7 @@
           range-separator="至"
           start-placeholder="开始日期"
           end-placeholder="结束日期"
-          value-format="timestamp"
+          value-format="yyyy-MM-dd"
           :picker-options="pickerOptions">
         </el-date-picker>
         <el-input class="sd-input-150" clearable placeholder="搜索商品名称" size="small" v-model.trim="searchContent"/>
@@ -372,7 +372,7 @@ export default {
       this.getBusinessCommodityList()
     },
     getBusinessCommodityList() {
-      if (this.chooseTimes.length>0) {
+      if (this.chooseTimes != null && this.chooseTimes != '') {
         let startTime = this.chooseTimes[0]
         let endTime = this.chooseTimes[1]
         this.$http({

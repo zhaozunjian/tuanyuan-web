@@ -10,7 +10,7 @@
           range-separator="至"
           start-placeholder="开始日期"
           end-placeholder="结束日期"
-          value-format="timestamp"
+          value-format="yyyy-MM-dd"
           :picker-options="pickerOptions">
         </el-date-picker>
         <el-button @click="handleClick()" class="sd-mag-l-10" icon="el-icon-search" size="small" type="primary">查询</el-button>
@@ -105,7 +105,7 @@ export default {
       this.initReportData()
     },
     initReportData() {
-      if (this.chooseTimes.length>0) {
+      if (this.chooseTimes != null && this.chooseTimes != '') {
         let startTime = this.chooseTimes[0]
         let endTime = this.chooseTimes[1]
         this.$http({

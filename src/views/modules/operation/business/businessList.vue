@@ -29,10 +29,10 @@
           </template>
         </el-table-column>
         <el-table-column label="商户码" prop="identificationCode"></el-table-column>
-        <el-table-column label="操作" width="260px">
+        <el-table-column label="操作" width="200px">
           <template slot-scope="scope">
             <el-button @click="handleCommodityList(scope.row)" size="small" type="text">查看商品</el-button>
-            <el-button @click="handleShoppingDistrictBindBusinessList(scope.row)" size="small" type="text">查看商圈</el-button>
+            <!--<el-button @click="handleShoppingDistrictBindBusinessList(scope.row)" size="small" type="text">查看商圈</el-button>-->
             <el-button @click="handleEdit(scope.$index, scope.row)" size="small" type="text">编辑</el-button>
             <el-button @click="handleDelete(scope.$index, scope.row)" size="small" type="text">删除</el-button>
           </template>
@@ -130,15 +130,7 @@ export default {
         });
       }
     },
-    handleShoppingDistrictBindBusinessList(row) {
-      this.$router.push({
-        name: "shoppingDistrictBindBusinessList",
-        query: {
-          businessId: row.businessId,
-          businessName: row.businessName
-        }
-      });
-    },
+
     handleBusinessTagBindBusinessList() {
       if (this.dataListSelections.length == 1){
         this.$router.push({

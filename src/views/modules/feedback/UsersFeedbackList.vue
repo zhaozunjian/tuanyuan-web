@@ -29,7 +29,7 @@
         label="联系人手机"
         prop="contactPhone">
       </el-table-column>
-      <el-table-column fixed="right" label="操作" width="120px">
+      <el-table-column label="操作" width="120px">
         <template slot-scope="scope">
           <el-button @click="handleEdit(scope.row.usersFeedbackId)" size="small" type="text">查看</el-button>
           <el-button @click="handleDelete(scope.row.usersFeedbackId)" size="small" type="text">删除</el-button>

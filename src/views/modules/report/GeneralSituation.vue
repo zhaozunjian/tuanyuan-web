@@ -68,10 +68,10 @@
             }
           },
           legend: {
-            data:['订单']
+            data:['已完成','待使用']
           },
           xAxis: {
-            data: ["1","10","20","30"],
+            data: ["7","10","20","30"],
             name: '单位:天',
           },
           yAxis: {
@@ -79,8 +79,12 @@
             name: '订单/单'
           },
           series: [{
-            name: '订单',
-            type: 'bar',
+            name: '已完成',
+            type: 'line',
+            data: []
+          },{
+            name: '待使用',
+            type: 'line',
             data: []
           }]
         };
@@ -100,10 +104,10 @@
             }
           },
           legend: {
-            data:['金额']
+            data:['已完成','待使用']
           },
           xAxis: {
-            data: ["1","10","20","30"],
+            data: ["7","10","20","30"],
             name: '单位:天',
           },
           yAxis: {
@@ -111,7 +115,11 @@
             name: '金额/元'
           },
           series: [{
-            name: '金额',
+            name: '已完成',
+            type: 'line',
+            data: []
+          },{
+            name: '待使用',
             type: 'line',
             data: []
           }]
@@ -130,7 +138,9 @@
             this.vivitorCount = data.result.vivitorCount
             this.moneyCount = data.result.moneyCount
             option.series[0].data = data.result.orderTotle.split(",");
+            option.series[1].data = data.result.orderUnusedTotle.split(",");
             option2.series[0].data = data.result.moneyTotle.split(",");
+            option2.series[1].data = data.result.moneyUnusedTotle.split(",");
             myChart.setOption(option);
             myChart2.setOption(option2);
           } else {
@@ -139,7 +149,7 @@
         })
       }
     },
-    activated(){
+    mounted(){
       this.getlist();
     }
   }

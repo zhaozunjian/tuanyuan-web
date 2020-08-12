@@ -3,6 +3,7 @@
     <el-card class="box-card" v-show="!openMap">
       <div class="text item">
         <el-button @click="submitForm" icon="el-icon-document" size="small" type="primary">保存</el-button>
+        <el-button @click="handleShoppingDistrictBindBusinessList" icon="el-icon-document" size="small" type="primary">查看商圈</el-button>
         <el-button @click="handleBusinessTagBindBusinessList" icon="el-icon-document" size="small" type="primary">标签列表</el-button>
         <el-button @click="handleMerchantBindMerchantUsersList" icon="el-icon-document" size="small" type="primary">店员列表</el-button>
         <el-button @click="handleBusinessIncome" icon="el-icon-document" size="small" type="primary">营业数据</el-button>
@@ -261,7 +262,7 @@ export default {
         businessDetailImage: [
           { required: true, message: "请选择详情图片", trigger: "blur" }
         ],
-        businessContactPhone: [{validator: this.$Utils.validPhone, required: true, trigger: 'change'}],
+        // businessContactPhone: [{validator: this.$Utils.validPhone, required: true, trigger: 'change'}],
       },
       gaodeLocation: {
         formattedAddress: "",
@@ -460,6 +461,15 @@ export default {
         query: {
           merchantId:this.merchantId,
           merchantName: this.businessName
+        }
+      });
+    },
+    handleShoppingDistrictBindBusinessList() {
+      this.$router.push({
+        name: "shoppingDistrictBindBusinessList",
+        query: {
+          businessId: this.businessId,
+          businessName: this.businessName
         }
       });
     },
