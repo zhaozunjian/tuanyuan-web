@@ -18,8 +18,11 @@
             <el-form-item label="商品名称" prop="businessCommodityName">
               <el-input v-model="commodity.businessCommodityName" placeholder="请输入商品名称"></el-input>
             </el-form-item>
+            <el-form-item label="商品副标题" prop="businessCommoditySubTitle">
+              <el-input v-model="commodity.businessCommoditySubTitle" placeholder="请输入商品副标题"></el-input>
+            </el-form-item>
             <el-form-item label="商品描述" prop="businessCommodityDescription">
-              <el-input v-model="commodity.businessCommodityDescription" placeholder="请输入商品描述"></el-input>
+              <el-input type="textarea" autosize v-model="commodity.businessCommodityDescription" placeholder="请输入商品描述"></el-input>
             </el-form-item>
             <el-form-item label="商品详情url" prop="detailContentUrl">
               <el-input v-model="commodity.detailContentUrl" placeholder="请输入商品详情url"></el-input>
@@ -62,6 +65,12 @@
             <el-form-item label="当前库存" prop="stockCount" v-show="commodity.openStock==1">
               <el-input-number v-model="commodity.stockCount" :min="0" :max="1000000"></el-input-number>
             </el-form-item>
+            <el-form-item label="总销量">
+              <el-input-number v-model="commodity.salesTotalCount" :min="0" :max="99999999"></el-input-number>
+            </el-form-item>
+            <el-form-item label="月销量">
+              <el-input-number v-model="commodity.salesCurrentMonthCount" :min="0" :max="99999999"></el-input-number>
+            </el-form-item>
             <el-form-item label="详情内容" prop="detailText">
               <el-input type="textarea" autosize placeholder="请输入详情内容" v-model="commodity.detailText"></el-input>
             </el-form-item>
@@ -82,6 +91,18 @@
                 <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过2MB</div>
               </el-upload>
             </el-form-item>
+            <el-form-item label="轮播图">
+              <el-upload
+                :limit="carouselLimit"
+                :headers="$GlobalApi.getUserToken()"
+                :on-success="carouselOnChange"
+                :before-remove="carouselBeforeRemove"
+                :file-list="carouselFileList"
+                :action="$GlobalApi.getServerUrl('/system/file/businessCommodity/upload')"
+                list-type="picture-card">
+                <i class="el-icon-plus"></i>
+              </el-upload>
+            </el-form-item>
             <el-form-item label="商品海报">
               <el-upload
                 :action="$GlobalApi.getServerUrl('/system/file/businessCommodity/upload')"
@@ -94,18 +115,6 @@
                 <img :src="imageServerUrl + commodityPoster" class="commodityAvatar" v-if="commodityPoster">
                 <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                 <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过2MB</div>
-              </el-upload>
-            </el-form-item>
-            <el-form-item label="轮播图走马灯">
-              <el-upload
-                :limit="carouselLimit"
-                :headers="$GlobalApi.getUserToken()"
-                :on-success="carouselOnChange"
-                :before-remove="carouselBeforeRemove"
-                :file-list="carouselFileList"
-                :action="$GlobalApi.getServerUrl('/system/file/businessCommodity/upload')"
-                list-type="picture-card">
-                <i class="el-icon-plus"></i>
               </el-upload>
             </el-form-item>
             <el-form-item label="商品详情图片">
@@ -156,16 +165,19 @@ export default {
         detailFileArray: "",
         businessId: "",
         businessCommodityName: "",
+        businessCommoditySubTitle: "",
         businessCommodityDescription: "",
         detailContentUrl: "",
         businessCommodityCategoryId: "",
-        priority: 1,
+        priority: 5,
         specsType: 1,
         costPrice: 0,
         originPrice: 0,
         currentPrice: 0,
         openStock: "1",
         stockCount: 10000,
+        salesTotalCount: '',
+        salesCurrentMonthCount: 0,
         detailText: "",
         noticeText: "",
         conSumType: "",
@@ -174,9 +186,6 @@ export default {
       rules: {
         businessCommodityName: [
           { required: true, message: "请输入商品名称", trigger: "blur" }
-        ],
-         businessCommodityDescription: [
-          { required: true, message: "请输入商品描述", trigger: "blur" }
         ],
           priority: [
           { required: true, message: "请选择推荐权重值", trigger: "change" }
@@ -210,7 +219,7 @@ export default {
         },
         {
           value: 5,
-          label: "五级"
+          label: "五级(默认)"
         },
         {
           value: 6,
@@ -443,11 +452,14 @@ export default {
               "noticeText": this.commodity.noticeText,
               "detailText": this.commodity.detailText,
               "stockCount": this.commodity.stockCount,
+              "salesTotalCount": this.commodity.salesTotalCount,
+              "salesCurrentMonthCount": this.commodity.salesCurrentMonthCount,
               "openStock": this.commodity.openStock,
               "currentPrice": this.commodity.currentPrice,
               "originPrice": this.commodity.originPrice,
               "costPrice": this.commodity.costPrice,
               "specsType": 1,
+              "businessCommoditySubTitle":this.commodity.businessCommoditySubTitle,
               "priority": this.commodity.priority,
               "businessId": this.commodity.businessId,
               "businessCommodityName":this.commodity.businessCommodityName,

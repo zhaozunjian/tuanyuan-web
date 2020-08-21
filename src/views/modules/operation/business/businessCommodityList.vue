@@ -25,21 +25,28 @@
       stripe>
       <el-table-column label="ID" prop="businessCommodityId" width="150px"/>
       <el-table-column label="商品名称" prop="businessCommodityName"/>
-      <el-table-column label="成本价(商户所得价)" prop="costPrice"/>
-      <el-table-column label="现价(用户购买价)" prop="currentPrice"/>
-      <el-table-column label="是否开启先砍后付" prop="openBeforeBargainDescription"></el-table-column>
-      <el-table-column label="是否开启每日限量" prop="openDailyLimitedDescription"></el-table-column>
-      <el-table-column label="操作" width="260px">
+      <el-table-column label="成本价" prop="costPrice"/>
+      <el-table-column label="现价" prop="currentPrice"/>
+      <el-table-column label="先砍后付" prop="openBeforeBargainDescription"></el-table-column>
+      <el-table-column label="每日限量" prop="openDailyLimitedDescription"></el-table-column>
+      <el-table-column label="售卖时间限制" prop="openContractTimeDescription"></el-table-column>
+      <el-table-column label="上下架状态" prop="businessCommodityStatusDescription"></el-table-column>
+      <el-table-column label="操作" width="280px">
         <template slot-scope="scope">
-          <el-button size="small" type="text" @click="handleCommodityTagBindCommodity(scope.row)">标签列表</el-button>
-          <el-button size="small" type="text" @click="handleSpecialAmountDivide(scope.row)">修改分成</el-button>
-          <el-button size="small" type="text" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-          <el-button size="small" type="text" @click="handleDelete(scope.row.businessCommodityId)">删除</el-button>
+          <el-button size="small" type="text" v-if="isAuth('business:tag:show')" @click="handleCommodityTagBindCommodity(scope.row)">标签列表</el-button>
+          <el-button size="small" type="text" @click="handleContractTime(scope.$index, scope.row)">售卖时间限制</el-button>
+          <el-button size="small" type="text" @click="handleStatus(scope.row.businessCommodityId)">状态切换</el-button>
+          <el-button size="small" type="text" v-if="isAuth('business:commodity:update')" @click="handleSpecialAmountDivide(scope.row)">修改分成</el-button>
+          <el-button size="small" type="text" v-if="isAuth('business:commodity:update')" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+          <el-button size="small" type="text" @click="handleExpand(scope.$index, scope.row)">扩展信息</el-button>
+          <el-button size="small" type="text" @click="handleExternalSupport(scope.$index, scope.row)">第三方支持</el-button>
+          <el-button size="small" type="text" v-if="isAuth('business:commodity:show')" @click="handleShow(scope.$index, scope.row)">查看</el-button>
+          <el-button size="small" type="text" v-if="isAuth('business:commodity:delete')" @click="handleDelete(scope.row.businessCommodityId)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
     <div class="sd-leftbutton">
-      <el-button @click="handleAddCommodity()" icon="el-icon-plus" size="small" type="primary">新增</el-button>
+      <el-button v-if="isAuth('business:commodity:add')" @click="handleAddCommodity()" icon="el-icon-plus" size="small" type="primary">新增</el-button>
     </div>
     <div class="sd-rightpage">
       <pager :current-page="currentPage" :page-size="pageSize" :total="total"
@@ -140,10 +147,62 @@ export default {
         }
       });
     },
+    handleExternalSupport(index, row) {
+      if (this.businessId) {
+        let item = row;
+        this.$router.push({
+          path: "BusinessCommodityExternalSupportList",
+          query: {
+            businessId: this.businessId,
+            businessName: this.businessName,
+            businessCommodityId: row.businessCommodityId,
+            businessCommodityName: row.businessCommodityName
+          }
+        });
+      }
+    },
+    handleExpand(index, row) {
+      if (this.businessId) {
+        let item = row;
+        this.$router.push({
+          path: "BusinessCommodityExpand",
+          query: {
+            businessId: this.businessId,
+            businessName: this.businessName,
+            businessCommodityId: row.businessCommodityId,
+            businessCommodityName: row.businessCommodityName
+          }
+        });
+      }
+    },
     handleEdit(index, row) {
       if (this.businessId) {
         this.$router.push({
           name: "updateBusinessCommodityOperation",
+          query: {
+            businessId: this.businessId,
+            businessName: this.businessName,
+            businessCommodityId: row.businessCommodityId,
+            businessCommodityName: row.businessCommodityName
+          }
+        });
+      }
+    },
+    handleShow(index, row) {
+      if (this.businessId) {
+        this.$router.push({
+          name: "UpdateBusinessCommodity",
+          query: {
+            businessCommodityId: row.businessCommodityId
+          }
+        });
+      }
+    },
+    handleContractTime(index, row) {
+      if (this.businessId) {
+        let item = row;
+        this.$router.push({
+          path: "UpdateBusinessCommodityContractTime",
           query: {
             businessId: this.businessId,
             businessName: this.businessName,
@@ -191,6 +250,36 @@ export default {
           this.$message({
             type: "info",
             message: "已取消删除"
+          });
+        });
+    },
+    handleStatus(businessCommodityId) {
+      this.$confirm("此操作将改变商品的上下架状态, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(() => {
+        this.$http({
+          url: this.$http.adornUrl(`/businessCommodity/switchBusinessCommodityStatus`),
+          method: 'get',
+          params: this.$http.adornParams({
+            businessCommodityId: businessCommodityId
+          })
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.$message({
+              type: "success",
+              message: "修改成功!"
+            });
+            this.initData();
+          } else {
+            this.$message.error(data.msg);
+          }
+        })
+        }).catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消操作"
           });
         });
     },

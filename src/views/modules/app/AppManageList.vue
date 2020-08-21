@@ -239,7 +239,7 @@ export default {
         })
       }).then(({data}) => {
         if (data && data.code === 0) {
-          this.form = res.data.result;
+          this.form = data.result;
           this.form.forceUpdate = String(data.result.forceUpdate)
           this.form.targetType = String(data.result.targetType)
           this.form.platformType = String(data.result.platformType)

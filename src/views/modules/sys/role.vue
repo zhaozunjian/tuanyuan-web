@@ -16,12 +16,7 @@
       :cell-style="$GlobalApi.cellClass"
       :data="dataList"
       v-loading="dataListLoading"
-      @selection-change="selectionChangeHandle"
       style="width: 100%;">
-      <el-table-column
-        type="selection"
-        width="50">
-      </el-table-column>
       <el-table-column
         prop="roleId"
         width="140px"
@@ -53,16 +48,16 @@
         label="操作">
         <template slot-scope="scope">
           <el-button v-if="isAuth('sys:role:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.roleId)">修改</el-button>
-          <el-button v-if="isAuth('sys:role:delete')" type="text" size="small" class="sd-delcolor" @click="deleteHandle(scope.row.roleId)">删除</el-button>
+          <!--<el-button v-if="isAuth('sys:role:delete')" type="text" size="small" class="sd-delcolor" @click="deleteHandle(scope.row.roleId)">删除</el-button>-->
         </template>
       </el-table-column>
     </el-table>
-    <div class="sd-leftbutton">
-      <el-button @click="addOrUpdateHandle()" size="small" icon="el-icon-plus" type="primary" v-if="isAuth('sys:role:add')">新增</el-button>
-      <el-select class="sd-others" placeholder="其他操作" size="small" value="其他操作">
-        <el-option @click.native="deleteHandle()" :disabled="dataListSelections.length <= 0" v-if="isAuth('sys:role:delete')" value="批量删除"></el-option>
-      </el-select>
-    </div>
+    <!--<div class="sd-leftbutton">-->
+      <!--<el-button @click="addOrUpdateHandle()" size="small" icon="el-icon-plus" type="primary" v-if="isAuth('sys:role:add')">新增</el-button>-->
+      <!--<el-select class="sd-others" placeholder="其他操作" size="small" value="其他操作">-->
+        <!--<el-option @click.native="deleteHandle()" :disabled="dataListSelections.length <= 0" v-if="isAuth('sys:role:delete')" value="批量删除"></el-option>-->
+      <!--</el-select>-->
+    <!--</div>-->
     <div class="sd-rightpage">
       <pager :current-page="pageIndex" :page-size="pageSize" :total="totalPage"
              @current-change="currentChangeHandle" @handle-size-change="sizeChangeHandle" background/>

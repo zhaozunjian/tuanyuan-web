@@ -15,7 +15,6 @@ import '@/assets/scss/common.scss'
 import '@/assets/scss/search-bottom.css'
 import GlobalApi from './assets/js/common.js'
 import TableTreeColumn from '@/components/table-tree-column'
-import SelectUsers from '@/components/SelectUsers'
 import ChooseAddress from '@/components/ChooseAddress'
 import pager from './components/Pager'
 import { Calendar } from 'element-ui';
@@ -74,7 +73,6 @@ Object.keys(filters).forEach(key=>{Vue.filter(key,filters[key])})
 window.SITE_CONFIG['storeState'] = cloneDeep(store.state);
 
 Vue.component("pager",pager);
-Vue.component("SelectUsers",SelectUsers);
 Vue.component("ChooseAddress",ChooseAddress);
 Vue.component("TableTreeColumn",TableTreeColumn);
 

@@ -7,6 +7,7 @@
         <el-button @click="handleBusinessTagBindBusinessList" icon="el-icon-document" size="small" type="primary">标签列表</el-button>
         <el-button @click="handleMerchantBindMerchantUsersList" icon="el-icon-document" size="small" type="primary">店员列表</el-button>
         <el-button @click="handleBusinessIncome" icon="el-icon-document" size="small" type="primary">营业数据</el-button>
+        <el-button @click="handleContractTime" icon="el-icon-document" size="small" type="primary">合作周期</el-button>
         <div class="box">
           <hr class="sd-hr"/>
           <el-row style="margin-top: 20px;" >
@@ -16,7 +17,7 @@
                   <el-input v-model="business.businessName"></el-input>
                 </el-form-item>
                 <el-form-item label="商家简介" prop="businessDescription">
-                  <el-input v-model="business.businessDescription"></el-input>
+                  <el-input type="textarea" autosize v-model="business.businessDescription"></el-input>
                 </el-form-item>
                 <el-form-item label="商家标语" prop="businessTitle">
                   <el-input v-model="business.businessTitle"></el-input>
@@ -125,7 +126,7 @@
                 <el-form-item label="起送费(最低消费)">
                   <el-input-number v-model="business.minStartDeliveryFee" :min="0" :max="99999999"></el-input-number>
                 </el-form-item>
-                <el-form-item label="商家头像" prop="businessAvatar">
+                <el-form-item label="商家头像">
                   <el-upload
                     :action="$GlobalApi.getServerUrl('/system/file/business/upload')"
                     :before-upload="beforeAvatarUpload"
@@ -139,7 +140,7 @@
                     <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过2MB</div>
                   </el-upload>
                 </el-form-item>
-                <el-form-item label="商家详情图片" prop="businessDetailImage">
+                <el-form-item label="商家详情图片">
                   <el-upload
                     :action="$GlobalApi.getServerUrl('/system/file/business/upload')"
                     :before-upload="beforeDetailImageUpload"
@@ -153,9 +154,34 @@
                     <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过2MB</div>
                   </el-upload>
                 </el-form-item>
-                <!--<el-form-item class="button_submit">-->
-                  <!--<el-button type="primary" @click="submitForm('business')">确认修改商家</el-button>-->
-                <!--</el-form-item>-->
+                <el-form-item label="营业执照图片">
+                  <el-upload
+                    class="avatar-uploader"
+                    :action="$GlobalApi.getServerUrl('/system/file/business/upload')"
+                    :before-upload="beforeoperateImageUpload"
+                    :headers="$GlobalApi.getUserToken()"
+                    :on-error="upImgoperateError"
+                    :on-success="upImgoperateSuccess"
+                    :show-file-list="false">
+                    <img v-if="operateLicense" :src="imageServerUrl + operateLicense" class="businessAvatar" />
+                    <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                    <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过2MB</div>
+                  </el-upload>
+                </el-form-item>
+                <el-form-item label="卫生许可图片">
+                  <el-upload
+                    class="avatar-uploader"
+                    :action="$GlobalApi.getServerUrl('/system/file/business/upload')"
+                    :before-upload="beforehealthImageUpload"
+                    :headers="$GlobalApi.getUserToken()"
+                    :on-error="upImghealthError"
+                    :on-success="upImghealthSuccess"
+                    :show-file-list="false">
+                    <img v-if="healthLicense" :src="imageServerUrl + healthLicense" class="businessAvatar" />
+                    <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                    <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过2MB</div>
+                  </el-upload>
+                </el-form-item>
               </el-form>
             </el-col>
           </el-row>
@@ -220,6 +246,8 @@ export default {
       businessName:'',
       weeks: weekOptions,
       businessAvatar: "",
+      operateLicense: "",
+      healthLicense: "",
       businessDetailImage: "",
       business: {
         businessId: null,
@@ -247,7 +275,9 @@ export default {
         deliveryDistance: 5,
         minStartDeliveryFee: 0,
         businessAvatarFile: "",
-        detailFileArray: ""
+        detailFileArray: "",
+        operateLicenseFile: null,
+        healthLicenseFile: null,
       },
       rules: {
         businessName: [
@@ -290,7 +320,7 @@ export default {
         },
         {
           value: 5,
-          label: "五级"
+          label: "五级(默认)"
         },
         {
           value: 6,
@@ -372,6 +402,54 @@ export default {
       }
       return (isJPG || isGIF || isPNG || isBMP) && isLt20M
     },
+    upImghealthSuccess (res, file) {
+      if (res && res.code === 0) {
+        this.healthLicense = res.url
+      } else {
+        this.$message.error(data.msg)
+      }
+    },
+    upImgoperateSuccess (res, file) {
+      if (res && res.code === 0) {
+        this.operateLicense = res.url
+      } else {
+        this.$message.error(data.msg)
+      }
+    },
+    upImghealthError (err, file, fileList) {
+      this.healthLicense = './src/assets/img/img_err.png';
+    },
+    upImgoperateError (err, file, fileList) {
+      this.operateLicense = './src/assets/img/img_err.png';
+    },
+    beforehealthImageUpload(file) {
+      const isJPG = file.type === 'image/jpeg'
+      const isGIF = file.type === 'image/gif'
+      const isPNG = file.type === 'image/png'
+      const isBMP = file.type === 'image/bmp'
+      const isLt20M = file.size / 20480 / 20480 < 20
+      if (!isJPG && !isGIF && !isPNG && !isBMP) {
+        this.$message.error('上传图片必须是JPG/GIF/PNG/BMP 格式!')
+      }
+      if (!isLt20M) {
+        this.$message.error('上传图片大小不能超过 20MB!')
+      }
+      return (isJPG || isGIF || isPNG || isBMP) && isLt20M
+    },
+    beforeoperateImageUpload(file) {
+      const isJPG = file.type === 'image/jpeg'
+      const isGIF = file.type === 'image/gif'
+      const isPNG = file.type === 'image/png'
+      const isBMP = file.type === 'image/bmp'
+      const isLt20M = file.size / 20480 / 20480 < 20
+      if (!isJPG && !isGIF && !isPNG && !isBMP) {
+        this.$message.error('上传图片必须是JPG/GIF/PNG/BMP 格式!')
+      }
+      if (!isLt20M) {
+        this.$message.error('上传图片大小不能超过 20MB!')
+      }
+      return (isJPG || isGIF || isPNG || isBMP) && isLt20M
+    },
     switchOpenMap() {
       this.openMap = !this.openMap;
     },
@@ -412,6 +490,8 @@ export default {
             this.gaodeLocation.formattedAddress = this.business.addressProbably;
             this.businessAvatar =data.result.businessAvatar;
             this.businessDetailImage =data.result.detailUrlList;
+            this.operateLicense = data.result.operateLicense
+            this.healthLicense = data.result.healthLicense
             this.businessLoading = false
           } else {
             this.businessLoading = false
@@ -454,6 +534,15 @@ export default {
           businessName: this.businessName
         }
       });
+    },
+    handleContractTime() {
+      this.$router.push({
+        name: "UpdateBusinessContractTime",
+        query: {
+          businessId: this.businessId,
+          businessName: this.businessName
+        }
+      })
     },
     handleMerchantBindMerchantUsersList() {
       this.$router.push({
@@ -499,6 +588,8 @@ export default {
               "minStartDeliveryFee":this.business.minStartDeliveryFee,
               "deliveryDistance":this.business.deliveryDistance,
               "averagePrice":this.business.averagePrice,
+              "operateLicenseFile":this.operateLicense,
+              "healthLicenseFile":this.healthLicense,
               "dayOperateTime":dayOperateTimeArr,
               "weekOperateTime":this.business.weekOperateTime,
               "businessName":this.business.businessName,

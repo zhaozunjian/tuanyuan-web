@@ -35,7 +35,7 @@ const mainRoutes = {
     // 2. iframeUrl: 是否通过iframe嵌套展示内容, '以http[s]://开头': 是, '': 否
     // 提示: 如需要通过iframe嵌套展示内容, 但不通过tab打开, 请自行创建组件使用iframe处理!
     {
-      path: '/GeneralSituation',
+      path: '/report-GeneralSituation',
       component: _import('modules/report/GeneralSituation'),
       name: 'report-GeneralSituation',
       meta: {title: '首页', isTab: true}
@@ -43,37 +43,130 @@ const mainRoutes = {
     {
       path: '/applyUserWithdraw',
       component: _import('modules/apply/applyUserWithdraw'),
-      name: 'apply-applyUserWithdraw',
+      name: 'applyUserWithdraw',
       meta: {title: '用户提现', isTab: true}
+      },
+    {
+      path: '/OrdersRefundApply',
+      component: _import('modules/apply/OrdersRefundApply'),
+      name: 'OrdersRefundApply',
+      meta: {title: '订单退款', isTab: true}
+      },
+    {
+      path: '/AddHeadquarter',
+      component: _import('modules/headquarter/AddHeadquarter'),
+      name: 'AddHeadquarter',
+      meta: {title: '添加品牌商', isTab: true}
+      },
+    {
+      path: '/UpdateHeadquarter',
+      component: _import('modules/headquarter/UpdateHeadquarter'),
+      name: 'UpdateHeadquarter',
+      meta: {title: '修改品牌商', isTab: true}
+      },
+    {
+      path: '/HeadquarterBindBusinessList',
+      component: _import('modules/headquarter/HeadquarterBindBusinessList'),
+      name: 'HeadquarterBindBusinessList',
+      meta: {title: '商家列表', isTab: true}
+      },
+    {
+      path: '/HeadquarterCutBusinessCommodityList',
+      component: _import('modules/headquarter/HeadquarterCutBusinessCommodityList'),
+      name: 'HeadquarterCutBusinessCommodityList',
+      meta: {title: '商品抽成列表', isTab: true}
       },
     {
       path: '/applyMerchantWithdraw',
       component: _import('modules/apply/applyMerchantWithdraw'),
-      name: 'apply-applyMerchantWithdraw',
+      name: 'applyMerchantWithdraw',
       meta: {title: '商户提现', isTab: true}
       },
     {
-      path: '/userDetail',
-      component: _import('modules/sys/userDetail'),
-      name: 'userDetail',
-      meta: {title: '用户详情', isTab: true}
-      },{
+      path: '/ApplyShareHead',
+      component: _import('modules/apply/ApplyShareHead'),
+      name: 'ApplyShareHead',
+      meta: {title: '分销团长申请', isTab: true}
+      },
+    {
+      path: '/BusinessContractTime',
+      component: _import('modules/business/BusinessContractTime'),
+      name: 'BusinessContractTime',
+      meta:{title: '将过期商家列表', isTab: true}
+    },{
+      path: '/BusinessCommodityContractTime',
+      component: _import('modules/business/BusinessCommodityContractTime'),
+      name: 'BusinessCommodityContractTime',
+      meta:{title: '将过期商品列表', isTab: true}
+    },{
+      path: '/addDirectStore',
+      component: _import('modules/direct/addDirectStore'),
+      name: 'addDirectStore',
+      meta:{title: '添加直营店', isTab: true}
+    },{
+      path: '/editDirectStore',
+      component: _import('modules/direct/editDirectStore'),
+      name: 'editDirectStore',
+      meta:{title: '修改直营店', isTab: true}
+    }
+    ,{
+      path: '/directCommodityList',
+      component: _import('modules/direct/directCommodityList'),
+      name: 'directCommodityList',
+      meta:{title: '商品列表', isTab: true}
+    }
+    ,{
+      path: '/directsIncome',
+      component: _import('modules/direct/directsIncome'),
+      name: 'directsIncome',
+      meta:{title: '营业数据', isTab: true}
+    },
+    {
+      path: '/UpdateBusinessCommodityContractTime',
+      component: _import('modules/business/UpdateBusinessCommodityContractTime'),
+      name: 'UpdateBusinessCommodityContractTime',
+      meta:{title: '修改商品售卖时间限制', isTab: true}
+    },
+    {
+      path: '/BusinessCommodityExternalSupportList',
+      component: _import('modules/business/BusinessCommodityExternalSupportList'),
+      name: 'BusinessCommodityExternalSupportList',
+      meta:{title: '商品的第三方平台购买支持', isTab: true}
+    },
+    {
+      path: '/BusinessCommodityExpand',
+      component: _import('modules/business/BusinessCommodityExpand'),
+      name: 'BusinessCommodityExpand',
+      meta:{title: '商品扩展信息', isTab: true}
+    },
+    {
+      path: '/UpdateBusinessContractTime',
+      component: _import('modules/business/UpdateBusinessContractTime'),
+      name: 'UpdateBusinessContractTime',
+      meta:{title: '设置合作周期', isTab: true}
+    },{
       path: '/UpdateBusiness',
       component: _import('modules/business/UpdateBusiness'),
       name: 'updateBusiness',
-      meta: {title: '美食酒店商家详情', isTab: true}
+      meta: {title: '商家详情', isTab: true}
     }
     ,{
       path: '/UpdateBusinessCommodity',
       component: _import('modules/businessCommodity/UpdateBusinessCommodity'),
       name: 'UpdateBusinessCommodity',
-      meta: {title: '美食酒店商品详情', isTab: true}
+      meta: {title: '商品详情', isTab: true}
     }
     ,{
       path: '/SysOpertionUserBindBusinessList',
       component: _import('modules/allocation/SysOpertionUserBindBusinessList'),
       name: 'SysOpertionUserBindBusinessList',
       meta: {title: '运营人员关联美食酒店商家', isTab: true}
+    }
+    ,{
+      path: '/SysOperationUserBindHeadquarterList',
+      component: _import('modules/allocation/SysOperationUserBindHeadquarterList'),
+      name: 'SysOperationUserBindHeadquarterList',
+      meta: {title: '运营人员关联品牌商列表', isTab: true}
     }
     ,{
       path: '/addBusiness',

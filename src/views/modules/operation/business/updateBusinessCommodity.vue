@@ -31,8 +31,11 @@
             <el-form-item label="商品名称" prop="businessCommodityName">
               <el-input v-model="commodity.businessCommodityName"></el-input>
             </el-form-item>
+            <el-form-item label="商品副标题" prop="businessCommoditySubTitle">
+              <el-input v-model="commodity.businessCommoditySubTitle"></el-input>
+            </el-form-item>
             <el-form-item label="商品描述" prop="businessCommodityDescription">
-              <el-input v-model="commodity.businessCommodityDescription"></el-input>
+              <el-input type="textarea" autosize v-model="commodity.businessCommodityDescription"></el-input>
             </el-form-item>
             <el-form-item label="详情url" prop="detailContentUrl">
               <el-input v-model="commodity.detailContentUrl"></el-input>
@@ -64,6 +67,12 @@
             </el-form-item>
             <el-form-item label="当前库存" v-show="commodity.openStock==1">
               <el-input-number v-model="commodity.stockCount" :min="0" :max="1000000"></el-input-number>
+            </el-form-item>
+            <el-form-item label="总销量">
+              <el-input-number v-model="commodity.salesTotalCount" :min="0" :max="99999999"></el-input-number>
+            </el-form-item>
+            <el-form-item label="月销量">
+              <el-input-number v-model="commodity.salesCurrentMonthCount" :min="0" :max="99999999"></el-input-number>
             </el-form-item>
             <el-form-item label="详情内容">
               <el-input type="textarea" autosize placeholder="详情内容" v-model="commodity.detailText"></el-input>
@@ -97,7 +106,7 @@
                 <i v-else class="el-icon-plus avatar-uploader-icon"></i>
               </el-upload>
             </el-form-item>
-            <el-form-item label="轮播图走马灯">
+            <el-form-item label="轮播图">
               <el-upload
                 :limit="carouselLimit"
                 :headers="$GlobalApi.getUserToken()"
@@ -154,6 +163,7 @@ export default {
         businessCommodityCategoryIdArray: [],
         commodiyAvatarFile: '',
         commodiyPosterFile: '',
+        businessCommoditySubTitle: "",
         detailFileArray: '',
         businessCommodityId: "",
         businessCommodityName: "",
@@ -173,6 +183,8 @@ export default {
         currentPrice: '',
         openStock: '',
         stockCount: '',
+        salesTotalCount: '',
+        salesCurrentMonthCount: '',
         conSumType: '',
         detailText: '',
         noticeText: ""
@@ -216,7 +228,7 @@ export default {
         },
         {
           value: 5,
-          label: "五级"
+          label: "五级(默认)"
         },
         {
           value: 6,
@@ -379,10 +391,13 @@ export default {
               "detailText": this.commodity.detailText,
               "stockCount": this.commodity.stockCount,
               "openStock": this.commodity.openStock,
+              "salesTotalCount": this.commodity.salesTotalCount,
+              "salesCurrentMonthCount": this.commodity.salesCurrentMonthCount,
               "currentPrice": this.commodity.currentPrice,
               "originPrice": this.commodity.originPrice,
               "costPrice": this.commodity.costPrice,
               "specsType": 1,
+              "businessCommoditySubTitle": this.commodity.businessCommoditySubTitle,
               "priority": this.commodity.priority,
               "businessId": this.commodity.businessId,
               "businessCommodityName":this.commodity.businessCommodityName,

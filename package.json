@@ -36,7 +36,7 @@
     "svg-sprite-loader": "3.7.3",
     "vue": "2.6.10",
     "vue-amap": "^0.5.10",
-    "vue-cookie": "1.1.4",
+    "vue-cookie": "^1.1.4",
     "vue-router": "3.0.1",
     "vuex": "^3.5.1",
     "vxe-table": "^2.9.15",

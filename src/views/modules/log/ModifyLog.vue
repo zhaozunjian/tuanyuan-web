@@ -18,7 +18,7 @@
         border
         :cell-style="$GlobalApi.cellClassNoEdit">
         <el-table-column prop="id" label="ID" width="150px" show-overflow-tooltip />
-        <el-table-column prop="userName" label="操作者"/>
+        <el-table-column prop="userName" label="操作者" width="120px"/>
         <el-table-column prop="operateTime" label="操作时间" width="140px"/>
         <el-table-column prop="operateIp" label="操作IP" width="120px"/>
         <el-table-column label="提现金额" >

@@ -7,4 +7,8 @@ const getImg = img=>{
 const getTime=time =>{
     return moment(time).format('YYYY-MM-DD HH:mm:ss ')
 }
-export default {getImg,getTime}
+
+const getTimeNoHour = time => {
+  return moment(time).format('YYYY-MM-DD')
+}
+export default {getImg,getTime,getTimeNoHour}

@@ -29,17 +29,25 @@
           </template>
         </el-table-column>
         <el-table-column label="商户码" prop="identificationCode"></el-table-column>
+        <el-table-column label="合作结束时间">
+          <template slot-scope="scope">
+            <div>{{scope.row.contractEndTime | getTimeNoHour(scope.row.contractEndTime)}}</div>
+          </template>
+        </el-table-column>
+        <el-table-column label="上下线状态" prop="businessStatusDescription"></el-table-column>
         <el-table-column label="操作" width="200px">
           <template slot-scope="scope">
             <el-button @click="handleCommodityList(scope.row)" size="small" type="text">查看商品</el-button>
-            <!--<el-button @click="handleShoppingDistrictBindBusinessList(scope.row)" size="small" type="text">查看商圈</el-button>-->
-            <el-button @click="handleEdit(scope.$index, scope.row)" size="small" type="text">编辑</el-button>
-            <el-button @click="handleDelete(scope.$index, scope.row)" size="small" type="text">删除</el-button>
+            <!--<el-button size="small" type="text" @click="handleContractTime(scope.$index, scope.row)">合作周期</el-button>-->
+            <el-button size="small" type="text" @click="handleStatus(scope.$index, scope.row)">状态切换</el-button>
+            <el-button v-if="isAuth('business:show')" @click="handleShow(scope.$index, scope.row)" size="small" type="text">查看</el-button>
+            <el-button v-if="isAuth('business:update')" @click="handleEdit(scope.$index, scope.row)" size="small" type="text">编辑</el-button>
+            <el-button v-if="isAuth('business:delete')" @click="handleDelete(scope.$index, scope.row)" size="small" type="text">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
       <div class="sd-leftbutton">
-        <el-button @click="addBusiness()" icon="el-icon-plus" size="small" type="primary">新增</el-button>
+        <el-button v-if="isAuth('business:add')" @click="addBusiness()" icon="el-icon-plus" size="small" type="primary">新增</el-button>
       </div>
       <div class="sd-rightpage">
         <pager :current-page="currentPage" :page-size="pageSize" :total="total"
@@ -77,8 +85,16 @@ export default {
         }
       });
     },
+    handleShow(index, row) {
+      this.$router.push({
+        name: "updateBusiness",
+        query: {
+          businessId: row.businessId
+        }
+      });
+    },
     handleDelete(index, row) {
-      this.$confirm(`确定对[id=${row.businessId}]进行删除操作?`, '提示', {
+      this.$confirm(`确认删除该商家并解除绑定关联吗?删除将导致该商家的所有商品也同时删除`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -98,6 +114,32 @@ export default {
           }
         })
       })
+    },
+    handleStatus(index, row) {
+      this.$confirm("确认修改该商家的上下线状态吗?下线将导致该商家所有商品也将下架", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(() => {
+        this.$http({
+          url: this.$http.adornUrl('/business/switchBusinessStatus'),
+          method: 'get',
+          params: this.$http.adornParams({
+            businessId: row.businessId
+          })
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.initData();
+          } else {
+            this.$message.error(data.msg)
+          }
+        })
+      }).catch(() => {
+        this.$message({
+          type: "info",
+          message: "已取消操作"
+        });
+      });
     },
     handleCommodityList(row) {
       this.$router.push({

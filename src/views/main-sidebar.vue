@@ -2,12 +2,12 @@
   <aside class="site-sidebar" :class="'site-sidebar--' + sidebarLayoutSkin">
     <div class="site-sidebar__inner">
       <el-menu
-        :default-active="menuActiveName || 'home'"
+        :default-active="menuActiveName"
         :collapse="sidebarFold"
         :collapseTransition="false"
         class="site-sidebar__menu">
         <sub-menu
-          v-for="menu in menuList[getChildMenuIdx] != null && menuList[getChildMenuIdx] != undefined ? menuList[getChildMenuIdx].list:''"
+          v-for="menu in menuList"
           :key="menu.menuId"
           :menu="menu"
           :dynamicMenuRoutes="dynamicMenuRoutes"
@@ -72,9 +72,9 @@
           this.$store.commit('common/updateMainTabsActiveName', val)
         }
       },
-      getChildMenuIdx() {
-        return this.$store.state.childMenuIdx ? this.$store.state.childMenuIdx : 0;
-      }
+      // getChildMenuIdx() {
+      //   return this.$store.state.childMenuIdx ? this.$store.state.childMenuIdx : 0;
+      // }
     },
     watch: {
       $route: 'routeHandle'

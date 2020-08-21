@@ -15,7 +15,7 @@
              ref="dataForm"
              @keyup.enter.native="dataFormSubmit()" >
       <el-form-item label="账号" >
-        <span>{{ userName }}</span>
+        <span>{{ nickName }}</span>
       </el-form-item>
       <el-form-item label="原密码" prop="password" >
         <el-input type="password" clearable v-model="dataForm.password"></el-input>
@@ -67,11 +67,11 @@
       }
     },
     computed: {
-      userName: {
-        get () { return this.$GlobalApi.getUserInfo().passport }
+      nickName: {
+        get () { return this.$GlobalApi.getUserInfo().nickName }
       },
       accId:{
-        get () { return this.$GlobalApi.getUserInfo().accId }
+        get () { return this.$GlobalApi.getUserInfo().id }
       },
       mainTabs: {
         get () { return this.$store.state.common.mainTabs },
@@ -95,10 +95,10 @@
 
             this.vloading = true
             this.$http({
-              url: this.$http.adornUrl('/sys/account/password'),
+              url: this.$http.adornUrl('/sys/user/password'),
               method: 'post',
               data: this.$http.adornData({
-                'accId':this.accId,
+                'userId':this.accId,
                 'password': this.dataForm.password,
                 'newPassword': this.dataForm.newPassword
               })

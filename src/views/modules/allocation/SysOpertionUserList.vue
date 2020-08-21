@@ -15,23 +15,14 @@
       highlight-current-row
       size="small"
       stripe>
-      <el-table-column label="头像" prop="avatarUrl" width="100px">
-        <template slot-scope="scope">
-          <el-popover
-            placement="right"
-            popper-class="member-popover"
-            trigger="hover">
-            <img :src="scope.row.avatarUrl" class="tcimg"/>
-            <img :src="scope.row.avatarUrl" class="img" slot="reference"/>
-          </el-popover>
-        </template>
-      </el-table-column>
       <el-table-column label="用户ID" prop="id"/>
       <el-table-column label="用户名称" prop="nickName"/>
       <el-table-column label="关联绑定的美食酒店数量" prop="bindBusinessCount"></el-table-column>
-      <el-table-column label="操作">
+      <el-table-column label="关联绑定的品牌商数量" prop="bindHeadquarterCount"></el-table-column>
+      <el-table-column label="操作" width="230px">
         <template slot-scope="scope">
-          <el-button size="small" type="text" @click="goBindBusinessList(scope.row)">查看关联分配的美食酒店列表</el-button>
+          <el-button size="small" type="text" @click="goBindBusinessList(scope.row)">关联美食酒店列表</el-button>
+          <el-button size="small" type="text" @click="goBindHeadquarterList(scope.row)">关联品牌商列表</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -55,7 +46,7 @@ export default {
       total: this.$GlobalApi.Constants.DICT.TOTAL,
     }
   },
-  mounted() {
+  activated() {
     this.getUsersOperationList();
   },
   methods: {
@@ -93,6 +84,15 @@ export default {
         query: {
           sysOperationUserId:row.id,
           sysOperationUserLoginName:row.nickName
+        }
+      });
+    },
+    goBindHeadquarterList(row) {
+      this.$router.push({
+        path: '/SysOperationUserBindHeadquarterList',
+        query: {
+          sysOperationUserId: row.id,
+          sysOperationUserLoginName: row.nickName
         }
       });
     }

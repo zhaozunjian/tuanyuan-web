@@ -6,21 +6,24 @@
       width="30%"
       @close="$refs['dataForm'].resetFields()"
       :visible.sync="visibleFlag">
-      <el-form :model="dataForm" :rules="dataRule" ref="dataForm" class="sd-form" @keyup.enter.native="dataFormSubmit()"
+      <el-form :model="dataForm" size="small" :rules="dataRule" ref="dataForm" class="sd-form" @keyup.enter.native="dataFormSubmit()"
                label-width="100px">
-        <el-form-item label="帐号" prop="passport">
-          <el-input v-model="dataForm.passport" placeholder="登录帐号建议使用熟悉的邮箱帐号" maxlength="32"></el-input>
+        <el-form-item label="帐号" prop="nickName">
+          <el-input v-model="dataForm.nickName" placeholder="登录帐号" maxlength="32"></el-input>
+        </el-form-item>
+        <el-form-item label="昵称" prop="userName">
+          <el-input v-model="dataForm.userName" placeholder="昵称"></el-input>
         </el-form-item>
         <el-form-item label="密码" prop="pwd">
           <el-input v-model="dataForm.pwd" placeholder="请输入密码" maxlength="16"></el-input>
         </el-form-item>
-        <el-form-item label="用户" prop="userName">
-          <el-input v-model="dataForm.userName" placeholder="用户" @click.native="coachDialog = true"></el-input>
+        <el-form-item label="岗位" prop="roleId">
+          <el-radio-group v-model="dataForm.roleId">
+            <el-radio :label="10">管理</el-radio>
+            <el-radio :label="20">运营</el-radio>
+          </el-radio-group>
         </el-form-item>
-        <el-form-item label="管理员" size="mini" prop="adminlv">
-            <el-switch :active-value="1" :inactive-value="0" v-model="dataForm.adminlv"></el-switch>
-        </el-form-item>
-        <el-form-item label="是否启用" size="mini" prop="status">
+        <el-form-item label="是否启用" size="mini" prop="isuse">
             <el-switch :active-value="1" :inactive-value="0" v-model="dataForm.isuse"></el-switch>
         </el-form-item>
       </el-form>
@@ -29,7 +32,6 @@
       <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
     </span>
     </el-dialog>
-    <select-users :visible.sync="coachDialog" @selected="selectedUser" />
   </div>
 </template>
 <script>
@@ -45,44 +47,50 @@
       return {
         coachDialog:false,
         visibleFlag: false,
-        acctypes: [{code: '1', name: '外部用户'},
-          {code: '0', name: '内部用户'}],
         dataForm: {
-          accId: '',
-          userId: '',
-          passport: '',
-          adminlv: 0,
+          id: '',
+          nickName: '',
+          roleId: 10,
           isuse: 1,
-          pwd: '',
-          userName: ''
+          pwd: ''
         },
         dataRule: {
-          userName: [
-            {required: true, trigger: 'change'}
+          roleId: [
+            {required: true, trigger: 'blur'}
           ],
           pwd: [
             {validator: validatePassword, trigger: 'blur'}
           ],
-          passport: [
+          nickName: [
+            {required: true, trigger: 'blur'},
+          ],
+          userName: [
             {required: true, trigger: 'blur'},
           ]
         },
+        roleList:[],
         isEdit: true
       }
     },
     created() {
-
+      // this.getInit();
     },
     methods: {
-      selectedUser(data){
-        if (null != data){
-          this.dataForm.userId = data[0].id
-          this.dataForm.userName = data[0].nickName
-        }
-      },
+      // getInit(){
+      //   this.$http({
+      //     url: this.$http.adornUrl(`/sys/role/dic`),
+      //     method: 'get',
+      //     params: this.$http.adornParams()
+      //   }).then(({data}) => {
+      //     if (data && data.code === 0) {
+      //       this.roleList = data.info.list
+      //     } else {
+      //       this.$message.error(data.msg)
+      //     }
+      //   })
+      // },
       init(id) {
-        console.log(id)
-        this.dataForm.accId = id || ''
+        this.dataForm.id = id || ''
         if (!id) {
           this.isEdit = false
         } else {
@@ -90,18 +98,13 @@
         }
         if (this.isEdit) {
           this.$http({
-            url: this.$http.adornUrl(`/sys/account/get/${this.dataForm.accId}`),
+            url: this.$http.adornUrl(`/sys/user/get/${this.dataForm.id}`),
             method: 'get',
             params: this.$http.adornParams()
           }).then(({data}) => {
             if (data && data.code === 0) {
-              this.dataForm.accId = data.account.accId
-              this.dataForm.userId = data.account.userId
-              this.dataForm.userName = data.account.userName
-              this.dataForm.pwd = data.account.pwd
-              this.dataForm.passport = data.account.passport
-              this.dataForm.adminlv = data.account.adminlv
-              this.dataForm.isuse = data.account.isuse
+              this.dataForm = data.user
+              this.dataForm.pwd = ''
             } else {
               this.$message.error(data.msg)
             }
@@ -114,15 +117,14 @@
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             this.$http({
-              url: this.$http.adornUrl(`/sys/account/${this.isEdit ? 'update' : 'add'}`),
+              url: this.$http.adornUrl(`/sys/user/${this.isEdit ? 'update' : 'add'}`),
               method: 'post',
               data: this.$http.adornData({
-                'accId': this.dataForm.accId,
-                'userId': this.dataForm.userId,
+                'id': this.dataForm.id,
+                'roleId': this.dataForm.roleId,
+                'nickName': this.dataForm.nickName,
                 'userName': this.dataForm.userName,
-                'adminlv': this.dataForm.adminlv,
                 'pwd': this.dataForm.pwd,
-                'passport': this.dataForm.passport,
                 'isuse': this.dataForm.isuse
               })
             }).then(({data}) => {

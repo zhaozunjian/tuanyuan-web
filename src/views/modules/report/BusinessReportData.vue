@@ -86,7 +86,7 @@ export default {
           if (data && data.code === 0) {
             this.businessReportData = data.result
           } else {
-            this.$message.error(res.data.msg);
+            this.$message.error(data.msg);
           }
         })
       }

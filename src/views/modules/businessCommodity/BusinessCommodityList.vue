@@ -6,6 +6,7 @@
         <el-button @click="getBusinessCommodityList()" class="sd-mag-l-10" icon="el-icon-search" size="small" type="primary">查询
         </el-button>
       </div>
+
       <el-table
         :cell-style="$GlobalApi.cellClass"
         :data="businessCommodityList"

@@ -13,6 +13,7 @@
         <el-tab-pane label="消费完成" name="30"></el-tab-pane>
         <el-tab-pane label="已退款" name="40"></el-tab-pane>
         <el-tab-pane label="已取消" name="50"></el-tab-pane>
+        <el-tab-pane label="已失效" name="61"></el-tab-pane>
       </el-tabs>
       <el-table
         :cell-style="$GlobalApi.cellClass"

@@ -135,11 +135,16 @@
       },
       // tabs, 关闭全部
       tabsCloseAllHandle () {
-        if (this.mainTabs.length > 1){
-          this.mainTabs = []
-          this.menuActiveName = ''
+        if (this.mainTabs.length === 1 && this.mainTabs[0].name === 'report-GeneralSituation'){
+          return false;
+        }else if (this.mainTabs.length > 0) {
+          this.mainTabs = this.mainTabs.filter(item => item.name === 'report-GeneralSituation')
+          this.$router.push({name: 'report-GeneralSituation'})
         }
-        this.$router.push({name: 'report-GeneralSituation'})
+
+        // this.mainTabs = []
+        // this.menuActiveName = ''
+        // this.$router.push({name: 'report-GeneralSituation'})
       },
       // tabs, 刷新当前
       tabsRefreshCurrentHandle (){

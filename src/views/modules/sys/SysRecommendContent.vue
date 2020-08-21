@@ -3,8 +3,9 @@
     <el-tabs v-model="belongPage" @tab-click="handleClick"  type="border-card">
       <el-tab-pane label="首页" name="10">
         <el-tabs v-model="recommendTypeId" @tab-click="handleClick"  type="card">
-          <el-tab-pane label="顶部的轮播图" name="1"></el-tab-pane>
+          <el-tab-pane label="顶部轮播图" name="1"></el-tab-pane>
           <el-tab-pane label="分类栏下广告位" name="2"></el-tab-pane>
+          <el-tab-pane label="首页标签图" name="3"></el-tab-pane>
         </el-tabs>
       </el-tab-pane>
       <el-tab-pane label="余额" name="100">
@@ -20,6 +21,7 @@
             <img :src="scope.row.imageUrl | getImg(scope.row.imageUrl)" alt class="imgclass" />
           </template>
         </el-table-column>
+        <el-table-column prop="observedRole" label="观察者角色"></el-table-column>
         <el-table-column prop="contentTypeName" label="内容类型"></el-table-column>
         <el-table-column prop="contentId" label="内容id"></el-table-column>
         <el-table-column prop="description" label="文字描述作用"></el-table-column>
@@ -38,7 +40,7 @@
         <el-button @click="dialogFormVisibleAdd = true" icon="el-icon-plus" size="small" type="primary">新增</el-button>
       </div>
     </el-tabs>
-    <el-dialog class="code-dialog" width="35%" title="添加轮播图" :visible.sync="dialogFormVisibleAdd" @close="closeDialog">
+    <el-dialog class="code-dialog" width="35%" title="添加内容" :visible.sync="dialogFormVisibleAdd" @close="closeDialog">
       <el-form class="sd-form" label-position="right" label-width="110px" size="small" style="padding-right: 6%" :model="addForm" ref="form">
         <el-form-item label="所属页面">
           <el-select style="width: 100%" v-model.trim="addForm.belongPage" placeholder="请选择所属页面">
@@ -50,9 +52,13 @@
           <el-select style="width: 100%" v-model.trim="addForm.recommendTypeId" placeholder="请选择所处位置">
             <el-option label="顶部的轮播图" value="1" v-if="addForm.belongPage==10"></el-option>
             <el-option label="分类栏下广告位" value="2" v-if="addForm.belongPage==10"></el-option>
+            <el-option label="首页的标签图" value="3" v-if="addForm.belongPage==10"></el-option>
             <el-option label="团猿平台须知" value="1" v-if="addForm.belongPage==100"></el-option>
             <el-option label="团猿平台须知详情" value="2" v-if="addForm.belongPage==100"></el-option>
           </el-select>
+        </el-form-item>
+        <el-form-item label="观察者角色(普通用户,分销师等)">
+          <el-input v-model.trim="addForm.observedRole"></el-input>
         </el-form-item>
         <el-form-item label="内容类型">
           <el-select style="width: 100%" v-model.trim="addForm.contentType" placeholder="请选择内容类型">
@@ -94,7 +100,7 @@
         <el-button size="small" type="primary" @click="submitAdd()">确 定</el-button>
       </div>
     </el-dialog>
-    <el-dialog class="code-dialog" width="35%" title="修改轮播图" :visible.sync="dialogFormVisibleEdit" @close="closeDialog">
+    <el-dialog class="code-dialog" width="35%" title="修改内容" :visible.sync="dialogFormVisibleEdit" @close="closeDialog">
       <el-form class="sd-form" label-position="right" label-width="110px" size="small" style="padding-right: 6%" :model="editForm" ref="form">
         <el-form-item label="所属页面">
           <el-select style="width: 100%" v-model.trim="editForm.belongPage" placeholder="请选择所属页面">
@@ -102,10 +108,14 @@
             <el-option label="余额" value="100"></el-option>
           </el-select>
         </el-form-item>
+        <el-form-item label="观察者角色(普通用户,分销师等)">
+          <el-input v-model.trim="editForm.observedRole"></el-input>
+        </el-form-item>
         <el-form-item label="所处位置">
           <el-select style="width: 100%" v-model.trim="editForm.recommendTypeId" placeholder="请选择活动区域">
             <el-option label="顶部的轮播图" value="1" v-if="editForm.belongPage==10"></el-option>
             <el-option label="分类栏下广告位" value="2" v-if="editForm.belongPage==10"></el-option>
+            <el-option label="首页的标签图" value="3" v-if="editForm.belongPage==10"></el-option>
             <el-option label="团猿平台须知" value="1" v-if="editForm.belongPage==100"></el-option>
             <el-option label="团猿平台须知详情" value="2" v-if="editForm.belongPage==100"></el-option>
           </el-select>
@@ -168,6 +178,7 @@ export default {
       addForm: {
         belongPage: "10",
         recommendTypeId: "1",
+        observedRole: "0",
         contentType: "0",
         contentId: "",
         weight: 0,
@@ -179,6 +190,7 @@ export default {
         belongPage: "",
         recommendTypeId: "",
         contentType: "",
+        observedRole: "",
         contentId: "",
         imageUrl: "",
         weight: 0,
@@ -274,6 +286,7 @@ export default {
           recommendTypeId:this.addForm.recommendTypeId,
           contentId:this.addForm.contentId,
           contentType:this.addForm.contentType,
+          observedRole: this.editForm.observedRole,
           file:this.addForm.imageUrl,
           description:this.addForm.description,
           weight:this.addForm.weight

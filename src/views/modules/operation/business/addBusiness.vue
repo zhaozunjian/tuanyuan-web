@@ -12,7 +12,7 @@
                   <el-input v-model="business.businessName"></el-input>
                 </el-form-item>
                 <el-form-item label="商家简介" prop="businessDescription">
-                  <el-input v-model="business.businessDescription"></el-input>
+                  <el-input type="textarea" autosize v-model="business.businessDescription"></el-input>
                 </el-form-item>
                 <el-form-item label="商家标语" prop="businessTitle">
                   <el-input v-model="business.businessTitle"></el-input>
@@ -153,9 +153,34 @@
                     <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过2MB</div>
                   </el-upload>
                 </el-form-item>
-                <!--<el-form-item class="button_submit">-->
-                  <!--<el-button type="primary" @click="submitForm('business')">确认创建商家</el-button>-->
-                <!--</el-form-item>-->
+                <el-form-item label="营业执照图片">
+                  <el-upload
+                    class="avatar-uploader"
+                    :action="$GlobalApi.getServerUrl('/system/file/business/upload')"
+                    :before-upload="beforeoperateImageUpload"
+                    :headers="$GlobalApi.getUserToken()"
+                    :on-error="upImgoperateError"
+                    :on-success="upImgoperateSuccess"
+                    :show-file-list="false">
+                    <img v-if="operateLicense" :src="imageServerUrl + operateLicense" class="businessAvatar" />
+                    <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                    <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过2MB</div>
+                  </el-upload>
+                </el-form-item>
+                <el-form-item label="卫生许可图片">
+                  <el-upload
+                    class="avatar-uploader"
+                    :action="$GlobalApi.getServerUrl('/system/file/business/upload')"
+                    :before-upload="beforehealthImageUpload"
+                    :headers="$GlobalApi.getUserToken()"
+                    :on-error="upImghealthError"
+                    :on-success="upImghealthSuccess"
+                    :show-file-list="false">
+                    <img v-if="healthLicense" :src="imageServerUrl + healthLicense" class="businessAvatar" />
+                    <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                    <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过2MB</div>
+                  </el-upload>
+                </el-form-item>
               </el-form>
             </el-col>
           </el-row>
@@ -218,9 +243,11 @@ export default {
         businessTitle: "",
         businessContactPhone: "",
         detailContentUrl: "",
-        priority: 1,
-        businessAvatarFile: null,
-        detailFileArray: null,
+        priority: 5,
+        businessAvatarFile: '',
+        detailFileArray: '',
+        operateLicenseFile: '',
+        healthLicenseFile: '',
         businessCategoryIdArray: [],
         lng: null,
         lat: null,
@@ -232,7 +259,7 @@ export default {
         dayOperateTime:'',
         dayOperateTimeList: [{
           startTime: '00:00',
-          endTime: '17:30'
+          endTime: '24:00'
         }],
         averagePrice: 0,
         deliveryDistance: 5,
@@ -242,6 +269,8 @@ export default {
       endTime: "24:00",
       businessAvatar: "",
       businessDetailImage: "",
+      operateLicense: "",
+      healthLicense: "",
       gaodeLocation: {
         formattedAddress: "",
         lnglatResult: null
@@ -259,7 +288,7 @@ export default {
         businessCategoryIdArray: [
           { required: true, message: "请输入商家类别", trigger: "blur" }
         ],
-        businessContactPhone: [{validator: this.$Utils.validPhone, required: true, trigger: 'change'}],
+        // businessContactPhone: [{validator: this.$Utils.validPhone, required: true, trigger: 'change'}],
       },
       openMap: false,
       aMapAutoComplete: undefined,
@@ -283,7 +312,7 @@ export default {
         },
         {
           value: 5,
-          label: "五级"
+          label: "五级(默认)"
         },
         {
           value: 6,
@@ -387,6 +416,54 @@ export default {
       }
       return (isJPG || isGIF || isPNG || isBMP) && isLt20M
     },
+    upImghealthSuccess (res, file) {
+      if (res && res.code === 0) {
+        this.healthLicense = res.url
+      } else {
+        this.$message.error(data.msg)
+      }
+    },
+    upImgoperateSuccess (res, file) {
+      if (res && res.code === 0) {
+        this.operateLicense = res.url
+      } else {
+        this.$message.error(data.msg)
+      }
+    },
+    upImghealthError (err, file, fileList) {
+      this.healthLicense = './src/assets/img/img_err.png';
+    },
+    upImgoperateError (err, file, fileList) {
+      this.operateLicense = './src/assets/img/img_err.png';
+    },
+    beforehealthImageUpload(file) {
+      const isJPG = file.type === 'image/jpeg'
+      const isGIF = file.type === 'image/gif'
+      const isPNG = file.type === 'image/png'
+      const isBMP = file.type === 'image/bmp'
+      const isLt20M = file.size / 20480 / 20480 < 20
+      if (!isJPG && !isGIF && !isPNG && !isBMP) {
+        this.$message.error('上传图片必须是JPG/GIF/PNG/BMP 格式!')
+      }
+      if (!isLt20M) {
+        this.$message.error('上传图片大小不能超过 20MB!')
+      }
+      return (isJPG || isGIF || isPNG || isBMP) && isLt20M
+    },
+    beforeoperateImageUpload(file) {
+      const isJPG = file.type === 'image/jpeg'
+      const isGIF = file.type === 'image/gif'
+      const isPNG = file.type === 'image/png'
+      const isBMP = file.type === 'image/bmp'
+      const isLt20M = file.size / 20480 / 20480 < 20
+      if (!isJPG && !isGIF && !isPNG && !isBMP) {
+        this.$message.error('上传图片必须是JPG/GIF/PNG/BMP 格式!')
+      }
+      if (!isLt20M) {
+        this.$message.error('上传图片大小不能超过 20MB!')
+      }
+      return (isJPG || isGIF || isPNG || isBMP) && isLt20M
+    },
     submitForm() {
       this.$refs['business'].validate(async valid => {
         if (valid) {
@@ -409,6 +486,8 @@ export default {
               "businessName":this.business.businessName,
               "businessDescription":this.business.businessDescription,
               "businessTitle":this.business.businessTitle,
+              "operateLicenseFile":this.operateLicense,
+              "healthLicenseFile":this.healthLicense,
               "businessContactPhone":this.business.businessContactPhone,
               "detailContentUrl":this.business.detailContentUrl,
               "priority":this.business.priority,
@@ -432,6 +511,8 @@ export default {
               Object.assign(this.business, this.$options.data().business)
               this.businessAvatar = ''
               this.businessDetailImage = ''
+              this.operateLicense = ''
+              this.healthLicense = ''
             } else {
               this.$message.error(data.msg)
             }

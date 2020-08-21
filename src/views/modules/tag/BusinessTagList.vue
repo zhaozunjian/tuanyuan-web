@@ -140,7 +140,7 @@ export default {
              }
            })
          }).catch(() => {
-           this.$message.error(res.data.msg);
+           this.$message.error(data.msg);
          })
     },
     submitAdd() {

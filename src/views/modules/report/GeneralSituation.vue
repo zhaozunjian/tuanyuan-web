@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-show="$GlobalApi.getUserInfo().roleId == 10">
     <el-col class="sd-main" style="width: 44.5%">
       <el-card shadow="hover" class="main-flow paddig">
         <div>
@@ -14,7 +14,7 @@
     <el-col class="sd-main" style="width: 25%">
       <el-card shadow="hover" class="main-flow paddig">
         <div class="main-secondary sale-info">
-          <span>今日访客<strong>{{vivitorCount || 0}}</strong></span>
+          <span>今日新增用户<strong>{{vivitorCount || 0}}</strong></span>
         </div>
       </el-card>
     </el-col>
@@ -76,7 +76,7 @@
           },
           yAxis: {
             type: 'value',
-            name: '订单/单'
+            name: '数量/单'
           },
           series: [{
             name: '已完成',

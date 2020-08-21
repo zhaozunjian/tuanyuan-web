@@ -208,7 +208,7 @@
               })
             }).then(({data}) => {
               if (data && data.code === 0) {
-                this.$message.success("新增成功")
+                this.$message.success(!this.dataForm.id ? "新增成功":"修改成功")
                 this.visible = false
                 this.$emit('refreshDataList')
               } else {

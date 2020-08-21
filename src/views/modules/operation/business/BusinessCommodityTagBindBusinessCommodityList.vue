@@ -17,13 +17,12 @@
       <el-table-column prop="businessCommodityTagName" label="标签名称" show-overflow-tooltip></el-table-column>
       <el-table-column label="操作" width="120px">
         <template slot-scope="scope">
-          <el-button size="small" type="text" @click="handleDelete(scope.row)">删除</el-button>
+          <el-button size="small" type="text" v-if="isAuth('business:tag:delete')" @click="handleDelete(scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
     <div class="sd-leftbutton">
-      <el-button @click="addBindTag()" icon="el-icon-plus" size="small" type="primary"
-      >新增
+      <el-button v-if="isAuth('business:tag:add')" @click="addBindTag()" icon="el-icon-plus" size="small" type="primary">新增
       </el-button>
     </div>
     <div class="sd-rightpage">

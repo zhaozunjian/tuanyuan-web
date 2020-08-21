@@ -20,12 +20,10 @@
                     v-model="dataForm.roleId"></el-input>
         </el-form-item>
         <el-form-item label="岗位名称" prop="roleName">
-          <el-input clearable placeholder="岗位名称" size="small" v-model="dataForm.roleName" maxlength="100"></el-input>
+          <el-input disabled placeholder="岗位名称" size="small" v-model="dataForm.roleName"></el-input>
         </el-form-item>
         <el-form-item label="是否启用" prop="isuse">
-          <el-tooltip :content="dataForm.isuse == 1 ? '已启用' : '未启用'" effect="dark" placement="top">
-            <el-switch active-value="1" inactive-value="0" v-model="dataForm.isuse"></el-switch>
-          </el-tooltip>
+          <el-switch :active-value="1" :inactive-value="0" v-model="dataForm.isuse"></el-switch>
         </el-form-item>
       </el-card>
 
@@ -136,7 +134,7 @@
         dataForm: {
           roleId: '',
           roleName: '',
-          isuse: '1',
+          isuse: 1,
           inputter: '',
           inputtime: '',
           modifytime: '',
@@ -244,13 +242,15 @@
         this.$http({
           url: this.$http.adornUrl('/sys/menu/list'),
           method: 'get',
-          params: this.$http.adornParams({})
+          params: this.$http.adornParams({
+            isuse: 1
+          })
         }).then(({data}) => {
           this.MenuDatas = data
           this.menuList = treeDataTranslate(data, 'menuId')
         })
         this.checkMenu = true
-        this.$GlobalApi.log('this.editDatas.menuIds', this.editDatas.menuIds)
+        // this.$GlobalApi.log('this.editDatas.menuIds', this.editDatas.menuIds)
         this.checkMenus = this.editDatas.menuIds
         this.menuLoading = false
       },

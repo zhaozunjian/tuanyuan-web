@@ -17,47 +17,47 @@
         </el-menu-item>
       </el-menu>
 
-      <el-menu class="site-navbar__menu site-navbar__menu--left" mode="horizontal"
-               style="width: 36vw;height:52px;overflow: auto">
-        <div style="float: left" v-for="(name,index) in names">
-          <el-menu-item :class='index==selected?"selected":""' @click="setchangeinfo(index,name.menuId)" index="">
-            {{name.thisname}}
-          </el-menu-item>
-        </div>
-      </el-menu>
+      <!--<el-menu class="site-navbar__menu site-navbar__menu&#45;&#45;left" mode="horizontal"-->
+               <!--style="width: 36vw;height:52px;overflow: auto">-->
+        <!--<div style="float: left" v-for="(name,index) in names">-->
+          <!--<el-menu-item :class='index==selected?"selected":""' @click="setchangeinfo(index,name.menuId)" index="">-->
+            <!--{{name.thisname}}-->
+          <!--</el-menu-item>-->
+        <!--</div>-->
+      <!--</el-menu>-->
 
 
       <el-menu class="site-navbar__menu site-navbar__menu--right" mode="horizontal">
         <el-menu-item class="site-navbar__avatar sd-sizes" index="3">
           <el-badge :value="$GlobalApi.getUserInfo().usermsg" class="item">
-            <el-button @click="userSubmit" icon="el-icon-chat-dot-round" size="small" type="text"></el-button>
+            <el-button @click="userSubmit" icon="el-icon-chat-dot-round" size="small" type="text">用户提现</el-button>
           </el-badge>
           <el-badge :value="$GlobalApi.getUserInfo().machmsg" class="item">
-            <el-button @click="merchanSubmit" icon="el-icon-chat-dot-round" size="small" type="text"></el-button>
+            <el-button @click="merchanSubmit" icon="el-icon-chat-dot-round" size="small" type="text">商户提现</el-button>
           </el-badge>
           <el-dropdown :show-timeout="0" placement="bottom">
             <span class="el-dropdown-link">
-              <img :alt="$GlobalApi.getUserInfo().userName" :src="imageServerUrl + $GlobalApi.getUserInfo().avatarUrl">
-              <span class="sd-name">{{ $GlobalApi.getUserInfo().userName }}<i class="el-icon-caret-bottom"></i></span>
+              <!--<img :alt="$GlobalApi.getUserInfo().userName" :src="imageServerUrl + $GlobalApi.getUserInfo().avatarUrl">-->
+              <span class="sd-name">{{ $GlobalApi.getUserInfo().nickName }}<i class="el-icon-caret-bottom"></i></span>
             </span>
             <el-dropdown-menu slot="dropdown">
               <div class="alert">
                 <div class="admin-pop">
-                  <div class="thumb">
-                    <div class="el-dropdown-link">
-                      <img :src="imageServerUrl + $GlobalApi.getUserInfo().avatarUrl">
-                    </div>
-                  </div>
+                  <!--<div class="thumb">-->
+                    <!--<div class="el-dropdown-link">-->
+                      <!--<img :src="imageServerUrl + $GlobalApi.getUserInfo().avatarUrl">-->
+                    <!--</div>-->
+                  <!--</div>-->
                   <ul class="info">
                     <li>
                       <span>姓名：</span>
-                      <p :title="$GlobalApi.getUserInfo().userName" class="user-type">
-                        {{$GlobalApi.getUserInfo().userName | ellipsis}}</p>
+                      <p :title="$GlobalApi.getUserInfo().nickName" class="user-type">
+                        {{$GlobalApi.getUserInfo().nickName | ellipsis}}</p>
                     </li>
                     <li>
                       <span>岗位：</span>
-                      <p :title="$GlobalApi.getUserInfo().roleName" class="user-type">
-                        {{$GlobalApi.getUserInfo().roleName | ellipsis}}</p>
+                      <p :title="$GlobalApi.getUserInfo().roleId == 10 ? '管理':'运营'" class="user-type">
+                        {{$GlobalApi.getUserInfo().roleId == 10 ? '管理':'运营' | ellipsis}}</p>
                     </li>
                   </ul>
                 </div>
@@ -182,9 +182,9 @@
               clearLoginInfo()
               this.dictionariesData.clear()
               this.$router.push({name: 'login'})
-              // if (this.$cookie.isKey("token")) {
-              //   this.$cookie.remove('token')
-              // }
+              if (this.$cookie.isKey("token")) {
+                this.$cookie.remove('token')
+              }
             }
           })
         }).catch(() => {
@@ -201,19 +201,19 @@
           this.$message.warning("已取消清除")
         }
       },
-      setchangeinfo: function (index, menuid) {
-        this.$store.commit('childMenuIdx', index)
-        this.$store.commit('menuId', menuid)
-        this.selected = index
-      },
-      getlistname () {
-        for (var a = 0; this.menuList.length > a; a++) {
-          this.names.push({thisname: this.menuList[a].mname, menuId: this.menuList[a].menuId})
-        }
-      },
+      // setchangeinfo: function (index, menuid) {
+      //   this.$store.commit('childMenuIdx', index)
+      //   this.$store.commit('menuId', menuid)
+      //   this.selected = index
+      // },
+      // getlistname () {
+      //   for (var a = 0; this.menuList.length > a; a++) {
+      //     this.names.push({thisname: this.menuList[a].mname, menuId: this.menuList[a].menuId})
+      //   }
+      // },
 
     }, mounted () {
-      this.getlistname()
+      // this.getlistname()
       let user = this.$GlobalApi.getUserInfo();
     }
   }
