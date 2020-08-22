@@ -1,13 +1,13 @@
 <template>
   <el-card>
-    <el-tabs v-model="ordersRefundResultStatus" @tab-click="tabClick"  type="border-card">
+    <el-tabs v-model="ordersRefundResultStatus" @tab-click="tabClick"  type="card">
       <el-tab-pane label="申请中" name="0"></el-tab-pane>
       <el-tab-pane label="已同意" name="1"></el-tab-pane>
       <el-tab-pane label="已拒绝" name="2"></el-tab-pane>
     </el-tabs>
     <el-table :data="ordersRefundApplyList" :cell-style="$GlobalApi.cellClass"
               :header-cell-style="$GlobalApi.rowClass"
-              :height="$GlobalApi.getWinHeight() - 300"
+              :height="$GlobalApi.getWinHeight() - 280"
               border
               highlight-current-row
               size="small"

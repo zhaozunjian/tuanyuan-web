@@ -21,7 +21,7 @@
                   <el-date-picker
                     v-model="contractEndTime"
                     type="date"
-                    value-format="timestamp"
+                    value-format="yyyy-MM-dd"
                     placeholder="选择日期">
                   </el-date-picker>
                 </div>
@@ -43,7 +43,7 @@
         businessCommodityName: '',
         form: {},
         openContractTime: "0",
-        contractEndTime: 0
+        contractEndTime: ''
       }
     },
     mounted() {

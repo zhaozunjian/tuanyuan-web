@@ -93,6 +93,7 @@
   export default {
     components: {UpdatePassword},
     data () {
+
       return {
         imageServerUrl: SERVER_CONSTANT.imageServerUrl,
         input: '',
@@ -116,6 +117,7 @@
         return value
       }
     },
+
     computed: {
       navbarLayoutType: {
         get () {

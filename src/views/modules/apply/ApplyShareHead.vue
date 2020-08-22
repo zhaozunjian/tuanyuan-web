@@ -1,13 +1,13 @@
 <template>
   <el-card>
-    <el-tabs v-model="applyStatus" @tab-click="handleTabClick"  type="border-card">
+    <el-tabs v-model="applyStatus" @tab-click="handleTabClick"  type="card">
       <el-tab-pane label="申请中" name="1"></el-tab-pane>
       <el-tab-pane label="已批准" name="2"></el-tab-pane>
       <el-tab-pane label="已拒绝" name="3"></el-tab-pane>
     </el-tabs>
     <el-table :data="applyShareHeadList" :cell-style="$GlobalApi.cellClass"
               :header-cell-style="$GlobalApi.rowClass"
-              :height="$GlobalApi.getWinHeight() - 300"
+              :height="$GlobalApi.getWinHeight() - 280"
               border
               highlight-current-row
               size="small"
@@ -23,7 +23,7 @@
           <span>{{scope.row.createTime | getTime(scope.row.createTime)}}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作"  width="180px" v-if="ordersRefundResultStatus==0">
+      <el-table-column label="操作"  width="180px" v-if="applyStatus==1">
         <template slot-scope="scope">
           <el-button size="small" type="text" @click="handleAgree(scope.row)">同意</el-button>
           <el-button size="small" type="text" @click="handleRefuse(scope.row)">拒绝</el-button>

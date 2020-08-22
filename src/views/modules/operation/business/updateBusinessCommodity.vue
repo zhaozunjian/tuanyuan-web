@@ -322,6 +322,7 @@ export default {
         })
       }).then(({data}) => {
         if (data && data.code === 0) {
+          console.log(data.result.carouselImagesUrlList)
           this.commodity = data.result
           this.commodity.businessCommodityCategoryIdArray = data.result.businessCommodityCategoryLevel
           this.commodityAvatar = data.result.businessCommodityAvatar

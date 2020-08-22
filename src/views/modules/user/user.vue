@@ -91,7 +91,7 @@
           params: this.$http.adornParams({
             page: this.currentPage,
             size: this.pageSize,
-            nickName: this.searchContent,
+            aliasName: this.searchContent,
             searchType: this.searchType
           })
         }).then(({data}) => {

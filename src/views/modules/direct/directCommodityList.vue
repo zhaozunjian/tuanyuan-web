@@ -347,7 +347,9 @@ export default {
       }).then(({data}) => {
         if (data && data.code === 0) {
           this.categoryList = data.result;
-          this.changeIndex(this.categoryList.length > 0 ? this.categoryList[0].directsCommodityCategoryId:'', 0);
+          if (this.categoryList.length != 0){
+            this.changeIndex(this.categoryList.length > 0 ? this.categoryList[0].directsCommodityCategoryId:'', 0);
+          }
         } else {
           this.$message.error(data.msg)
         }

@@ -17,6 +17,7 @@
           <div>{{scope.row.createTime | getTime(scope.row.createTime)}}</div>
         </template>
       </el-table-column>
+      <el-table-column prop="withdrawWayDescription" label="提现方式"></el-table-column>
       <el-table-column prop="withdrawAmount" label="提现金额"></el-table-column>
       <el-table-column prop="bankName" label="银行名称"></el-table-column>
       <el-table-column prop="cardHolder" label="持卡人名称"></el-table-column>

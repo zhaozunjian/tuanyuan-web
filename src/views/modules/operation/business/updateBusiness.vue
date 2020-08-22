@@ -490,8 +490,8 @@ export default {
             this.gaodeLocation.formattedAddress = this.business.addressProbably;
             this.businessAvatar =data.result.businessAvatar;
             this.businessDetailImage =data.result.detailUrlList;
-            this.operateLicense = data.result.operateLicense
-            this.healthLicense = data.result.healthLicense
+            this.operateLicense = data.result.operateLicenseFile
+            this.healthLicense = data.result.healthLicenseFile
             this.businessLoading = false
           } else {
             this.businessLoading = false

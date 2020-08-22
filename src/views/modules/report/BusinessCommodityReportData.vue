@@ -77,8 +77,8 @@ export default {
         let endTime = this.chooseTimes[1]
         this.$http({
           url: this.$http.adornUrl('/report/businessCommodity/history'),
-          method: 'post',
-          data: this.$http.adornData({
+          method: 'get',
+          params: this.$http.adornParams({
             startTime: startTime,
             endTime: endTime
           })

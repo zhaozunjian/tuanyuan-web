@@ -38,7 +38,6 @@
         <el-table-column label="操作" width="200px">
           <template slot-scope="scope">
             <el-button @click="handleCommodityList(scope.row)" size="small" type="text">查看商品</el-button>
-            <!--<el-button size="small" type="text" @click="handleContractTime(scope.$index, scope.row)">合作周期</el-button>-->
             <el-button size="small" type="text" @click="handleStatus(scope.$index, scope.row)">状态切换</el-button>
             <el-button v-if="isAuth('business:show')" @click="handleShow(scope.$index, scope.row)" size="small" type="text">查看</el-button>
             <el-button v-if="isAuth('business:update')" @click="handleEdit(scope.$index, scope.row)" size="small" type="text">编辑</el-button>
