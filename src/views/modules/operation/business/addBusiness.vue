@@ -24,11 +24,14 @@
                   <el-input v-model="business.detailContentUrl"></el-input>
                 </el-form-item>
                 <el-form-item label="推荐权重值">
-                  <el-cascader
-                    v-model="business.priority"
-                    :options="businessPriorityOptions"
-                    :props="{ expandTrigger: 'hover' }"
-                  ></el-cascader>
+                  <!--<el-cascader-->
+                    <!--v-model="business.priority"-->
+                    <!--:options="businessPriorityOptions"-->
+                    <!--:props="{ expandTrigger: 'hover' }"-->
+                  <!--&gt;</el-cascader>-->
+                  <el-select v-model="business.priority" placeholder="推荐权重值">
+                    <el-option v-for="item in businessPriorityOptions" :key="item.value" :label="item.label" :value="item.value" />
+                  </el-select>
                 </el-form-item>
                 <el-form-item label="商家类别(必填且不可修改)" prop="businessCategoryIdArray">
                   <el-cascader

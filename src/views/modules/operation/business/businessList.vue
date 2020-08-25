@@ -2,7 +2,7 @@
   <div class="mod-user">
     <el-card body-style="padding:10px" class="box-card" shadow="never">
       <div slot="header">
-        <el-input class="sd-input-150" clearable placeholder="输入关键字搜索" size="small" v-model.trim="searchContent"/>
+        <el-input class="sd-input-150" clearable placeholder="输入关键字搜索" size="small" @change="getchangeInit" v-model.trim="searchContent"/>
         <el-button @click="initData()" class="sd-mag-l-10" icon="el-icon-search" size="small" type="primary">查询
         </el-button>
       </div>
@@ -64,9 +64,9 @@ export default {
       tableData: [],
       businessLoading:false,
       searchContent: "",
-      currentPage: this.$GlobalApi.Constants.DICT.PAGE,
-      pageSize: this.$GlobalApi.Constants.DICT.LIMIT,
-      total: this.$GlobalApi.Constants.DICT.TOTAL,
+      currentPage: 1,
+      pageSize: 10,
+      total: 0,
       dataListSelections:[]
     };
   },
@@ -181,6 +181,11 @@ export default {
             businessName: this.dataListSelections[0].businessName
           }
         })
+      }
+    },
+    getchangeInit(val){
+      if (val === null || val === ''){
+        this.initData();
       }
     },
     initData() {

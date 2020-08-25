@@ -1,12 +1,10 @@
 <template>
   <el-card>
-    <el-row class="row-search sd-nopadding" slot="header">
-      <el-col class="search">
-        <span>所选择的商品名称: {{this.businessCommodityName}}</span>
-      </el-col>
-    </el-row>
+    <div slot="header">
+      <span>所选择的商品名称: {{this.businessCommodityName}}</span>
+    </div>
     <el-table :data="businessCommodityExternalSupportList" :cell-style="$GlobalApi.cellClass"
-              :header-cell-style="$GlobalApi.rowClass":height="tableHeight" border highlight-current-row size="small" stripe>
+              :header-cell-style="$GlobalApi.rowClass":height="$GlobalApi.getWinHeight() - 260" border highlight-current-row size="small" stripe>
       <el-table-column prop="belongPlatformSupport" label="第三方支持平台" show-overflow-tooltip></el-table-column>
       <el-table-column prop="goodCode" label="第三方支持平台的商品码" show-overflow-tooltip></el-table-column>
       <el-table-column prop="goodName" label="第三方支持平台的商品名称" show-overflow-tooltip></el-table-column>

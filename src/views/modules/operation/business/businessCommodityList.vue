@@ -193,7 +193,10 @@ export default {
         this.$router.push({
           name: "UpdateBusinessCommodity",
           query: {
-            businessCommodityId: row.businessCommodityId
+            businessId: this.businessId,
+            businessName: this.businessName,
+            businessCommodityId: row.businessCommodityId,
+            businessCommodityName: row.businessCommodityName
           }
         });
       }

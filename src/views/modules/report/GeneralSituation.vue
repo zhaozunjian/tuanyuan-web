@@ -150,7 +150,9 @@
       }
     },
     mounted(){
-      this.getlist();
+      if (this.$GlobalApi.getUserInfo().roleId == 10) {
+        this.getlist();
+      }
     }
   }
 

@@ -124,7 +124,7 @@
           this.$http({
             url: this.$http.adornUrl(`/headquarterCutBusinessCommodity/update`),
             method: 'post',
-            params: this.$http.adornParams({
+            data: this.$http.adornData({
               headquarterId: headquarterId,
               businessCommodityId: takeCutEditForm.businessCommodityId,
               takeCutPrice: takeCutEditForm.takeCutPrice
@@ -133,7 +133,7 @@
             if (data && data.code === 0) {
               this.initCutBusinessCommodityList()
               this.$message.success('设置成功');
-              this.closeDialog()
+              this.takeCutBusinessCommoditydialogFormVisible = false
             } else {
               this.$message.error(data.msg);
             }

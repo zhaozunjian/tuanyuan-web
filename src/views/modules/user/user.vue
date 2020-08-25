@@ -1,7 +1,7 @@
 <template>
   <el-card>
     <div slot="header">
-      <el-input class="sd-input-150" clearable placeholder="昵称" size="small" v-model="searchContent"/>
+      <el-input class="sd-input-150" clearable placeholder="昵称/手机号" size="small" v-model="searchContent"/>
       <el-button @click="getUserList()" class="sd-mag-l-10" icon="el-icon-search" size="small" type="primary">查询</el-button>
     </div>
     <el-tabs v-model="searchType" @tab-click="swithcTab()"  type="card">
@@ -10,13 +10,13 @@
     </el-tabs>
     <el-table :data="userList" :cell-style="$GlobalApi.cellClass"
               :header-cell-style="$GlobalApi.rowClass"
-              :height="tableHeight" v-loading="userLoding"
+              :height="$GlobalApi.getWinHeight() - 320" v-loading="userLoding"
               border
               highlight-current-row
               size="small"
               stripe>
-      <el-table-column label="昵称" prop="nickName"></el-table-column>
-      <el-table-column label="别称备注" prop="aliasName"></el-table-column>
+      <el-table-column label="用户名称" prop="nickName"></el-table-column>
+      <el-table-column label="昵称" prop="aliasName"></el-table-column>
       <el-table-column label="手机号码" prop="phoneNumber"></el-table-column>
       <el-table-column label="邀请码" prop="invitationCode"></el-table-column>
       <el-table-column prop="createTime" label="注册时间">
@@ -67,7 +67,6 @@
         searchType: "1",
         searchContent:'',
         userList: [],
-        tableHeight: this.$GlobalApi.getWinHeight() - 320,
         total: 0,
         currentPage: 1,
         pageSize: 10,

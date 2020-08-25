@@ -41,11 +41,14 @@
               <el-input v-model="commodity.detailContentUrl"></el-input>
             </el-form-item>
             <el-form-item label="推荐权重值" prop="priority">
-              <el-cascader
-                v-model="commodity.priority"
-                :options="businessCommodityPriorityOptions"
-                :props="{ expandTrigger: 'hover' }"
-              ></el-cascader>
+              <!--<el-cascader-->
+                <!--v-model="commodity.priority"-->
+                <!--:options="businessCommodityPriorityOptions"-->
+                <!--:props="{ expandTrigger: 'hover' }"-->
+              <!--&gt;</el-cascader>-->
+              <el-select v-model="commodity.priority" placeholder="推荐权重值">
+                <el-option v-for="item in businessCommodityPriorityOptions" :key="item.value" :label="item.label" :value="item.value" />
+              </el-select>
             </el-form-item>
             <!-- <el-form-item label="最多可砍价">
                 <span>{{ commodity.beforeBargainMaxAmount }}</span>
@@ -175,7 +178,7 @@ export default {
         businessName: '',
         businessRootCategoryName: '',
         businessCategoryName: '',
-        priority: '',
+        priority: 5,
         detailContentUrl: '',
         specsType: '',
         costPrice: '',
@@ -368,6 +371,7 @@ export default {
       });
     },
     submitForm() {
+      console.log(this.commodity)
       this.$refs['commodity'].validate(async valid => {
         if (valid) {
           var str = "";

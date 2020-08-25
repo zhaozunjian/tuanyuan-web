@@ -41,11 +41,14 @@
               ></el-cascader>
             </el-form-item>
             <el-form-item label="推荐权重值" prop="priority">
-              <el-cascader
-                v-model="commodity.priority"
-                :options="businessCommodityPriorityOptions"
-                :props="{ expandTrigger: 'hover' }"
-              ></el-cascader>
+              <!--<el-cascader-->
+                <!--v-model="commodity.priority"-->
+                <!--:options="businessCommodityPriorityOptions"-->
+                <!--:props="{ expandTrigger: 'hover' }"-->
+              <!--&gt;</el-cascader>-->
+              <el-select v-model="commodity.priority" placeholder="推荐权重值">
+                <el-option v-for="item in businessCommodityPriorityOptions" :key="item.value" :label="item.label" :value="item.value" />
+              </el-select>
             </el-form-item>
             <el-form-item label="合作价(商户所得价)">
               <el-input-number v-model="commodity.costPrice" :min="0" :max="99999999"></el-input-number>
@@ -77,7 +80,7 @@
             <el-form-item label="购买须知" prop="noticeText">
               <el-input type="textarea" autosize placeholder="请输入购买须知" v-model="commodity.noticeText"></el-input>
             </el-form-item>
-            <el-form-item label="商家头像">
+            <el-form-item label="商品头像">
               <el-upload
                 :action="$GlobalApi.getServerUrl('/system/file/businessCommodity/upload')"
                 :before-upload="beforeAvatarUpload"

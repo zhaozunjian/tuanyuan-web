@@ -14,6 +14,7 @@
               stripe
               style="width: 100%;">
       <el-table-column prop="ordersId" label="订单id"></el-table-column>
+      <el-table-column prop="ordersName" label="订单名称"></el-table-column>
       <el-table-column prop="merchantName" label="商户名称"></el-table-column>
       <el-table-column prop="usersNickName" label="退款申请的用户昵称"></el-table-column>
       <el-table-column prop="refundAmount" label="申请的退款金额"></el-table-column>
@@ -30,7 +31,7 @@
       </el-table-column>
       <el-table-column prop="refundAmount" label="退款金额"></el-table-column>
       <el-table-column prop="applyStatusDescription" label="申请状态"></el-table-column>
-      <el-table-column prop="resultStatusDescription" label="退款备注"></el-table-column>
+      <el-table-column prop="remark" label="退款备注"></el-table-column>
       <el-table-column label="操作"  width="180px" v-if="ordersRefundResultStatus==0">
         <template slot-scope="scope">
           <el-button size="small" type="text" @click="handleAgree(scope.row)">同意</el-button>

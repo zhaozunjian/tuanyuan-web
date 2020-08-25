@@ -32,11 +32,13 @@
     </div>
     <el-dialog class="code-dialog" width="45%" title="添加绑定标签" :visible.sync="dialogAddFormVisible" @close="closeDialog">
       <el-table
-        ref="multipleTable"
         :data="addForm.businessTagListData"
+        :height="$GlobalApi.getWinHeight() - 300"
         tooltip-effect="dark"
         style="width: 100%"
-        @selection-change="handleSelectionChange">
+        @select="selectChange"
+        @select-all="selectAll"
+        ref="multipleTable">
         <el-table-column
           type="selection"
           width="35">
@@ -46,7 +48,7 @@
           label="标签名称">
         </el-table-column>
       </el-table>
-      <pager :current-page="addForm.addCurrentPage" :page-size="addForm.addPageSize" :total="addForm.addTotal"
+      <pager :current-page="addCurrentPage" :page-size="addPageSize" :total="addTotal"
              @current-change="handleAddCurrentChange" @handle-size-change="handleAddSizeChange" background/>
       <div slot="footer" class="dialog-footer">
         <el-button size="small" plain @click="dialogAddFormVisible=false">取 消</el-button>
@@ -70,11 +72,11 @@ export default {
         listPageSize: 10,
         addForm: {
             businessTagListData: [],
-            multipleSelectionAdd: [],
-            addTotal: 0,
-            addCurrentPage: 1,
-            addPageSize: 10,
         },
+      selectDataArrL:[],
+      addTotal: 0,
+      addCurrentPage: 1,
+      addPageSize: 10,
     }
   },
   mounted() {
@@ -150,9 +152,11 @@ export default {
         })
       },
       closeDialog() {
+        this.selectDataArrL = []
         this.dialogAddFormVisible = false
       },
       addBindTag() {
+        this.selectDataArrL = []
           this.dialogAddFormVisible = true
           this.initBusinessTagList()
       },
@@ -161,23 +165,73 @@ export default {
           url: this.$http.adornUrl(`/businessTag/pageAll`),
           method: 'post',
           params: this.$http.adornParams({
-            currentPage: this.addForm.addCurrentPage,
-            pageSize: this.addForm.addPageSize
+            currentPage: this.addCurrentPage,
+            pageSize: this.addPageSize
           })
         }).then(({data}) => {
           if (data && data.code === 0) {
             this.addForm.businessTagListData = data.result.data
-            this.addForm.addTotal = data.result.pageModel.total;
+            this.addTotal = data.result.pageModel.total;
+
+            //请求到的数据多选后回显被选中
+            this.$nextTick(function () {
+              this.selectDataArrL.forEach((item) => {
+                this.addForm.businessTagListData.forEach((listitem) => {
+                  if (item.businessTagId == listitem.businessTagId) {
+                    this.$refs.multipleTable.toggleRowSelection(listitem, true);
+                  }
+                });
+              });
+            });
           } else {
             this.$message.error(data.msg);
           }
         })
       },
-      handleSelectionChange(val) {
-          this.addForm.multipleSelectionAdd = val
-      },
+    //多选
+    selectChange(arr, row) {
+      let isHaveItem = this.selectDataArrL.find((item) => item.businessTagId == row.businessTagId);
+      if (isHaveItem) {
+        this.selectDataArrL = this.selectDataArrL.filter(
+          (item) => item.businessTagId != isHaveItem.businessTagId
+        );
+      } else {
+        this.selectDataArrL.push(row);
+      }
+    },
+    // 全选
+    selectAll(arr) {
+      if (arr.length > 0) {
+        this.addRows(arr)
+      } else {
+        this.removeRows(this.addForm.businessCommodityTagListData)
+      }
+    },
+    // 添加选中行
+    addRows(rows) {
+      for (let key of rows) {
+        // 如果选中的数据中没有这条就添加进去
+        if (
+          !this.selectDataArrL.find(
+            (item) => item.businessTagId === key.businessTagId
+          )
+        ) {
+          this.selectDataArrL.push(key);
+        }
+      }
+    },
+    // 取消选中行
+    removeRows(rows) {
+      if (this.selectDataArrL.length > 0) {
+        for (let row of rows) {
+          this.selectDataArrL = this.selectDataArrL.filter(
+            (item) => item.businessTagId !== row.businessTagId
+          );
+        }
+      }
+    },
       handleAddBusinessTag() {
-        let multipleSelectionAdd = this.addForm.multipleSelectionAdd
+        let multipleSelectionAdd = this.selectDataArrL
         let multipleSelectionLength = multipleSelectionAdd.length
         if (multipleSelectionLength<=0) {
             this.$message.error('请选择需绑定的标签');
@@ -218,11 +272,11 @@ export default {
         })
       },
       handleAddCurrentChange(val) {
-        this.addForm.addCurrentPage = val
+        this.addCurrentPage = val
           this.initBusinessTagList()
       },
       handleAddSizeChange() {
-        this.addForm.addPageSize = val;
+        this.addPageSize = val;
         this.initBusinessTagList()
       }
   }

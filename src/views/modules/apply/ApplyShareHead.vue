@@ -8,11 +8,7 @@
     <el-table :data="applyShareHeadList" :cell-style="$GlobalApi.cellClass"
               :header-cell-style="$GlobalApi.rowClass"
               :height="$GlobalApi.getWinHeight() - 280"
-              border
-              highlight-current-row
-              size="small"
-              stripe
-              style="width: 100%;">
+              border highlight-current-row size="small" stripe style="width: 100%;">
       <el-table-column prop="actualName" label="申请时的真实姓名"></el-table-column>
       <el-table-column prop="usersNickName" label="用户昵称"></el-table-column>
       <el-table-column prop="usersPhoneNumber" label="用户注册手机号码"></el-table-column>

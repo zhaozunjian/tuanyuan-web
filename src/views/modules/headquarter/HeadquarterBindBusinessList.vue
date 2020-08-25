@@ -95,12 +95,11 @@
         }
       },
       initBindBusinessList() {
-        let headquarterId = this.$route.query.headquarterId
         this.$http({
           url: this.$http.adornUrl('/headquarterBindBusiness/pageBindBusiness'),
           method: 'post',
           params: this.$http.adornParams({
-            headquarterId: headquarterId,
+            headquarterId: this.headquarterId,
             currentPage: this.listCurrentPage,
             pageSize: this.listPageSize
           })
@@ -118,12 +117,11 @@
         this.getUnBindBusinessList()
       },
       getUnBindBusinessList() {
-        let headquarterId = this.$route.query.headquarterId
         this.$http({
           url: this.$http.adornUrl('/headquarterBindBusiness/pageNoBindBusiness'),
           method: 'post',
           params: this.$http.adornParams({
-            headquarterId: headquarterId,
+            headquarterId: this.headquarterId,
             searchContent: this.addForm.searchContent,
             currentPage: this.addCurrentPage,
             pageSize: this.addPageSize
@@ -138,12 +136,11 @@
         })
       },
       handleBind(businessId) {
-        let headquarterId = this.$route.query.headquarterId
         this.$http({
           url: this.$http.adornUrl('/headquarterBindBusiness/bind'),
           method: 'get',
           params: this.$http.adornParams({
-            headquarterId: headquarterId,
+            headquarterId: this.headquarterId,
             businessId: businessId
           })
         }).then(({data}) => {
@@ -167,12 +164,11 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          let headquarterId = that.$route.query.headquarterId
           this.$http({
             url: this.$http.adornUrl('/headquarterBindBusiness/unBind'),
             method: 'get',
             params: this.$http.adornParams({
-              headquarterId: headquarterId,
+              headquarterId: this.headquarterId,
               businessId: businessId
             })
           }).then(({data}) => {
