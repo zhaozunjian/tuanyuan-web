@@ -1,6 +1,6 @@
 <template>
   <div v-show="$GlobalApi.getUserInfo().roleId == 10">
-    <el-col class="sd-main" style="width: 44.5%">
+    <el-col class="sd-main" style="width: 42.5%">
       <el-card shadow="hover" class="main-flow paddig">
         <div>
           <div class="main-secondary sale-info">
@@ -11,24 +11,37 @@
         </div>
       </el-card>
     </el-col>
-    <el-col class="sd-main" style="width: 25%">
+    <el-col class="sd-main" style="width: 22%">
       <el-card shadow="hover" class="main-flow paddig">
         <div class="main-secondary sale-info">
           <span>今日新增用户<strong>{{vivitorCount || 0}}</strong></span>
         </div>
       </el-card>
     </el-col>
-    <el-col class="sd-main" style="width: 25%">
+    <el-col class="sd-main" style="width: 30%">
       <el-card shadow="hover" class="main-flow paddig">
         <div class="main-secondary sale-info">
           <span>今日金额<strong>{{moneyCount || 0}}</strong></span>
+          <span>利润<strong>{{profit || 0}}</strong></span>
         </div>
       </el-card>
     </el-col>
     <el-col style="width: 97.5%;margin: 10px">
       <el-card shadow="hover">
-        <div ref="echartmain" style="width:50%; height:350px;float: left"></div>
-        <div id="moneymain" style="width:50%; height:350px;float: right"></div>
+        <div style="width:50%; height:400px;float: left">
+          <div style="width:100%; height:30px;text-align: right;padding-right: 30px;">
+            <el-button size="mini" @click="getlist(30)">30天</el-button>
+            <el-button size="mini" @click="getlist(7)" :autofocus="true">7天</el-button>
+          </div>
+          <div ref="echartmain" style="width:100%; height:350px;"></div>
+        </div>
+        <div style="width:50%; height:400px;float: right">
+          <div style="width:100%; height:30px;text-align: right;padding-right: 30px;">
+            <el-button size="mini" @click="getMoneyList(30)">30天</el-button>
+            <el-button size="mini" @click="getMoneyList(7)" :autofocus="true">7天</el-button>
+          </div>
+          <div id="moneymain" style="width:100%; height:350px;"></div>
+        </div>
       </el-card>
     </el-col>
   </div>
@@ -47,11 +60,12 @@
         orderUnCount: 0,
         orderOver: 0,
         vivitorCount:0,
+        profit:0,
         moneyCount: 0
       }
     },
     methods: {
-      getlist(){
+      getlist(val){
         var myChart = echarts.init(this.$refs.echartmain);
         // 指定图表的配置项和数据
         var option = {
@@ -71,8 +85,8 @@
             data:['已完成','待使用']
           },
           xAxis: {
-            data: ["7","10","20","30"],
-            name: '单位:天',
+            data: [],
+            name: '日期',
           },
           yAxis: {
             type: 'value',
@@ -88,6 +102,32 @@
             data: []
           }]
         };
+
+        this.$http({
+          url: this.$http.adornUrl('/report/home'),
+          method: 'get',
+          isLoading: true,
+          params: this.$http.adornParams({
+            day: val
+          })
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.orderCount = data.result.orderCount
+            this.orderUnCount = data.result.orderUnCount
+            this.orderOver = data.result.orderOver
+            this.vivitorCount = data.result.vivitorCount
+            this.moneyCount = data.result.moneyCount
+            this.profit = data.result.profit
+            option.series[0].data = data.result.orderTotle.split(",");
+            option.series[1].data = data.result.orderUnusedTotle.split(",");
+            option.xAxis.data = data.result.weekDay.split(",");
+            myChart.setOption(option);
+          } else {
+            this.$message.error(data.msg);
+          }
+        })
+      },
+      getMoneyList(val){
         var myChart2 = echarts.init(document.getElementById('moneymain'));
         // 指定图表的配置项和数据
         var option2 = {
@@ -107,8 +147,8 @@
             data:['已完成','待使用']
           },
           xAxis: {
-            data: ["7","10","20","30"],
-            name: '单位:天',
+            data: [],
+            name: '日期',
           },
           yAxis: {
             type: 'value',
@@ -124,12 +164,13 @@
             data: []
           }]
         };
-
         this.$http({
           url: this.$http.adornUrl('/report/home'),
           method: 'get',
           isLoading: true,
-          params: this.$http.adornParams({})
+          params: this.$http.adornParams({
+            day: val
+          })
         }).then(({data}) => {
           if (data && data.code === 0) {
             this.orderCount = data.result.orderCount
@@ -137,11 +178,10 @@
             this.orderOver = data.result.orderOver
             this.vivitorCount = data.result.vivitorCount
             this.moneyCount = data.result.moneyCount
-            option.series[0].data = data.result.orderTotle.split(",");
-            option.series[1].data = data.result.orderUnusedTotle.split(",");
+            this.profit = data.result.profit
+            option2.xAxis.data = data.result.weekDay.split(",");
             option2.series[0].data = data.result.moneyTotle.split(",");
             option2.series[1].data = data.result.moneyUnusedTotle.split(",");
-            myChart.setOption(option);
             myChart2.setOption(option2);
           } else {
             this.$message.error(data.msg);
@@ -151,7 +191,8 @@
     },
     mounted(){
       if (this.$GlobalApi.getUserInfo().roleId == 10) {
-        this.getlist();
+        this.getlist(7);
+        this.getMoneyList(7);
       }
     }
   }
@@ -191,7 +232,7 @@
   .main-secondary {
     color: #eaf5ff;
     font-size: 16px;
-    margin: 10px 0 10px 36px;
+    /*margin: 10px 0 10px 36px;*/
     text-align: center;
   }
 

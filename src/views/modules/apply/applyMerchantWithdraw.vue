@@ -28,7 +28,7 @@
           <el-button size="small" type="text" @click="handleRefuse(scope.row.merchantAssetsWithdrawApplyId)">拒绝</el-button>
         </template>
       </el-table-column>
-      <el-table-column label="操作" v-if="activeName==12" width="100px">
+      <el-table-column label="操作" v-if="activeName==21" width="100px">
         <template slot-scope="scope">
           <el-button size="small" type="text" @click="handleConfirm(scope.row.merchantAssetsWithdrawApplyId)">确认到账</el-button>
         </template>

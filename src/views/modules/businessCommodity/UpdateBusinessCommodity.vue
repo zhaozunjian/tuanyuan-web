@@ -91,14 +91,14 @@
             </el-form-item>
             <el-form-item label="商品海报" prop="commodityPost">
               <el-upload
-                :action="$GlobalApi.getServerUrl('/system/file/businessCommodity/upload')"
+                :action="$GlobalApi.getServerUrl('/system/file/businessCommodity/post')"
                 :before-upload="beforePosterUpload"
                 :headers="$GlobalApi.getUserToken()"
                 :on-error="upImgPosterError"
                 :on-success="upImgPosterSuccess"
                 :show-file-list="false"
                 class="avatar-uploader">
-                <img :src="imageServerUrl + commodityPost" class="commodityAvatar" v-if="commodityPost">
+                <img :src="imageHttpsServerUrl + commodityPost" class="commodityAvatar" v-if="commodityPost">
                 <i v-else class="el-icon-plus avatar-uploader-icon"></i>
               </el-upload>
             </el-form-item>
@@ -127,9 +127,6 @@
                 <i v-else class="el-icon-plus avatar-uploader-icon"></i>
               </el-upload>
             </el-form-item>
-            <!--<el-form-item>-->
-            <!--<el-button type="primary" @click="submitForm('commodity')">确认修改商品</el-button>-->
-            <!--</el-form-item>-->
           </el-form>
         </div>
       </div>
@@ -145,6 +142,7 @@
       return {
         businessLoading:false,
         imageServerUrl:SERVER_CONSTANT.imageServerUrl,
+        imageHttpsServerUrl:SERVER_CONSTANT.imageHttpsServerUrl,
         businessId: "",
         businessCommodityId: "",
         businessName:'',
@@ -318,7 +316,6 @@
           })
         }).then(({data}) => {
           if (data && data.code === 0) {
-            console.log(data.result.carouselImagesUrlList)
             this.commodity = data.result
             this.commodity.businessCommodityCategoryIdArray = data.result.businessCommodityCategoryLevel
             this.commodityAvatar = data.result.businessCommodityAvatar
@@ -330,7 +327,7 @@
               let splitArr = carouselImagesUrlList.split(',')
               splitArr.forEach(element => {
                 this.carouselFileList.push({
-                  url: element
+                  url: this.imageServerUrl + element
                 })
               });
             }
@@ -360,74 +357,6 @@
             businessName: this.businessName,
             businessCommodityId: this.businessCommodityId,
             businessCommodityName: this.businessCommodityName
-          }
-        });
-      },
-      submitForm() {
-        this.$refs['commodity'].validate(async valid => {
-          if (valid) {
-            var str = "";
-            for (var i = 0; i < this.carouselFileList.length; i++) {
-              str += this.carouselFileList[i].url + ",";
-            }
-            //去掉最后一个逗号(如果不需要去掉，就不用写)
-            if (str.length > 0) {
-              str = str.substr(0, str.length - 1);
-            }
-            this.$http({
-              url: this.$http.adornUrl(`/businessCommodity/update`),
-              method: 'post',
-              data: this.$http.adornData({
-                "businessCommodityId":this.commodity.businessCommodityId,
-                "businessCommodityAvatarFile":this.commodityAvatar,
-                'carouselImagesFileArray': str,
-                "businessCommodityCategoryId": this.commodity.businessCommodityCategoryIdArray[1],
-                "businessCommodityCategoryIdArray": this.commodity.businessCommodityCategoryIdArray,
-                "conSumType": this.commodity.conSumType,
-                "noticeText": this.commodity.noticeText,
-                "detailText": this.commodity.detailText,
-                "stockCount": this.commodity.stockCount,
-                "openStock": this.commodity.openStock,
-                "salesTotalCount": this.commodity.salesTotalCount,
-                "salesCurrentMonthCount": this.commodity.salesCurrentMonthCount,
-                "currentPrice": this.commodity.currentPrice,
-                "originPrice": this.commodity.originPrice,
-                "costPrice": this.commodity.costPrice,
-                "specsType": 1,
-                "businessCommoditySubTitle": this.commodity.businessCommoditySubTitle,
-                "priority": this.commodity.priority,
-                "businessId": this.commodity.businessId,
-                "businessCommodityName":this.commodity.businessCommodityName,
-                "businessCommodityDescription":this.commodity.businessCommodityDescription,
-                "detailContentUrl":this.commodity.detailContentUrl,
-                'businessCommodityPosterFile': this.commodityPost,
-                "detailFileArray":this.commodityDetailImage
-              })
-            }).then(({data}) => {
-              if (data && data.code === 0) {
-                this.$message({
-                  message: "修改成功",
-                  type: "success"
-                });
-                this.$router.push({
-                  path: "businessCommodityList",
-                  query: {
-                    businessId: this.commodity.businessId,
-                    businessName: this.commodity.businessName
-                  }
-                });
-                this.carouselFileList = []
-              } else {
-                this.$message.error(data.msg);
-              }
-            })
-          } else {
-            this.$notify.error({
-              title: "错误",
-              message: "请检查输入是否正确",
-              offset: 100
-            });
-            return false;
           }
         });
       },

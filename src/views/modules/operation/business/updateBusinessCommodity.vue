@@ -22,8 +22,7 @@
               <span>{{this.commodity.businessRootCategoryName!=''?this.commodity.businessRootCategoryName + '/':'' + this.commodity.businessCategoryName}}</span>
             </el-form-item>
             <el-form-item label="所属商品分类" prop="businessCommodityCategoryIdArray">
-              <el-cascader
-                v-model="commodity.businessCommodityCategoryIdArray"
+              <el-cascader v-model="commodity.businessCommodityCategoryIdArray"
                 :options="businessCommodityCategoryOptions"
                 :props="{ expandTrigger: 'hover' }"
               ></el-cascader>
@@ -50,9 +49,6 @@
                 <el-option v-for="item in businessCommodityPriorityOptions" :key="item.value" :label="item.label" :value="item.value" />
               </el-select>
             </el-form-item>
-            <!-- <el-form-item label="最多可砍价">
-                <span>{{ commodity.beforeBargainMaxAmount }}</span>
-            </el-form-item> -->
             <el-form-item label="合作价(商户所得价)" prop="costPrice">
               <el-input-number v-model="commodity.costPrice" :min="0" :max="99999999"></el-input-number>
             </el-form-item>
@@ -98,14 +94,14 @@
             </el-form-item>
             <el-form-item label="商品海报" prop="commodityPost">
               <el-upload
-                :action="$GlobalApi.getServerUrl('/system/file/businessCommodity/upload')"
+                :action="$GlobalApi.getServerUrl('/system/file/businessCommodity/post')"
                 :before-upload="beforePosterUpload"
                 :headers="$GlobalApi.getUserToken()"
                 :on-error="upImgPosterError"
                 :on-success="upImgPosterSuccess"
                 :show-file-list="false"
                 class="avatar-uploader">
-                <img :src="imageServerUrl + commodityPost" class="commodityAvatar" v-if="commodityPost">
+                <img :src="imageHttpsServerUrl + commodityPost" class="commodityAvatar" v-if="commodityPost">
                 <i v-else class="el-icon-plus avatar-uploader-icon"></i>
               </el-upload>
             </el-form-item>
@@ -152,6 +148,7 @@ export default {
     return {
       businessLoading:false,
       imageServerUrl:SERVER_CONSTANT.imageServerUrl,
+      imageHttpsServerUrl:SERVER_CONSTANT.imageHttpsServerUrl,
       businessId: "",
       businessCommodityId: "",
       businessName:'',
@@ -337,7 +334,7 @@ export default {
             let splitArr = carouselImagesUrlList.split(',')
             splitArr.forEach(element => {
               this.carouselFileList.push({
-                url: element
+                url: this.imageServerUrl + element
               })
             });
           }
@@ -371,12 +368,12 @@ export default {
       });
     },
     submitForm() {
-      console.log(this.commodity)
       this.$refs['commodity'].validate(async valid => {
         if (valid) {
           var str = "";
           for (var i = 0; i < this.carouselFileList.length; i++) {
-            str += this.carouselFileList[i].url + ",";
+            var replace = this.carouselFileList[i].url.replace(this.imageServerUrl,"");
+            str += replace + ",";
           }
           //去掉最后一个逗号(如果不需要去掉，就不用写)
           if (str.length > 0) {

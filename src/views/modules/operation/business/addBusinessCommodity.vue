@@ -108,14 +108,14 @@
             </el-form-item>
             <el-form-item label="商品海报">
               <el-upload
-                :action="$GlobalApi.getServerUrl('/system/file/businessCommodity/upload')"
+                :action="$GlobalApi.getServerUrl('/system/file/businessCommodity/post')"
                 :before-upload="beforePosterUpload"
                 :headers="$GlobalApi.getUserToken()"
                 :on-error="upImgPosterError"
                 :on-success="upImgPosterSuccess"
                 :show-file-list="false"
                 class="avatar-uploader">
-                <img :src="imageServerUrl + commodityPoster" class="commodityAvatar" v-if="commodityPoster">
+                <img :src="imageHttpsServerUrl + commodityPoster" class="commodityAvatar" v-if="commodityPoster">
                 <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                 <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过2MB</div>
               </el-upload>
@@ -134,9 +134,6 @@
                 <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过2MB</div>
               </el-upload>
             </el-form-item>
-            <!--<el-form-item>-->
-              <!--<el-button type="primary" @click="submitForm('commodity')">确认添加商品</el-button>-->
-            <!--</el-form-item>-->
           </el-form>
         </div>
       </div>
@@ -151,6 +148,7 @@ export default {
   data() {
     return {
       imageServerUrl:SERVER_CONSTANT.imageServerUrl,
+      imageHttpsServerUrl:SERVER_CONSTANT.imageHttpsServerUrl,
       carouselLimit: 5,
       carouselFileList: [],
       categoryForm: {
@@ -437,7 +435,8 @@ export default {
         if (valid) {
           var str = "";
           for (var i = 0; i < this.carouselFileList.length; i++) {
-            str += this.carouselFileList[i].url + ",";
+            var replace = this.carouselFileList[i].url.replace(this.imageServerUrl,"");
+            str += replace + ",";
           }
           //去掉最后一个逗号(如果不需要去掉，就不用写)
           if (str.length > 0) {

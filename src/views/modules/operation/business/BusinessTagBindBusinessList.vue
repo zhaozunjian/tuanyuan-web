@@ -43,10 +43,7 @@
           type="selection"
           width="35">
         </el-table-column>
-        <el-table-column
-          prop="businessTagName"
-          label="标签名称">
-        </el-table-column>
+        <el-table-column prop="businessTagName" label="标签名称"></el-table-column>
       </el-table>
       <pager :current-page="addCurrentPage" :page-size="addPageSize" :total="addTotal"
              @current-change="handleAddCurrentChange" @handle-size-change="handleAddSizeChange" background/>
