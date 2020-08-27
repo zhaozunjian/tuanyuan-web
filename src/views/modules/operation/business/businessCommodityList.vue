@@ -2,7 +2,7 @@
   <el-card>
     <el-row class="row-search sd-nopadding" slot="header" style="margin-top: 0px">
       <el-col style="width: 50%">
-        <el-input class="sd-input-150" clearable placeholder="商品名称" size="small" v-model="searchContent"/>
+        <el-input class="sd-input-150" clearable placeholder="商品名称" size="small" @change="getchangeInit" v-model="searchContent"/>
         <el-button @click="initData()" class="sd-mag-l-10" icon="el-icon-search" size="small" type="primary">查询</el-button>
       </el-col>
       <el-col style="width: 50%;">
@@ -294,6 +294,11 @@ export default {
     handleSizeChange(val) {
         this.pageSize = val;
         this.initData()
+    },
+    getchangeInit(val){
+      if (val === null || val === ''){
+        this.initData();
+      }
     },
     initData() {
       if (this.businessId) {

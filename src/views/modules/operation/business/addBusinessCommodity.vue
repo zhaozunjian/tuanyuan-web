@@ -143,370 +143,369 @@
 
 <script>
   import * as SERVER_CONSTANT from "@/assets/js/serverConstant";
-
-export default {
-  data() {
-    return {
-      imageServerUrl:SERVER_CONSTANT.imageServerUrl,
-      imageHttpsServerUrl:SERVER_CONSTANT.imageHttpsServerUrl,
-      carouselLimit: 5,
-      carouselFileList: [],
-      categoryForm: {
-        categoryList: [],
-        categorySelect: "",
-        name: "",
-        description: ""
+  export default {
+    data() {
+      return {
+        imageServerUrl:SERVER_CONSTANT.imageServerUrl,
+        imageHttpsServerUrl:SERVER_CONSTANT.imageHttpsServerUrl,
+        carouselLimit: 5,
+        carouselFileList: [],
+        categoryForm: {
+          categoryList: [],
+          categorySelect: "",
+          name: "",
+          description: ""
+        },
+        commodityAvatar: "",
+        commodityPoster: "",
+        commodityDetailImage: "",
+        commodity: {
+          businessCommodityAvatarFile: "",
+          businessCommodityPosterFile: "",
+          detailFileArray: "",
+          businessId: "",
+          businessCommodityName: "",
+          businessCommoditySubTitle: "",
+          businessCommodityDescription: "",
+          detailContentUrl: "",
+          businessCommodityCategoryId: "",
+          priority: 5,
+          specsType: 1,
+          costPrice: 0,
+          originPrice: 0,
+          currentPrice: 0,
+          openStock: "1",
+          stockCount: 10000,
+          salesTotalCount: '',
+          salesCurrentMonthCount: 0,
+          detailText: "",
+          noticeText: "",
+          conSumType: "",
+          businessCommodityCategoryIdArray: ""
+        },
+        rules: {
+          businessCommodityName: [
+            { required: true, message: "请输入商品名称", trigger: "blur" }
+          ],
+            priority: [
+            { required: true, message: "请选择推荐权重值", trigger: "change" }
+          ],
+           specsType: [
+            { required: true, message: "请选择规格类型", trigger: "change" }
+          ],
+           conSumType: [
+            { required: true, message: "请输入消费类型", trigger: "change" }
+          ],
+          businessCommodityCategoryIdArray: [
+            { required: true, message: "请输入商品分类", trigger: "change" }
+          ]
+        },
+        businessCommodityPriorityOptions: [
+          {
+            value: 1,
+            label: "一级"
+          },
+          {
+            value: 2,
+            label: "二级"
+          },
+          {
+            value: 3,
+            label: "三级"
+          },
+          {
+            value: 4,
+            label: "四级"
+          },
+          {
+            value: 5,
+            label: "五级(默认)"
+          },
+          {
+            value: 6,
+            label: "六级"
+          },
+          {
+            value: 7,
+            label: "七级"
+          },
+          {
+            value: 8,
+            label: "八级"
+          },
+          {
+            value: 9,
+            label: "九级"
+          },
+          {
+            value: 10,
+            label: "十级"
+          }
+        ],
+        businessCommodityCategoryOptions: []
+      };
+    },
+    mounted() {
+      this.checkBusinessId();
+      this.initData();
+    },
+    methods: {
+      initData() {
+        if (this.$route.query.businessId) {
+          this.initBusiness(this.$route.query.businessId);
+          this.initCommodityCategory(this.$route.query.businessId)
+        }
       },
-      commodityAvatar: "",
-      commodityPoster: "",
-      commodityDetailImage: "",
-      commodity: {
-        businessCommodityAvatarFile: "",
-        businessCommodityPosterFile: "",
-        detailFileArray: "",
-        businessId: "",
-        businessCommodityName: "",
-        businessCommoditySubTitle: "",
-        businessCommodityDescription: "",
-        detailContentUrl: "",
-        businessCommodityCategoryId: "",
-        priority: 5,
-        specsType: 1,
-        costPrice: 0,
-        originPrice: 0,
-        currentPrice: 0,
-        openStock: "1",
-        stockCount: 10000,
-        salesTotalCount: '',
-        salesCurrentMonthCount: 0,
-        detailText: "",
-        noticeText: "",
-        conSumType: "",
-        businessCommodityCategoryIdArray: ""
-      },
-      rules: {
-        businessCommodityName: [
-          { required: true, message: "请输入商品名称", trigger: "blur" }
-        ],
-          priority: [
-          { required: true, message: "请选择推荐权重值", trigger: "change" }
-        ],
-         specsType: [
-          { required: true, message: "请选择规格类型", trigger: "change" }
-        ],
-         conSumType: [
-          { required: true, message: "请输入消费类型", trigger: "change" }
-        ],
-        businessCommodityCategoryIdArray: [
-          { required: true, message: "请输入商品分类", trigger: "change" }
-        ]
-      },
-      businessCommodityPriorityOptions: [
-        {
-          value: 1,
-          label: "一级"
-        },
-        {
-          value: 2,
-          label: "二级"
-        },
-        {
-          value: 3,
-          label: "三级"
-        },
-        {
-          value: 4,
-          label: "四级"
-        },
-        {
-          value: 5,
-          label: "五级(默认)"
-        },
-        {
-          value: 6,
-          label: "六级"
-        },
-        {
-          value: 7,
-          label: "七级"
-        },
-        {
-          value: 8,
-          label: "八级"
-        },
-        {
-          value: 9,
-          label: "九级"
-        },
-        {
-          value: 10,
-          label: "十级"
-        }
-      ],
-      businessCommodityCategoryOptions: []
-    };
-  },
-  mounted() {
-    this.checkBusinessId();
-    this.initData();
-  },
-  methods: {
-    initData() {
-      if (this.$route.query.businessId) {
-        this.initBusiness(this.$route.query.businessId);
-        this.initCommodityCategory(this.$route.query.businessId)
-      }
-    },
-    initCommodityCategory(businessId) {
-      this.$http({
-        url: this.$http.adornUrl(`/businessCategoryBindCommodityCategory/findListByBusinessId`),
-        method: 'get',
-        params: this.$http.adornParams({
-          businessId: businessId
-        })
-      }).then(({data}) => {
-        if (data && data.code === 0) {
-          this.businessCommodityCategoryOptions = this.getTreeData(data.result)
-        } else {
-          this.$message.error(data.msg);
-        }
-      })
-    },
-    initBusiness(businessId) {
-      this.$http({
-        url: this.$http.adornUrl(`/business/info`),
-        method: 'get',
-        params: this.$http.adornParams({
-          businessId: businessId
-        })
-      }).then(({data}) => {
-        if (data && data.code === 0) {
-          this.commodity.businessId = data.result.businessId;
-          this.commodity.businessName = data.result.businessName;
-          this.commodity.businessRootCategoryName =
-            data.result.businessRootCategoryName;
-          this.commodity.businessCategoryName =
-            data.result.businessCategoryName;
-        } else {
-          this.$message.error(data.msg);
-        }
-      })
-    },
-    getTreeData(data) {
-      // 循环遍历json数据
-      for (var i = 0; i < data.length; i++) {
-        if (data[i].children.length < 1) {
-          // children若为空数组，则将children设为undefined
-          data[i].children = undefined;
-        } else {
-          // children若不为空数组，则继续 递归调用 本方法
-          this.getTreeData(data[i].children);
-        }
-      }
-      return data;
-    },
-    beforeAvatarUpload(file) {
-      const isJPG = file.type === 'image/jpeg'
-      const isGIF = file.type === 'image/gif'
-      const isPNG = file.type === 'image/png'
-      const isBMP = file.type === 'image/bmp'
-      const isLt20M = file.size / 20480 / 20480 < 20
-      if (!isJPG && !isGIF && !isPNG && !isBMP) {
-        this.$message.error('上传图片必须是JPG/GIF/PNG/BMP 格式!')
-      }
-      if (!isLt20M) {
-        this.$message.error('上传图片大小不能超过 20MB!')
-      }
-      return (isJPG || isGIF || isPNG || isBMP) && isLt20M
-    },
-    upImgSuccess (res, file) {
-      if (res && res.code === 0) {
-        this.commodityAvatar = res.url
-      } else {
-        this.$message.error(data.msg)
-      }
-    },
-    upImgError (err, file, fileList) {
-      this.commodityAvatar = './src/assets/img/img_err.png';
-    },
-
-    beforePosterUpload(file) {
-      const isJPG = file.type === 'image/jpeg'
-      const isGIF = file.type === 'image/gif'
-      const isPNG = file.type === 'image/png'
-      const isBMP = file.type === 'image/bmp'
-      const isLt20M = file.size / 20480 / 20480 < 20
-      if (!isJPG && !isGIF && !isPNG && !isBMP) {
-        this.$message.error('上传图片必须是JPG/GIF/PNG/BMP 格式!')
-      }
-      if (!isLt20M) {
-        this.$message.error('上传图片大小不能超过 20MB!')
-      }
-      return (isJPG || isGIF || isPNG || isBMP) && isLt20M
-    },
-    upImgPosterSuccess (res, file) {
-      if (res && res.code === 0) {
-        this.commodityPoster = res.url
-      } else {
-        this.$message.error(data.msg)
-      }
-    },
-    upImgPosterError (err, file, fileList) {
-      this.commodityPoster = './src/assets/img/img_err.png';
-    },
-
-    beforeDetailUpload(file) {
-      const isJPG = file.type === 'image/jpeg'
-      const isGIF = file.type === 'image/gif'
-      const isPNG = file.type === 'image/png'
-      const isBMP = file.type === 'image/bmp'
-      const isLt20M = file.size / 20480 / 20480 < 20
-      if (!isJPG && !isGIF && !isPNG && !isBMP) {
-        this.$message.error('上传图片必须是JPG/GIF/PNG/BMP 格式!')
-      }
-      if (!isLt20M) {
-        this.$message.error('上传图片大小不能超过 20MB!')
-      }
-      return (isJPG || isGIF || isPNG || isBMP) && isLt20M
-    },
-    upImgDetailSuccess (res, file) {
-      if (res && res.code === 0) {
-        this.commodityDetailImage = res.url
-      } else {
-        this.$message.error(data.msg)
-      }
-    },
-    upImgDetailError (err, file, fileList) {
-      this.commodityDetailImage = './src/assets/img/img_err.png';
-    },
-
-    carouselHandleExceed(file, fileList) {
-      if (fileList.length >= this.carouselLimit) {
-        this.$message.error(
-          `轮播走马灯图片最多上传${this.carouselLimit}个文件`
-        );
-        return false;
-      }
-    },
-    carouselOnChange(res, file) {
-      if (res && res.code === 0) {
-        this.carouselFileList.push({
-          url: this.imageServerUrl + res.url
-        })
-      } else {
-        this.$message.error(data.msg)
-      }
-    },
-    carouselBeforeRemove(file) {
-      for(let i = 0; i < this.carouselFileList.length; i++) {
-        let _file = this.carouselFileList[i]
-        if (_file.url == file.url) {
-          this.$http({
-            url: this.$http.adornUrl('/system/file/delete'),
-            method: 'post',
-            params: this.$http.adornParams({
-              file: this.carouselFileList[i].url
-            })
-          }).then(({data}) => {
-            if (data && data.code === 0) {
-              this.carouselFileList.splice(i, 1)
-            } else {
-              this.$message.error(data.msg)
-            }
+      initCommodityCategory(businessId) {
+        this.$http({
+          url: this.$http.adornUrl(`/businessCategoryBindCommodityCategory/findListByBusinessId`),
+          method: 'get',
+          params: this.$http.adornParams({
+            businessId: businessId
           })
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.businessCommodityCategoryOptions = this.getTreeData(data.result)
+          } else {
+            this.$message.error(data.msg);
+          }
+        })
+      },
+      initBusiness(businessId) {
+        this.$http({
+          url: this.$http.adornUrl(`/business/info`),
+          method: 'get',
+          params: this.$http.adornParams({
+            businessId: businessId
+          })
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.commodity.businessId = data.result.businessId;
+            this.commodity.businessName = data.result.businessName;
+            this.commodity.businessRootCategoryName =
+              data.result.businessRootCategoryName;
+            this.commodity.businessCategoryName =
+              data.result.businessCategoryName;
+          } else {
+            this.$message.error(data.msg);
+          }
+        })
+      },
+      getTreeData(data) {
+        // 循环遍历json数据
+        for (var i = 0; i < data.length; i++) {
+          if (data[i].children.length < 1) {
+            // children若为空数组，则将children设为undefined
+            data[i].children = undefined;
+          } else {
+            // children若不为空数组，则继续 递归调用 本方法
+            this.getTreeData(data[i].children);
+          }
         }
-      }
-    },
-    checkBusinessId() {
-      if (this.$route.query.businessId) {
-        this.businessId = this.$route.query.businessId;
-      } else {
-        this.businessId = Math.ceil(Math.random() * 10);
-        this.$alert("添加商家商品需要选择一个商家,先去选择商家", "提示", {
-          confirmButtonText: "确定",
-          callback: action => {
-            this.$router.push("/businessList");
+        return data;
+      },
+      beforeAvatarUpload(file) {
+        const isJPG = file.type === 'image/jpeg'
+        const isGIF = file.type === 'image/gif'
+        const isPNG = file.type === 'image/png'
+        const isBMP = file.type === 'image/bmp'
+        const isLt20M = file.size / 20480 / 20480 < 20
+        if (!isJPG && !isGIF && !isPNG && !isBMP) {
+          this.$message.error('上传图片必须是JPG/GIF/PNG/BMP 格式!')
+        }
+        if (!isLt20M) {
+          this.$message.error('上传图片大小不能超过 20MB!')
+        }
+        return (isJPG || isGIF || isPNG || isBMP) && isLt20M
+      },
+      upImgSuccess (res, file) {
+        if (res && res.code === 0) {
+          this.commodityAvatar = res.url
+        } else {
+          this.$message.error(data.msg)
+        }
+      },
+      upImgError (err, file, fileList) {
+        this.commodityAvatar = './src/assets/img/img_err.png';
+      },
+
+      beforePosterUpload(file) {
+        const isJPG = file.type === 'image/jpeg'
+        const isGIF = file.type === 'image/gif'
+        const isPNG = file.type === 'image/png'
+        const isBMP = file.type === 'image/bmp'
+        const isLt20M = file.size / 20480 / 20480 < 20
+        if (!isJPG && !isGIF && !isPNG && !isBMP) {
+          this.$message.error('上传图片必须是JPG/GIF/PNG/BMP 格式!')
+        }
+        if (!isLt20M) {
+          this.$message.error('上传图片大小不能超过 20MB!')
+        }
+        return (isJPG || isGIF || isPNG || isBMP) && isLt20M
+      },
+      upImgPosterSuccess (res, file) {
+        if (res && res.code === 0) {
+          this.commodityPoster = res.url
+        } else {
+          this.$message.error(data.msg)
+        }
+      },
+      upImgPosterError (err, file, fileList) {
+        this.commodityPoster = './src/assets/img/img_err.png';
+      },
+
+      beforeDetailUpload(file) {
+        const isJPG = file.type === 'image/jpeg'
+        const isGIF = file.type === 'image/gif'
+        const isPNG = file.type === 'image/png'
+        const isBMP = file.type === 'image/bmp'
+        const isLt20M = file.size / 20480 / 20480 < 20
+        if (!isJPG && !isGIF && !isPNG && !isBMP) {
+          this.$message.error('上传图片必须是JPG/GIF/PNG/BMP 格式!')
+        }
+        if (!isLt20M) {
+          this.$message.error('上传图片大小不能超过 20MB!')
+        }
+        return (isJPG || isGIF || isPNG || isBMP) && isLt20M
+      },
+      upImgDetailSuccess (res, file) {
+        if (res && res.code === 0) {
+          this.commodityDetailImage = res.url
+        } else {
+          this.$message.error(data.msg)
+        }
+      },
+      upImgDetailError (err, file, fileList) {
+        this.commodityDetailImage = './src/assets/img/img_err.png';
+      },
+
+      carouselHandleExceed(file, fileList) {
+        if (fileList.length >= this.carouselLimit) {
+          this.$message.error(
+            `轮播走马灯图片最多上传${this.carouselLimit}个文件`
+          );
+          return false;
+        }
+      },
+      carouselOnChange(res, file) {
+        if (res && res.code === 0) {
+          this.carouselFileList.push({
+            url: this.imageServerUrl + res.url
+          })
+        } else {
+          this.$message.error(data.msg)
+        }
+      },
+      carouselBeforeRemove(file) {
+        for(let i = 0; i < this.carouselFileList.length; i++) {
+          let _file = this.carouselFileList[i]
+          if (_file.url == file.url) {
+            this.$http({
+              url: this.$http.adornUrl('/system/file/delete'),
+              method: 'post',
+              params: this.$http.adornParams({
+                file: this.carouselFileList[i].url
+              })
+            }).then(({data}) => {
+              if (data && data.code === 0) {
+                this.carouselFileList.splice(i, 1)
+              } else {
+                this.$message.error(data.msg)
+              }
+            })
+          }
+        }
+      },
+      checkBusinessId() {
+        if (this.$route.query.businessId) {
+          this.businessId = this.$route.query.businessId;
+        } else {
+          this.businessId = Math.ceil(Math.random() * 10);
+          this.$alert("添加商家商品需要选择一个商家,先去选择商家", "提示", {
+            confirmButtonText: "确定",
+            callback: action => {
+              this.$router.push("/businessList");
+            }
+          });
+        }
+      },
+      async submitForm() {
+        this.$refs['commodity'].validate(async valid => {
+          if (valid) {
+            var str = "";
+            for (var i = 0; i < this.carouselFileList.length; i++) {
+              var replace = this.carouselFileList[i].url.replace(this.imageServerUrl,"");
+              str += replace + ",";
+            }
+            //去掉最后一个逗号(如果不需要去掉，就不用写)
+            if (str.length > 0) {
+              str = str.substr(0, str.length - 1);
+            }
+            this.$http({
+              url: this.$http.adornUrl(`/businessCommodity/add`),
+              method: 'post',
+              data: this.$http.adornData({
+                "businessCommodityAvatarFile":this.commodityAvatar,
+                'carouselImagesFileArray': str,
+                "businessCommodityCategoryId": this.commodity.businessCommodityCategoryIdArray[1],
+                "businessCommodityCategoryIdArray": this.commodity.businessCommodityCategoryIdArray,
+                "conSumType": this.commodity.conSumType,
+                "noticeText": this.commodity.noticeText,
+                "detailText": this.commodity.detailText,
+                "stockCount": this.commodity.stockCount,
+                "salesTotalCount": this.commodity.salesTotalCount,
+                "salesCurrentMonthCount": this.commodity.salesCurrentMonthCount,
+                "openStock": this.commodity.openStock,
+                "currentPrice": this.commodity.currentPrice,
+                "originPrice": this.commodity.originPrice,
+                "costPrice": this.commodity.costPrice,
+                "specsType": 1,
+                "businessCommoditySubTitle":this.commodity.businessCommoditySubTitle,
+                "priority": this.commodity.priority,
+                "businessId": this.commodity.businessId,
+                "businessCommodityName":this.commodity.businessCommodityName,
+                "businessCommodityDescription":this.commodity.businessCommodityDescription,
+                "detailContentUrl":this.commodity.detailContentUrl,
+                'businessCommodityPosterFile': this.commodityPoster,
+                "detailFileArray":this.commodityDetailImage
+              })
+            }).then(({data}) => {
+              if (data && data.code === 0) {
+                this.$message({
+                  message: "添加成功",
+                  type: "success"
+                });
+                let businessId = this.commodity.businessId
+                let businessName = this.commodity.businessName
+                this.$router.push({
+                  path: "businessCommodityList",
+                  query: {
+                    businessId: businessId,
+                    businessName: businessName
+                  }
+                });
+                Object.assign(this.commodity, this.$options.data().commodity)
+                this.commodity.businessId = businessId
+                this.commodity.businessName = businessName
+                this.commodityAvatar = ''
+                this.carouselFileList = []
+                this.commodityPoster = ''
+                this.commodityDetailImage = ''
+              } else {
+                this.$message.error(data.msg);
+              }
+            })
+          } else {
+            this.$notify.error({
+              title: "错误",
+              message: "请检查输入是否正确",
+              offset: 100
+            });
+            return false;
           }
         });
       }
-    },
-    async submitForm() {
-      this.$refs['commodity'].validate(async valid => {
-        if (valid) {
-          var str = "";
-          for (var i = 0; i < this.carouselFileList.length; i++) {
-            var replace = this.carouselFileList[i].url.replace(this.imageServerUrl,"");
-            str += replace + ",";
-          }
-          //去掉最后一个逗号(如果不需要去掉，就不用写)
-          if (str.length > 0) {
-            str = str.substr(0, str.length - 1);
-          }
-          this.$http({
-            url: this.$http.adornUrl(`/businessCommodity/add`),
-            method: 'post',
-            data: this.$http.adornData({
-              "businessCommodityAvatarFile":this.commodityAvatar,
-              'carouselImagesFileArray': str,
-              "businessCommodityCategoryId": this.commodity.businessCommodityCategoryIdArray[1],
-              "businessCommodityCategoryIdArray": this.commodity.businessCommodityCategoryIdArray,
-              "conSumType": this.commodity.conSumType,
-              "noticeText": this.commodity.noticeText,
-              "detailText": this.commodity.detailText,
-              "stockCount": this.commodity.stockCount,
-              "salesTotalCount": this.commodity.salesTotalCount,
-              "salesCurrentMonthCount": this.commodity.salesCurrentMonthCount,
-              "openStock": this.commodity.openStock,
-              "currentPrice": this.commodity.currentPrice,
-              "originPrice": this.commodity.originPrice,
-              "costPrice": this.commodity.costPrice,
-              "specsType": 1,
-              "businessCommoditySubTitle":this.commodity.businessCommoditySubTitle,
-              "priority": this.commodity.priority,
-              "businessId": this.commodity.businessId,
-              "businessCommodityName":this.commodity.businessCommodityName,
-              "businessCommodityDescription":this.commodity.businessCommodityDescription,
-              "detailContentUrl":this.commodity.detailContentUrl,
-              'businessCommodityPosterFile': this.commodityPoster,
-              "detailFileArray":this.commodityDetailImage
-            })
-          }).then(({data}) => {
-            if (data && data.code === 0) {
-              this.$message({
-                message: "添加成功",
-                type: "success"
-              });
-              let businessId = this.commodity.businessId
-              let businessName = this.commodity.businessName
-              this.$router.push({
-                path: "businessCommodityList",
-                query: {
-                  businessId: businessId,
-                  businessName: businessName
-                }
-              });
-              Object.assign(this.commodity, this.$options.data().commodity)
-              this.commodity.businessId = businessId
-              this.commodity.businessName = businessName
-              this.commodityAvatar = ''
-              this.carouselFileList = []
-              this.commodityPoster = ''
-              this.commodityDetailImage = ''
-            } else {
-              this.$message.error(data.msg);
-            }
-          })
-        } else {
-          this.$notify.error({
-            title: "错误",
-            message: "请检查输入是否正确",
-            offset: 100
-          });
-          return false;
-        }
-      });
     }
-  }
 };
 </script>
 

@@ -15,6 +15,7 @@
               highlight-current-row
               size="small"
               stripe>
+      <!--<el-table-column label="用户ID" prop="usersId"></el-table-column>-->
       <el-table-column label="用户名称" prop="nickName"></el-table-column>
       <el-table-column label="昵称" prop="aliasName"></el-table-column>
       <el-table-column label="手机号码" prop="phoneNumber"></el-table-column>
@@ -95,6 +96,7 @@
           })
         }).then(({data}) => {
           if (data && data.code === 0) {
+            console.log(data)
             this.userList = data.page.list;
             this.total = data.page.totalCount;
             this.userLoding = false
@@ -123,7 +125,7 @@
             url: this.$http.adornUrl('/user/switchDisable'),
             method: 'get',
             params: this.$http.adornParams({
-              usersId: row.id
+              usersId: row.usersId
             })
           }).then(({data}) => {
             if (data && data.code === 0) {
@@ -149,7 +151,7 @@
           url: this.$http.adornUrl('/usersAdditional/info'),
           method: 'get',
           params: this.$http.adornParams({
-            usersId: row.id
+            usersId: row.usersId
           })
         }).then(({data}) => {
           if (data && data.code === 0) {
@@ -190,7 +192,7 @@
             url: this.$http.adornUrl('/usersAdditional/remove'),
             method: 'get',
             params: this.$http.adornParams({
-              usersId: row.id
+              usersId: row.usersId
             })
           }).then(({data}) => {
             if (data && data.code === 0) {
