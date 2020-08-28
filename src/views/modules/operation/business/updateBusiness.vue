@@ -172,8 +172,7 @@
                   </el-upload>
                 </el-form-item>
                 <el-form-item label="卫生许可图片">
-                  <el-upload
-                    class="avatar-uploader"
+                  <el-upload class="avatar-uploader"
                     :action="$GlobalApi.getServerUrl('/system/file/business/upload')"
                     :before-upload="beforehealthImageUpload"
                     :headers="$GlobalApi.getUserToken()"
