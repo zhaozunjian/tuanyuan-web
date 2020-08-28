@@ -32,21 +32,16 @@
              @current-change="handleListCurrentChange" @handle-size-change="handleListSizeChange" background/>
     </div>
     <el-dialog class="code-dialog" width="45%" title="添加商圈" :visible.sync="dialogAddFormVisible" @close="closeDialog">
-      <el-form class="sd-form" label-position="right" label-width="110px" size="small" style="padding-right: 6%" :model="addForm" ref="form">
-        <el-form-item label="商圈城市">
-          <el-cascader
-            v-model="addForm.administrativeAreaArrayAdd"
-            :options="administrativeAreaOptions"
-            :props="{ expandTrigger: 'hover' }"
-          ></el-cascader>
-          <el-button @click="initAddShoppingDistrictBindBusinessList(addAdministrativeAreaArray[addAdministrativeAreaArray.length-1])" class="sd-mag-l-10" icon="el-icon-search" size="small" type="primary">查询</el-button>
-        </el-form-item>
-      </el-form>
+      <el-cascader
+        v-model="addForm.administrativeAreaArrayAdd"
+        :options="administrativeAreaOptions"
+        :props="{ expandTrigger: 'hover' }"
+      ></el-cascader>
+      <el-button @click="initAddShoppingDistrictBindBusinessList(addAdministrativeAreaArray[addAdministrativeAreaArray.length-1])" class="sd-mag-l-10" icon="el-icon-search" size="small" type="primary">查询</el-button>
       <el-table
         ref="singleTable"
         :data="addForm.shoppingDistrictListAddForm"
-        highlight-current-row
-        style="width: 100%">
+        :height="$GlobalApi.getWinHeight() - 300">
         <el-table-column prop="administrativeAreaId" label="城市编号"></el-table-column>
         <el-table-column prop="shoppingDistrictName" label="商圈名称" show-overflow-tooltip></el-table-column>
         <el-table-column fixed="right" label="操作" width="100px">
@@ -55,14 +50,8 @@
           </template>
         </el-table-column>
       </el-table>
-      <div class="dialog-footer">
-        <pager :current-page="addCurrentPage" :page-size="addPageSize" :total="addTotal"
-               @current-change="handleAddCurrentChange" @handle-size-change="handleAddSizeChange" background/>
-      </div>
-      <!--<div slot="footer" class="dialog-footer">-->
-        <!--&lt;!&ndash;<el-button size="small" plain @click="dialogAddFormVisible=false">取 消</el-button>&ndash;&gt;-->
-        <!--<el-button size="small" type="primary" @click="handleAddShoppingDistrict()">确 定</el-button>-->
-      <!--</div>-->
+      <pager :current-page="addCurrentPage" :page-size="addPageSize" :total="addTotal"
+             @current-change="handleAddCurrentChange" @handle-size-change="handleAddSizeChange" background/>
     </el-dialog>
   </el-card>
 </template>
@@ -78,7 +67,7 @@ export default {
       administrativeAreaOptions: [],
       addTotal: 0,
       addCurrentPage: 1,
-      addPageSize: 5,
+      addPageSize: 10,
       addForm: {
           administrativeAreaArrayAdd: [],
           shoppingDistrictListAddForm: [],
@@ -200,12 +189,12 @@ export default {
         })
     },
     initAddShoppingDistrictBindBusinessList(administrativeAreaId) {
-        if (!this.addCurrentPage) {
-            this.addCurrentPage = 1;
-        }
-        if (!this.addPageSize) {
-            this.addPageSize = 5;
-        }
+        // if (!this.addCurrentPage) {
+        //     this.addCurrentPage = 1;
+        // }
+        // if (!this.addPageSize) {
+        //     this.addPageSize = 5;
+        // }
       this.$http({
         url: this.$http.adornUrl(`/shoppingDistrict/pageByAdministrativeAreaId`),
         method: 'post',
@@ -218,8 +207,8 @@ export default {
         if (data && data.code === 0) {
           this.addForm.shoppingDistrictListAddForm = data.result.data
           this.addTotal = data.result.pageModel.total;
-          this.addCurrentPage = data.result.pageModel.currentPage;
-          this.addPageSize = data.result.pageModel.pageSize;
+          // this.addCurrentPage = data.result.pageModel.currentPage;
+          // this.addPageSize = data.result.pageModel.pageSize;
         } else {
           this.$message.error(data.msg);
         }

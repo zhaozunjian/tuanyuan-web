@@ -154,7 +154,7 @@
           let headquarterId = this.$route.query.headquarterId
           this.$http({
             url: this.$http.adornUrl(`/headquarterCutBusinessCommodity/remove`),
-            method: 'post',
+            method: 'get',
             params: this.$http.adornParams({
               headquarterId: headquarterId,
               businessCommodityId: takeCutEditForm.businessCommodityId
