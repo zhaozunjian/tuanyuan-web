@@ -1,7 +1,7 @@
 <template>
   <el-card>
     <div slot="header">
-      <el-input class="sd-input-150" clearable placeholder="帐号" size="small" v-model="searchContent"/>
+      <el-input class="sd-input-150" clearable placeholder="商品名称" size="small" @change="getchangeInit" v-model="searchContent"/>
       <el-button @click="initBusinessCommodityContractTimeList()" class="sd-mag-l-10" icon="el-icon-search" size="small" type="primary">查询</el-button>
     </div>
     <el-table
@@ -50,6 +50,11 @@
     methods: {
       initData() {
         this.initBusinessCommodityContractTimeList();
+      },
+      getchangeInit(val){
+        if (val === null || val === ''){
+          this.initBusinessCommodityContractTimeList();
+        }
       },
       initBusinessCommodityContractTimeList() {
         this.$http({

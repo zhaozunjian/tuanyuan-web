@@ -29,10 +29,10 @@
 
       <el-menu class="site-navbar__menu site-navbar__menu--right" mode="horizontal">
         <el-menu-item class="site-navbar__avatar sd-sizes" index="3">
-          <el-badge :value="$GlobalApi.getUserInfo().usermsg" class="item">
+          <el-badge :value="$GlobalApi.getUserInfo().usermsg" class="item" v-if="$GlobalApi.getUserInfo().roleId == 10">
             <el-button @click="userSubmit" icon="el-icon-chat-dot-round" size="small" type="text">用户提现</el-button>
           </el-badge>
-          <el-badge :value="$GlobalApi.getUserInfo().machmsg" class="item">
+          <el-badge :value="$GlobalApi.getUserInfo().machmsg" class="item" v-if="$GlobalApi.getUserInfo().roleId == 10">
             <el-button @click="merchanSubmit" icon="el-icon-chat-dot-round" size="small" type="text">商户提现</el-button>
           </el-badge>
           <el-dropdown :show-timeout="0" placement="bottom">

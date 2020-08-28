@@ -35,7 +35,7 @@
       <el-cascader
         v-model="addForm.administrativeAreaArrayAdd"
         :options="administrativeAreaOptions"
-        :props="{ expandTrigger: 'hover' }"
+        :props="{ expandTrigger: 'hover' }" size="small"
       ></el-cascader>
       <el-button @click="initAddShoppingDistrictBindBusinessList(addAdministrativeAreaArray[addAdministrativeAreaArray.length-1])" class="sd-mag-l-10" icon="el-icon-search" size="small" type="primary">查询</el-button>
       <el-table

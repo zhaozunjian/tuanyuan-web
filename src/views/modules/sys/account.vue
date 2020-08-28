@@ -2,7 +2,7 @@
   <div class="mod-user">
     <el-card body-style="padding:10px" class="box-card" shadow="never">
       <div slot="header">
-        <el-input class="sd-input-150" clearable placeholder="用户名称" size="small" v-model="dataForm.nickName"/>
+        <el-input class="sd-input-150" clearable placeholder="账号名称" size="small" @change="getchangeInit" v-model="nickName"/>
         <el-button @click="getDataList()" class="sd-mag-l-10" icon="el-icon-search" size="small" type="primary">查询
         </el-button>
       </div>
@@ -98,9 +98,7 @@
   export default {
     data () {
       return {
-        dataForm: {
-          nickName: '',
-        },
+        nickName: '',
         accountLoading:false,
         accountList:[],
         pageIndex: this.$GlobalApi.Constants.DICT.PAGE,
@@ -117,6 +115,11 @@
       this.getDataList()
     },
     methods: {
+      getchangeInit(val){
+        if (val === null || val === ''){
+          this.getDataList();
+        }
+      },
       // 获取数据列表
       getDataList () {
         this.accountLoading =true
@@ -126,7 +129,7 @@
           params: this.$http.adornParams({
             'page': this.pageIndex,
             'size': this.pageSize,
-            'nickName': this.dataForm.nickName
+            'aliasName': this.nickName
           })
         }).then(({data}) => {
           if (data && data.code === 0) {

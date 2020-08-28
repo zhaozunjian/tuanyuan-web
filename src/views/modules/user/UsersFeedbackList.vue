@@ -1,11 +1,9 @@
 <template>
   <el-card>
-    <el-row class="row-search sd-nopadding" slot="header">
-      <el-col class="search">
-        <el-input class="sd-input-150" placeholder="用户名称" size="small" v-model="contactName"/>
-        <el-button @click="initUsersFeedbackList()" class="sd-mag-l-10" icon="el-icon-search" size="small" type="primary">查询</el-button>
-      </el-col>
-    </el-row>
+    <div slot="header">
+      <el-input class="sd-input-150" clearable placeholder="联系人名称" size="small" @change="getchangeInit" v-model="contactName"/>
+      <el-button @click="initUsersFeedbackList()" class="sd-mag-l-10" icon="el-icon-search" size="small" type="primary">查询</el-button>
+    </div>
     <el-table
       :cell-style="$GlobalApi.cellClass"
       :data="feedbackList"
@@ -93,6 +91,11 @@ export default {
       initData() {
           this.initUsersFeedbackList();
       },
+    getchangeInit(val){
+      if (val === null || val === ''){
+        this.initUsersFeedbackList();
+      }
+    },
       initUsersFeedbackList() {
         this.$http({
           url: this.$http.adornUrl(`/usersFeedback/pageAll`),

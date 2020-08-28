@@ -1,7 +1,7 @@
 <template>
   <el-card>
     <div slot="header">
-      <el-input class="sd-input-150" clearable placeholder="昵称/手机号" size="small" v-model="searchContent"/>
+      <el-input class="sd-input-150" clearable placeholder="昵称/手机号" size="small" @change="getchangeInit" v-model="searchContent"/>
       <el-button @click="getUserList()" class="sd-mag-l-10" icon="el-icon-search" size="small" type="primary">查询</el-button>
     </div>
     <el-tabs v-model="searchType" @tab-click="swithcTab()"  type="card">
@@ -83,6 +83,11 @@
       this.getUserList()
     },
     methods: {
+      getchangeInit(val){
+        if (val === null || val === ''){
+          this.getUserList();
+        }
+      },
       getUserList() {
         this.userLoding = true
         this.$http({
@@ -96,7 +101,6 @@
           })
         }).then(({data}) => {
           if (data && data.code === 0) {
-            console.log(data)
             this.userList = data.page.list;
             this.total = data.page.totalCount;
             this.userLoding = false

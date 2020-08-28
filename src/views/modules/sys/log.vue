@@ -2,9 +2,9 @@
   <div class="mod-log">
     <el-card class="box-card" shadow="never" body-style="padding:10px">
       <div slot="header">
-        <el-input placeholder="用户名" size="small" clearable class="sd-input-150" v-model="dataForm.key"/>
+        <el-input placeholder="用户名" size="small" clearable class="sd-input-150" @change="getchangeInit" v-model="dataForm.key"/>
         <el-button @click="getDataList()" size="small" type="primary" class="sd-mag-l-10" icon="el-icon-search">查询</el-button>
-  </div>
+      </div>
     <el-table
       :height="$GlobalApi.getWinHeight() - 260"
       :header-cell-style="$GlobalApi.rowClass"
@@ -69,6 +69,11 @@
       this.getDataList()
     },
     methods: {
+      getchangeInit(val){
+        if (val === null || val === ''){
+          this.getDataList();
+        }
+      },
       // 获取数据列表
       getDataList () {
         this.dataListLoading = true

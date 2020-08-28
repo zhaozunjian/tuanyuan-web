@@ -2,7 +2,7 @@
   <div class="mod-user">
     <el-card body-style="padding:10px" class="box-card" shadow="never">
       <div slot="header">
-        <el-input class="sd-input-150" clearable placeholder="请输入订单id或订单号码" size="small" v-model.trim="searchContent"/>
+        <el-input class="sd-input-150" clearable placeholder="请输入订单id或订单号码" size="small" @change="getchangeInit" v-model.trim="searchContent"/>
         <el-button @click="getOrdersList()" class="sd-mag-l-10" icon="el-icon-search" size="small" type="primary">查询
         </el-button>
       </div>
@@ -186,6 +186,11 @@ export default {
             this.pageSize = 10
             this.getOrdersList()
         },
+      getchangeInit(val){
+        if (val === null || val === ''){
+          this.getOrdersList();
+        }
+      },
         getOrdersList() {
           this.$http({
             url: this.$http.adornUrl('/ordersRecord/pageWithSearch'),

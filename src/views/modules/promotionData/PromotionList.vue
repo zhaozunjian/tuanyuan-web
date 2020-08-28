@@ -4,7 +4,7 @@
       :cell-style="$GlobalApi.cellClass"
       :data="promotionList"
       :header-cell-style="$GlobalApi.rowClass"
-      :height="$GlobalApi.getWinHeight() - 260"
+      :height="$GlobalApi.getWinHeight() - 220"
       border
       highlight-current-row
       size="small"

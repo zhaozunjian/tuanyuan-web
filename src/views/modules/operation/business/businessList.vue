@@ -2,7 +2,7 @@
   <div class="mod-user">
     <el-card body-style="padding:10px" class="box-card" shadow="never">
       <div slot="header">
-        <el-input class="sd-input-150" clearable placeholder="输入关键字搜索" size="small" @change="getchangeInit" v-model.trim="searchContent"/>
+        <el-input class="sd-input-150" clearable placeholder="商家名称" size="small" @change="getchangeInit" v-model.trim="searchContent"/>
         <el-button @click="initData()" class="sd-mag-l-10" icon="el-icon-search" size="small" type="primary">查询
         </el-button>
       </div>

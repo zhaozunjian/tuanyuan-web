@@ -1,12 +1,10 @@
 <template>
   <el-card>
-    <el-row class="row-search sd-nopadding" slot="header">
-      <el-col class="search">
-        <el-cascader class="sd-input-150" size="small" v-model="administrativeAreaArrayList" :options="administrativeAreaOptions" :props="{ expandTrigger: 'hover' }"
-        ></el-cascader>
-        <el-button @click="initShoppingDistrict()" class="sd-mag-l-10" icon="el-icon-search" size="small" type="primary">查询</el-button>
-      </el-col>
-    </el-row>
+    <div slot="header">
+      <el-cascader class="sd-input-150" size="small" v-model="administrativeAreaArrayList" :options="administrativeAreaOptions" :props="{ expandTrigger: 'hover' }"
+      ></el-cascader>
+      <el-button @click="initShoppingDistrict()" class="sd-mag-l-10" icon="el-icon-search" size="small" type="primary">查询</el-button>
+    </div>
     <el-table
       :cell-style="$GlobalApi.cellClass"
       :data="shoppingDistrictList"

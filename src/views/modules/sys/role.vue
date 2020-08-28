@@ -2,7 +2,7 @@
   <div class="mod-role">
     <el-card class="box-card" shadow="never" body-style="padding:10px">
       <div slot="header">
-            <el-input v-model="roleName" size="small" class="sd-input-150" placeholder="岗位名称" clearable></el-input>
+            <el-input v-model="roleName" @change="getchangeInit" size="small" class="sd-input-150" placeholder="岗位名称" clearable></el-input>
             <el-button @click="getDataList()" class="sd-mag-l-10" icon="el-icon-search" size="small" type="primary">查询</el-button>
       </div>
 
@@ -95,6 +95,11 @@
       this.getDataList()
     },
     methods: {
+      getchangeInit(val){
+        if (val === null || val === ''){
+          this.getDataList();
+        }
+      },
       // 获取数据列表
       getDataList () {
         this.dataListLoading = true

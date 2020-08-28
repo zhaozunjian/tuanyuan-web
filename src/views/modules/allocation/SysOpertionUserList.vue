@@ -1,11 +1,9 @@
 <template>
-  <el-card>
-    <el-row class="row-search sd-nopadding" slot="header">
-      <el-col class="search">
-        <el-input class="sd-input-150" placeholder="用户名称" size="small" v-model="searchContent"/>
-        <el-button @click="getUsersOperationList()" class="sd-mag-l-10" icon="el-icon-search" size="small" type="primary">查询</el-button>
-      </el-col>
-    </el-row>
+  <el-card body-style="padding:10px" class="box-card" shadow="never">
+    <div slot="header">
+      <el-input class="sd-input-150" placeholder="用户名称" size="small" clearable @change="getchangeInit" v-model="searchContent"/>
+      <el-button @click="getUsersOperationList()" class="sd-mag-l-10" icon="el-icon-search" size="small" type="primary">查询</el-button>
+    </div>
     <el-table
       :cell-style="$GlobalApi.cellClass"
       :data="sysOperationUserList"
@@ -50,6 +48,11 @@ export default {
     this.getUsersOperationList();
   },
   methods: {
+    getchangeInit(val){
+      if (val === null || val === ''){
+        this.getUsersOperationList();
+      }
+    },
     getUsersOperationList() {
       this.$http({
         url: this.$http.adornUrl('/sys/user/userlist'),
