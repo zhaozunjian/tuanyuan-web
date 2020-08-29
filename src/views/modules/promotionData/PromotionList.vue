@@ -73,8 +73,7 @@
 
 <script>
 
-
-export default {
+  export default {
     data() {
         return {
             currentPage: 1,
@@ -225,7 +224,7 @@ export default {
             this.initPromotionList()
         }
     }
-};
+  };
 </script>
 
 <style lang="less">

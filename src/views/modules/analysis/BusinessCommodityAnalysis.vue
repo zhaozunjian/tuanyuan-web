@@ -13,7 +13,7 @@
           value-format="yyyy-MM-dd"
           :picker-options="pickerOptions">
         </el-date-picker>
-        <el-input class="sd-input-150" clearable placeholder="搜索商品名称" size="small" v-model.trim="searchContent"/>
+        <el-input class="sd-input-150" clearable placeholder="搜索商品名称" size="small" @change="getchangeInit" v-model.trim="searchContent"/>
         <el-button @click="getBusinessCommodityList()" class="sd-mag-l-10" icon="el-icon-search" size="small" type="primary">查询</el-button>
       </div>
 
@@ -370,6 +370,11 @@ export default {
   methods: {
     handleClick() {
       this.getBusinessCommodityList()
+    },
+    getchangeInit(val){
+      if (val === null || val === ''){
+        this.getBusinessCommodityList();
+      }
     },
     getBusinessCommodityList() {
       if (this.chooseTimes != null && this.chooseTimes != '') {
