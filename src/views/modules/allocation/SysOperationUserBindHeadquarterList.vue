@@ -1,10 +1,8 @@
 <template>
   <el-card>
-    <el-row class="row-search sd-nopadding" slot="header">
-      <el-col class="search">
-        <div>所选运营:{{this.sysOperationUserLoginName}}</div>
-      </el-col>
-    </el-row>
+    <div slot="header">
+      <div>所选运营:{{this.sysOperationUserLoginName}}</div>
+    </div>
     <el-table
       :cell-style="$GlobalApi.cellClass"
       :data="listForm.bindHeadquarterList"
@@ -34,17 +32,11 @@
              @current-change="handleListCurrentChange" @handle-size-change="handleListSizeChange" background/>
     </div>
     <el-dialog class="code-dialog" width="45%" title="新建关联" :visible.sync="dialogFormVisibleAdd">
-      <div class="mb20 flex align-center justify-between">
-        <div>所选运营:{{this.sysOperationUserLoginName}}</div>
-        <div slot="header">
-          <el-input class="sd-input-150" clearable placeholder="请输入品牌商名称" size="small" v-model="addForm.searchContent"/>
-          <el-button @click="getUnBindHeadquarterList()" class="sd-mag-l-10" icon="el-icon-search" size="small" type="primary">查询
-          </el-button>
-        </div>
-      </div>
-      <el-table :data="addForm.UnBindHeadquarterList" :cell-style="$GlobalApi.cellClass"
+      <el-input class="sd-input-150" clearable placeholder="请输入品牌商名称" size="small" @change="getBusiness" v-model="addForm.searchContent"/>
+      <el-button @click="getUnBindHeadquarterList()" class="sd-mag-l-10" icon="el-icon-search" size="small" type="primary">查询</el-button>
+      <el-table style="margin-top: 20px;" :data="addForm.UnBindHeadquarterList" :cell-style="$GlobalApi.cellClass"
                 :header-cell-style="$GlobalApi.rowClass"
-                :height="$GlobalApi.getWinHeight() - 280"
+                :height="$GlobalApi.getWinHeight() - 300"
                 border
                 highlight-current-row
                 size="small"
@@ -118,18 +110,17 @@
         this.dialogFormVisibleAdd = true
         this.getUnBindHeadquarterList()
       },
-      addFormChange() {
-        if (this.addForm.searchContent==''){
-          this.getUnBindHeadquarterList()
+      getBusiness(val){
+        if (val === null || val === ''){
+          this.getUnBindHeadquarterList();
         }
       },
       getUnBindHeadquarterList() {
-        let sysOperationUserId = this.$route.query.sysOperationUserId
         this.$http({
           url: this.$http.adornUrl('/sysOperationUserBindHeadquarter/pageNoBindHeadquarter'),
           method: 'post',
           params: this.$http.adornParams({
-            sysOperationUserId: sysOperationUserId,
+            sysOperationUserId: this.sysOperationUserId,
             searchContent: this.addForm.searchContent,
             currentPage: this.addCurrentPage,
             pageSize: this.addPageSize
@@ -144,8 +135,6 @@
         })
       },
       handleUnbind(headquarter) {
-        let sysOperationUserId = this.$route.query.sysOperationUserId
-        var that = this
         this.$confirm('此操作将解除关联该品牌商, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -155,7 +144,7 @@
             url: this.$http.adornUrl('/sysOperationUserBindHeadquarter/unBind'),
             method: 'get',
             params: this.$http.adornParams({
-              sysOperationUserId: sysOperationUserId,
+              sysOperationUserId: this.sysOperationUserId,
               headquarterId: headquarter.headquarterId
             })
           }).then(({data}) => {
@@ -177,12 +166,11 @@
         });
       },
       handleBind(headquarter) {
-        let sysOperationUserId = this.$route.query.sysOperationUserId
         this.$http({
           url: this.$http.adornUrl('/sysOperationUserBindHeadquarter/bind'),
           method: 'get',
           params: this.$http.adornParams({
-            sysOperationUserId: sysOperationUserId,
+            sysOperationUserId: this.sysOperationUserId,
             headquarterId: headquarter.headquarterId
           })
         }).then(({data}) => {

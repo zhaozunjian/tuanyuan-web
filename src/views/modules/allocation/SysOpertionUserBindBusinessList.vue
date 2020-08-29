@@ -1,12 +1,8 @@
 <template>
   <el-card>
-    <el-row class="row-search sd-nopadding" slot="header">
-      <el-col class="search">
-        <div class="container-top flex align-center justify-between pb20">
-          <div>所选运营:{{this.sysOperationUserLoginName}}</div>
-        </div>
-      </el-col>
-    </el-row>
+    <div slot="header">
+      <div>所选运营:{{this.sysOperationUserLoginName}}</div>
+    </div>
     <el-table
       :cell-style="$GlobalApi.cellClass"
       :data="bindBusinessList"
@@ -38,18 +34,13 @@
       <pager :current-page="listCurrentPage" :page-size="listPageSize" :total="listTotal"
              @current-change="handleListCurrentChange" @handle-size-change="handleListSizeChange" background/>
     </div>
-    <el-dialog class="code-dialog" :visible.sync="dialogFormVisibleAdd"
-               width="50%" :close-on-click-modal="false" :modal-append-to-body='false'>
+    <el-dialog class="code-dialog" :visible.sync="dialogFormVisibleAdd" width="50%" :close-on-click-modal="false" :modal-append-to-body='false'>
       <h3 slot="title" style="margin:0px">添加关联</h3>
-      <el-row class="row-search sd-nopadding" slot="header">
-        <el-col class="search">
-          <el-input class="sd-input-150" placeholder="请输入商家名称" size="small" v-model.trim="addForm.searchContent"/>
-          <el-button @click="getUnBindBusinessList()" class="sd-mag-l-10" icon="el-icon-search" size="small" type="primary">查询</el-button>
-        </el-col>
-      </el-row>
-      <el-table :data="addForm.unBindBusinessList" :cell-style="$GlobalApi.cellClass"
+      <el-input class="sd-input-150" clearable placeholder="请输入商家名称" size="small" @change="getBusiness" v-model.trim="addForm.searchContent"/>
+      <el-button @click="getUnBindBusinessList()" class="sd-mag-l-10" icon="el-icon-search" size="small" type="primary">查询</el-button>
+      <el-table style="margin-top: 20px;" :data="addForm.unBindBusinessList" :cell-style="$GlobalApi.cellClass"
                 :header-cell-style="$GlobalApi.rowClass"
-                :height="$GlobalApi.getWinHeight() - 320" border highlight-current-row
+                :height="$GlobalApi.getWinHeight() - 300" border highlight-current-row
                 size="small" stripe>
         <el-table-column property="businessName" label="商家名称"></el-table-column>
         <el-table-column
@@ -61,7 +52,7 @@
           </template>
         </el-table-column>
       </el-table>
-      <pager :current-page="addForm.addCurrentPage" :page-size="addForm.addPageSize" :total="addForm.addTotal"
+      <pager :current-page="addCurrentPage" :page-size="addPageSize" :total="addTotal"
              @current-change="handleAddCurrentChange" @handle-size-change="handleAddSizeAddChange" background/>
     </el-dialog>
   </el-card>
@@ -81,11 +72,11 @@ export default {
       dialogFormVisibleAdd: false,
       addForm: {
         searchContent: '',
-        addCurrentPage: 1,
-        addPageSize: 10,
-        addTotal: 0,
         unBindBusinessList: []
-      }
+      },
+      addCurrentPage: 1,
+      addPageSize: 10,
+      addTotal: 0,
     }
   },
   mounted() {
@@ -93,29 +84,31 @@ export default {
   },
   methods: {
     initData() {
-      this.sysOperationUserId = this.$route.query.sysOperationUserId
-      this.sysOperationUserLoginName = this.$route.query.sysOperationUserLoginName
+      if (this.$route.query.sysOperationUserId) {
+        this.sysOperationUserId = this.$route.query.sysOperationUserId
+        this.sysOperationUserLoginName = this.$route.query.sysOperationUserLoginName
+      }
       this.initBindBusinessList()
     },
     initBindBusinessList() {
-      let sysOperationUserId = this.$route.query.sysOperationUserId
-      let sysOperationUserLoginName = this.$route.query.sysOperationUserLoginName
-      this.$http({
-        url: this.$http.adornUrl(`/sysOperationUserBindBusiness/pageBindBusinessList`),
-        method: 'post',
-        params: this.$http.adornParams({
-          sysOperationUserId: sysOperationUserId,
-          currentPage: this.listCurrentPage,
-          pageSize: this.listPageSize
+      if (this.sysOperationUserId){
+        this.$http({
+          url: this.$http.adornUrl(`/sysOperationUserBindBusiness/pageBindBusinessList`),
+          method: 'post',
+          params: this.$http.adornParams({
+            sysOperationUserId: this.sysOperationUserId,
+            currentPage: this.listCurrentPage,
+            pageSize: this.listPageSize
+          })
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.bindBusinessList = data.result.data
+            this.listTotal = data.result.pageModel.total
+          } else {
+            this.$message.error(data.msg);
+          }
         })
-      }).then(({data}) => {
-        if (data && data.code === 0) {
-          this.bindBusinessList = data.result.data
-          this.listTotal = data.result.pageModel.total
-        } else {
-          this.$message.error(data.msg);
-        }
-      })
+      }
     },
     handleUnbind(businessId) {
       var that = this
@@ -153,40 +146,37 @@ export default {
       this.dialogFormVisibleAdd = true
       this.getUnBindBusinessList()
     },
-    onChange(){
-        if (this.addForm.searchContent==''){
-            this.getUnBindBusinessList()
-        }
+    getBusiness(val){
+      if (val === null || val === ''){
+        this.getUnBindBusinessList();
+      }
     },
     getUnBindBusinessList() {
-      let sysOperationUserId = this.$route.query.sysOperationUserId
-
       this.$http({
         url: this.$http.adornUrl(`/sysOperationUserBindBusiness/pageUnBindBusinessWithSearch`),
         method: 'post',
         params: this.$http.adornParams({
-          sysOperationUserId: sysOperationUserId,
+          sysOperationUserId: this.sysOperationUserId,
           searchContent: this.addForm.searchContent,
-          currentPage: this.addForm.addCurrentPage,
-          pageSize: this.addForm.addPageSize
+          currentPage: this.addCurrentPage,
+          pageSize: this.addPageSize
         })
       }).then(({data}) => {
         if (data && data.code === 0) {
           this.addForm.unBindBusinessList = data.result.data
-          this.addForm.addTotal = data.result.pageModel.total
+          this.addTotal = data.result.pageModel.total
         } else {
           this.$message.error(data.msg);
         }
       })
     },
     handleBind(businessId) {
-      let sysOperationUserId = this.$route.query.sysOperationUserId
       this.$http({
         url: this.$http.adornUrl(`/sysOperationUserBindBusiness/bind`),
         method: 'get',
         params: this.$http.adornParams({
           businessId:businessId,
-          sysOperationUserId:sysOperationUserId
+          sysOperationUserId:this.sysOperationUserId
         })
       }).then(({data}) => {
         if (data && data.code === 0) {
@@ -210,12 +200,12 @@ export default {
       this.listPageSize = val
       this.initBindBusinessList()
     },
-    handleAddCurrentChange() {
-      this.addForm.addCurrentPage = val
+    handleAddCurrentChange(val) {
+      this.addCurrentPage = val
       this.getUnBindBusinessList()
     },
     handleAddSizeAddChange(val) {
-      this.addForm.addPageSize = val
+      this.addPageSize = val
       this.getUnBindBusinessList()
     }
   }
