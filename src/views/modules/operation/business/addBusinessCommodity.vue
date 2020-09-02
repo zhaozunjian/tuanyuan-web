@@ -15,6 +15,20 @@
             <el-form-item label="所属商家分类">
               <span>{{this.commodity.businessRootCategoryName!=''?this.commodity.businessRootCategoryName + '/':'' + this.commodity.businessCategoryName}}</span>
             </el-form-item>
+            <el-form-item label="是否折扣商品" prop="isDiscountPay">
+              <el-select v-model="commodity.isDiscountPay" placeholder="请选择">
+                <el-option label="是" value="1"></el-option>
+                <el-option label="否" value="0"></el-option>
+              </el-select>
+            </el-form-item>
+            <template v-if="commodity.isDiscountPay == '1'">
+              <el-form-item label="售价百分比" prop="sellPercentage">
+                <el-input-number v-model="commodity.sellPercentage" :precision="2" :step="0.01" :max="1"></el-input-number>
+              </el-form-item>
+              <el-form-item label="成本百分比" prop="costPercentage">
+                <el-input-number v-model="commodity.costPercentage" :precision="2" :step="0.01" :max="1"></el-input-number>
+              </el-form-item>
+            </template>
             <el-form-item label="商品名称" prop="businessCommodityName">
               <el-input v-model="commodity.businessCommodityName" placeholder="请输入商品名称"></el-input>
             </el-form-item>
@@ -28,7 +42,7 @@
               <el-input v-model="commodity.detailContentUrl" placeholder="请输入商品详情url"></el-input>
             </el-form-item>
             <el-form-item label="消费类型(必填)" prop="conSumType">
-              <el-select v-model="commodity.conSumType" placeholder="请选择消费类型">
+              <el-select v-model="commodity.conSumType" placeholder="请选择消费类型" :disabled="commodity.isDiscountPay == '1'">
                 <el-option label="核销" value="1"></el-option>
                 <el-option label="外送" value="2"></el-option>
               </el-select>
@@ -41,26 +55,23 @@
               ></el-cascader>
             </el-form-item>
             <el-form-item label="推荐权重值" prop="priority">
-              <!--<el-cascader-->
-                <!--v-model="commodity.priority"-->
-                <!--:options="businessCommodityPriorityOptions"-->
-                <!--:props="{ expandTrigger: 'hover' }"-->
-              <!--&gt;</el-cascader>-->
               <el-select v-model="commodity.priority" placeholder="推荐权重值">
                 <el-option v-for="item in businessCommodityPriorityOptions" :key="item.value" :label="item.label" :value="item.value" />
               </el-select>
             </el-form-item>
-            <el-form-item label="合作价(商户所得价)">
-              <el-input-number v-model="commodity.costPrice" :min="0" :max="99999999"></el-input-number>
-            </el-form-item>
-            <el-form-item label="售价(用户购买价)">
-              <el-input-number v-model="commodity.currentPrice" :min="0" :max="99999999"></el-input-number>
-            </el-form-item>
-            <el-form-item label="原价(界面灰色的价格)">
-              <el-input-number v-model="commodity.originPrice" :min="0" :max="99999999"></el-input-number>
-            </el-form-item>
+            <template v-if="commodity.isDiscountPay != '1'">
+              <el-form-item label="合作价(商户所得价)">
+                <el-input-number v-model="commodity.costPrice" :min="0" :precision="2" :max="99999999"></el-input-number>
+              </el-form-item>
+              <el-form-item label="售价(用户购买价)">
+                <el-input-number v-model="commodity.currentPrice" :min="0" :precision="2" :max="99999999"></el-input-number>
+              </el-form-item>
+              <el-form-item label="原价(界面灰色的价格)">
+                <el-input-number v-model="commodity.originPrice" :min="0" :precision="2" :max="99999999"></el-input-number>
+              </el-form-item>
+            </template>
             <el-form-item label="是否开启库存限制">
-              <el-select v-model.trim="commodity.openStock">
+              <el-select v-model.trim="commodity.openStock" :disabled="commodity.isDiscountPay == '1'">
                 <el-option label="开启" value="1"></el-option>
                 <el-option label="不开启(无限库存)" value="2"></el-option>
               </el-select>
@@ -171,21 +182,27 @@
           businessCommodityCategoryId: "",
           priority: 5,
           specsType: 1,
-          costPrice: 0,
-          originPrice: 0,
-          currentPrice: 0,
-          openStock: "1",
+          costPrice: 0.00,
+          originPrice: 0.00,
+          currentPrice: 0.00,
+          openStock: "2",
           stockCount: 10000,
           salesTotalCount: '',
           salesCurrentMonthCount: 0,
           detailText: "",
           noticeText: "",
-          conSumType: "",
+          conSumType: "1",
+          isDiscountPay: "0",
+          costPercentage: 0.00,
+          sellPercentage: 0.00,
           businessCommodityCategoryIdArray: ""
         },
         rules: {
           businessCommodityName: [
             { required: true, message: "请输入商品名称", trigger: "blur" }
+          ],
+          isDiscountPay: [
+            { required: true, message: "请输入是否折扣", trigger: "blur" }
           ],
             priority: [
             { required: true, message: "请选择推荐权重值", trigger: "change" }
@@ -456,9 +473,9 @@
                 "salesTotalCount": this.commodity.salesTotalCount,
                 "salesCurrentMonthCount": this.commodity.salesCurrentMonthCount,
                 "openStock": this.commodity.openStock,
-                "currentPrice": this.commodity.currentPrice,
-                "originPrice": this.commodity.originPrice,
-                "costPrice": this.commodity.costPrice,
+                "currentPrice": this.commodity.isDiscountPay == '1'?0:this.commodity.currentPrice,
+                "originPrice": this.commodity.isDiscountPay == '1'?0:this.commodity.originPrice,
+                "costPrice": this.commodity.isDiscountPay == '1'?0:this.commodity.costPrice,
                 "specsType": 1,
                 "businessCommoditySubTitle":this.commodity.businessCommoditySubTitle,
                 "priority": this.commodity.priority,
@@ -466,6 +483,9 @@
                 "businessCommodityName":this.commodity.businessCommodityName,
                 "businessCommodityDescription":this.commodity.businessCommodityDescription,
                 "detailContentUrl":this.commodity.detailContentUrl,
+                "sellPercentage":this.commodity.sellPercentage,
+                "isDiscountPay":this.commodity.isDiscountPay,
+                "costPercentage":this.commodity.costPercentage,
                 'businessCommodityPosterFile': this.commodityPoster,
                 "detailFileArray":this.commodityDetailImage
               })

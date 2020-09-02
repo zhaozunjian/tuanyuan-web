@@ -29,10 +29,10 @@
 
       <el-menu class="site-navbar__menu site-navbar__menu--right" mode="horizontal">
         <el-menu-item class="site-navbar__avatar sd-sizes" index="3">
-          <el-badge :value="$GlobalApi.getUserInfo().usermsg" class="item" v-if="$GlobalApi.getUserInfo().roleId == 10">
+          <el-badge :value="message.userCount" class="item" v-if="$GlobalApi.getUserInfo().roleId == 10">
             <el-button @click="userSubmit" icon="el-icon-chat-dot-round" size="small" type="text">用户提现</el-button>
           </el-badge>
-          <el-badge :value="$GlobalApi.getUserInfo().machmsg" class="item" v-if="$GlobalApi.getUserInfo().roleId == 10">
+          <el-badge :value="message.merchantCount" class="item" v-if="$GlobalApi.getUserInfo().roleId == 10">
             <el-button @click="merchanSubmit" icon="el-icon-chat-dot-round" size="small" type="text">商户提现</el-button>
           </el-badge>
           <el-dropdown :show-timeout="0" placement="bottom">
@@ -93,7 +93,6 @@
   export default {
     components: {UpdatePassword},
     data () {
-
       return {
         imageServerUrl: SERVER_CONSTANT.imageServerUrl,
         input: '',
@@ -105,7 +104,9 @@
         names: [],
         selected: -1,
         noData: false,
-        userInfo: null
+        userInfo: null,
+        timer:0,
+        message: JSON.parse(localStorage.getItem("messageInfo"))
       }
     },
     filters: {
@@ -154,6 +155,14 @@
         }
       }
     },
+    created(){
+      this.timer = setInterval(() => {
+        this.message = JSON.parse(localStorage.getItem("messageInfo"))
+      }, 0)
+    },
+    beforeDestroy(){
+      clearInterval(this.timer)
+    },
     methods: {
       userSubmit(){
         this.$router.push({name:'apply-applyUserWithdraw'})
@@ -182,11 +191,9 @@
           }).then(({data}) => {
             if (data && data.code === 0) {
               clearLoginInfo()
-              this.dictionariesData.clear()
+              this.dictionariesData.remove()
+              localStorage.removeItem("messageInfo")
               this.$router.push({name: 'login'})
-              // if (this.$cookie.isKey("token")) {
-              //   this.$cookie.remove('token')
-              // }
             }
           })
         }).catch(() => {
@@ -196,7 +203,7 @@
         let UserInfo = this.$GlobalApi.getUserInfo()
         let type = await this.$GlobalApi.confirmMsg('此操作将永久删除当前记录, 是否继续?', '提示', 1)
         if (type == true) {
-          this.dictionariesData.clear()
+          this.dictionariesData.remove()
           this.dictionariesData.set('userInfo', UserInfo)
           this.$message.success("清除成功")
         } else {

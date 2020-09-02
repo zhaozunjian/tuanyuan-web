@@ -410,6 +410,7 @@ function getUserInfo() {
     router.push({name: 'login'})
   }
 }
+
 /**
  * 数组去重
  * @param array 数组

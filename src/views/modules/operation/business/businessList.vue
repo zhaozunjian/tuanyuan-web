@@ -39,8 +39,8 @@
           <template slot-scope="scope">
             <el-button @click="handleCommodityList(scope.row)" size="small" type="text">查看商品</el-button>
             <el-button size="small" type="text" @click="handleStatus(scope.$index, scope.row)">状态切换</el-button>
-            <el-button v-if="isAuth('business:show')" @click="handleShow(scope.$index, scope.row)" size="small" type="text">查看</el-button>
-            <el-button v-if="isAuth('business:update')" @click="handleEdit(scope.$index, scope.row)" size="small" type="text">编辑</el-button>
+            <el-button v-if="isAuth('business:show')" @click="handleEdit(true, scope.row)" size="small" type="text">查看</el-button>
+            <el-button v-if="isAuth('business:update')" @click="handleEdit(false, scope.row)" size="small" type="text">编辑</el-button>
             <el-button v-if="isAuth('business:delete')" @click="handleDelete(scope.$index, scope.row)" size="small" type="text">删除</el-button>
           </template>
         </el-table-column>
@@ -74,21 +74,14 @@ export default {
     this.initData();
   },
   methods: {
-    handleEdit(index, row) {
+    handleEdit(flag, row) {
       this.$router.push({
         name: "updateBusinessOperation",
         query: {
           businessId: row.businessId,
           businessName: row.businessName,
-          merchantId:row.merchantId
-        }
-      });
-    },
-    handleShow(index, row) {
-      this.$router.push({
-        name: "updateBusiness",
-        query: {
-          businessId: row.businessId
+          merchantId:row.merchantId,
+          flag: flag
         }
       });
     },

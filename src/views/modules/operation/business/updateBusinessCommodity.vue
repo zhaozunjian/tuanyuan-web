@@ -2,13 +2,18 @@
   <div id="personnel-detail" v-loading="businessLoading">
     <el-card class="box-card">
       <div class="text item">
-        <el-button @click="submitForm" icon="el-icon-document" size="small" type="primary">保存</el-button>
+        <el-button :disabled="flag" @click="submitForm" icon="el-icon-document" size="small" type="primary">保存</el-button>
         <el-button @click="handleBargain" icon="el-icon-document" size="small" type="primary">先砍后付</el-button>
         <el-button @click="handleDailyLimited" icon="el-icon-document" size="small" type="primary">每日限量</el-button>
+        <el-button @click="handleCommodityTagBindCommodity" icon="el-icon-document" size="small" type="primary">标签列表</el-button>
+        <el-button @click="handleContractTime" icon="el-icon-document" size="small" type="primary">售卖时间限制</el-button>
+        <el-button @click="handleSpecialAmountDivide" icon="el-icon-document" size="small" type="primary">修改分成</el-button>
+        <el-button @click="handleExpand" icon="el-icon-document" size="small" type="primary">扩展信息</el-button>
+        <el-button @click="handleExternalSupport" icon="el-icon-document" size="small" type="primary">第三方支持</el-button>
         <hr class="sd-hr"/>
         <div style="width: 70%">
           <el-form
-            :model="commodity"
+            :model="commodity" :disabled="flag"
             :rules="rules"
             ref="commodity"
             label-width="180px">
@@ -27,6 +32,20 @@
                 :props="{ expandTrigger: 'hover' }"
               ></el-cascader>
             </el-form-item>
+            <el-form-item label="是否折扣商品" prop="isDiscountPay">
+              <el-select v-model="commodity.isDiscountPay" placeholder="请选择">
+                <el-option label="是" value="1"></el-option>
+                <el-option label="否" value="0"></el-option>
+              </el-select>
+            </el-form-item>
+            <template v-if="commodity.isDiscountPay == '1'">
+              <el-form-item label="售价百分比" prop="sellPercentage">
+                <el-input-number v-model="commodity.sellPercentage" :precision="2" :step="0.01" :max="1"></el-input-number>
+              </el-form-item>
+              <el-form-item label="成本百分比" prop="costPercentage">
+                <el-input-number v-model="commodity.costPercentage" :precision="2" :step="0.01" :max="1"></el-input-number>
+              </el-form-item>
+            </template>
             <el-form-item label="商品名称" prop="businessCommodityName">
               <el-input v-model="commodity.businessCommodityName"></el-input>
             </el-form-item>
@@ -40,26 +59,23 @@
               <el-input v-model="commodity.detailContentUrl"></el-input>
             </el-form-item>
             <el-form-item label="推荐权重值" prop="priority">
-              <!--<el-cascader-->
-                <!--v-model="commodity.priority"-->
-                <!--:options="businessCommodityPriorityOptions"-->
-                <!--:props="{ expandTrigger: 'hover' }"-->
-              <!--&gt;</el-cascader>-->
               <el-select v-model="commodity.priority" placeholder="推荐权重值">
                 <el-option v-for="item in businessCommodityPriorityOptions" :key="item.value" :label="item.label" :value="item.value" />
               </el-select>
             </el-form-item>
-            <el-form-item label="合作价(商户所得价)" prop="costPrice">
-              <el-input-number v-model="commodity.costPrice" :min="0" :max="99999999"></el-input-number>
-            </el-form-item>
-            <el-form-item label="售价(用户购买价)">
-              <el-input-number v-model="commodity.currentPrice" :min="0" :max="99999999"></el-input-number>
-            </el-form-item>
-            <el-form-item label="原价(灰色的价格)">
-              <el-input-number v-model="commodity.originPrice" :min="0" :max="99999999"></el-input-number>
-            </el-form-item>
+            <template v-if="commodity.isDiscountPay != '1'">
+              <el-form-item label="合作价(商户所得价)" prop="costPrice">
+                <el-input-number v-model="commodity.costPrice" :min="0" :precision="2" :max="99999999"></el-input-number>
+              </el-form-item>
+              <el-form-item label="售价(用户购买价)">
+                <el-input-number v-model="commodity.currentPrice" :min="0" :precision="2" :max="99999999"></el-input-number>
+              </el-form-item>
+              <el-form-item label="原价(灰色的价格)">
+                <el-input-number v-model="commodity.originPrice" :min="0" :precision="2" :max="99999999"></el-input-number>
+              </el-form-item>
+            </template>
             <el-form-item label="是否开启库存限制">
-              <el-select v-model.trim="commodity.openStock">
+              <el-select v-model.trim="commodity.openStock" :disabled="commodity.isDiscountPay == '1'">
                 <el-option label="开启" value="1"></el-option>
                 <el-option label="不开启(无限库存)" value="2"></el-option>
               </el-select>
@@ -130,12 +146,76 @@
                 <i v-else class="el-icon-plus avatar-uploader-icon"></i>
               </el-upload>
             </el-form-item>
-            <!--<el-form-item>-->
-              <!--<el-button type="primary" @click="submitForm('commodity')">确认修改商品</el-button>-->
-            <!--</el-form-item>-->
           </el-form>
         </div>
       </div>
+      <el-dialog
+        title="设置售卖时间"
+        width="30%"
+        :visible.sync="businessCommodityFlag">
+        <el-form :model="form" ref="form" label-width="100px" class="demo-dynamic">
+          <el-form-item label="是否开启限制售卖时间" prop="openContractTime">
+            <el-select v-model="openContractTime">
+              <el-option label="关闭" value="0"></el-option>
+              <el-option label="开启(开启后才可修改限制售卖的时间)" value="1"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="限制售卖结束时间(截止日期)" prop="contractEndTime" v-show="openContractTime==1">
+            <el-date-picker
+              v-model="contractEndTime"
+              type="date"
+              value-format="yyyy-MM-dd"
+              placeholder="选择日期">
+            </el-date-picker>
+          </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+      <el-button @click="businessCommodityFlag = false">取消</el-button>
+      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+    </span>
+      </el-dialog>
+      <el-dialog class="code-dialog" width="45%" title="修改商品金额分成" :visible.sync="dialogFormVisible" @close="closeDialog">
+        <el-form ref="specialAmountDivide-form" :model="specialAmountDivide" class="sd-form" label-position="right" label-width="110px" size="small" style="padding-right: 6%">
+          <el-form-item label="修改该商品的金额分成">
+            <span>{{this.businessCommodityName}}</span>
+          </el-form-item>
+          <el-form-item label="总毛利率(由此得计算价)">
+            <el-input v-model="specialAmountDivide.totalProfit" :disabled="isChange"></el-input>
+          </el-form-item>
+          <el-form-item>
+            <span>无分享</span>
+          </el-form-item>
+          <el-form-item label="无分享单上级一级分成率">
+            <el-input v-model="specialAmountDivide.noShareAloneOneLevelReward" :disabled="isChange"></el-input>
+          </el-form-item>
+          <el-form-item label="无分享多上级一级分成率">
+            <el-input v-model="specialAmountDivide.noShareMultipleOneLevelReward" :disabled="isChange"></el-input>
+          </el-form-item>
+          <el-form-item label="无分享多上级二级分成率">
+            <el-input v-model="specialAmountDivide.noShareMultipleTwoLevelReward" :disabled="isChange"></el-input>
+          </el-form-item>
+          <el-form-item label="无分享的返积分率">
+            <el-input v-model="specialAmountDivide.noShareUserIntegralReward" :disabled="isChange"></el-input>
+          </el-form-item>
+          <el-form-item>
+            <span>有分享</span>
+          </el-form-item>
+          <el-form-item label="被动分享人返积分率">
+            <el-input v-model="specialAmountDivide.receiveShareUserIntegralReward" :disabled="isChange"></el-input>
+          </el-form-item>
+          <el-form-item label="主动分享人的分享率">
+            <el-input v-model="specialAmountDivide.initiateShareShareReward" :disabled="isChange"> </el-input>
+          </el-form-item>
+          <el-form-item label="主动分享人单上级一级分成率">
+            <el-input v-model="specialAmountDivide.initiateShareAloneOneLevelReward" :disabled="isChange"></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="isChange = !isChange">切换修改</el-button>
+            <el-button type="primary" @click="handleChange()">确认修改</el-button>
+            <el-button type="danger" @click="handleRestoreSpecialAmountDivide()">还原为默认分成</el-button>
+          </el-form-item>
+        </el-form>
+      </el-dialog>
     </el-card>
   </div>
 </template>
@@ -169,7 +249,6 @@ export default {
         businessCommodityName: "",
         businessCommodityDescription: "",
         description: "",
-        image_path: "",
         detailContentUrl: "",
         businessId: '',
         businessName: '',
@@ -178,15 +257,18 @@ export default {
         priority: 5,
         detailContentUrl: '',
         specsType: '',
-        costPrice: '',
-        originPrice: '',
-        currentPrice: '',
-        openStock: '',
+        costPrice: 0.00,
+        originPrice: 0.00,
+        currentPrice: 0.00,
+        openStock: '2',
+        isDiscountPay: "0",
         stockCount: '',
         salesTotalCount: '',
         salesCurrentMonthCount: '',
         conSumType: '',
         detailText: '',
+        costPercentage: 0.00,
+        sellPercentage: 0.00,
         noticeText: ""
       },
       rules: {
@@ -207,6 +289,9 @@ export default {
         ],
         businessCommodityCategoryIdArray: [
           { required: true, message: "请输入商品分类", trigger: "change" }
+        ],
+        isDiscountPay: [
+          { required: true, message: "请输入是否折扣", trigger: "change" }
         ]
       },
       businessCommodityPriorityOptions: [
@@ -250,7 +335,26 @@ export default {
           value: 10,
           label: "十级"
         }
-      ]
+      ],
+      flag: false,
+      form: {},
+      businessCommodityFlag:false,
+      openContractTime: "0",
+      contractEndTime: '',
+      dialogFormVisible: false,
+      isChange: true,
+      specialAmountDivide: {
+        choosebusinessCommodityId: '',
+        choosebusinessCommodityName: '',
+        noShareTotalProfit: '',
+        noShareAloneOneLevelReward: '',
+        noShareMultipleOneLevelReward: '',
+        noShareMultipleTwoLevelReward: '',
+        noShareUserIntegralReward: '',
+        receiveShareUserIntegralReward: '',
+        initiateShareShareReward: '',
+        initiateShareAloneOneLevelReward: ''
+      }
     };
   },
   activated() {
@@ -260,23 +364,68 @@ export default {
       this.businessId = this.$route.query.businessId;
       this.businessCommodityName = this.$route.query.businessCommodityName;
       this.businessName = this.$route.query.businessName;
+      this.flag = this.$route.query.flag;
     }
     this.initData();
   },
   methods: {
-    // checkBusinessCommodityId() {
-    //   if (this.$route.query.businessCommodityId) {
-    //     this.businessCommodityId = this.$route.query.businessCommodityId;
-    //   } else {
-    //     this.businessCommodityId = Math.ceil(Math.random() * 10);
-    //     this.$alert("修改商品需要选择一个商家,先去选择商家", "提示", {
-    //       confirmButtonText: "确定",
-    //       callback: action => {
-    //         this.$router.push("/businessList");
-    //       }
-    //     });
-    //   }
-    // },
+    closeDialog() {
+      this.specialAmountDivide = {};
+    },
+    handleChange(){
+      this.$http({
+        url: this.$http.adornUrl(`/businessCommoditySpecialAmountDivide/update`),
+        method: 'post',
+        params: this.$http.adornParams({
+          businessCommodityId: this.businessCommodityId,
+          totalProfit: this.specialAmountDivide.totalProfit,
+          noShareAloneOneLevelReward: this.specialAmountDivide.noShareAloneOneLevelReward,
+          noShareMultipleOneLevelReward: this.specialAmountDivide.noShareMultipleOneLevelReward,
+          noShareMultipleTwoLevelReward: this.specialAmountDivide.noShareMultipleTwoLevelReward,
+          noShareUserIntegralReward: this.specialAmountDivide.noShareUserIntegralReward,
+          receiveShareUserIntegralReward: this.specialAmountDivide.receiveShareUserIntegralReward,
+          initiateShareShareReward: this.specialAmountDivide.initiateShareShareReward,
+          initiateShareAloneOneLevelReward: this.specialAmountDivide.initiateShareAloneOneLevelReward
+        })
+      }).then(({data}) => {
+        if (data && data.code === 0) {
+          this.$message({
+            message: "修改成功",
+            type: "success"
+          });
+          this.isChange = true
+        } else {
+          this.$message.error(data.msg);
+        }
+      })
+    },
+    handleRestoreSpecialAmountDivide() {
+      this.$confirm("确认将此商品的分成设置还原为全局金额分成设置?, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(() => {
+        this.$http({
+          url: this.$http.adornUrl(`/businessCommoditySpecialAmountDivide/remove`),
+          method: 'get',
+          params: this.$http.adornParams({
+            businessCommodityId: this.businessCommodityId
+          })
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.handleSpecialAmountDivide()
+            this.$message.success('设置成功');
+          } else {
+            this.$message.error(data.msg);
+          }
+        })
+      }).catch(() => {
+        this.$message({
+          type: "info",
+          message: "已取消"
+        });
+      });
+    },
     initData() {
       if (this.businessCommodityId) {
         this.initCommodityCategory(this.businessId)
@@ -322,7 +471,6 @@ export default {
         })
       }).then(({data}) => {
         if (data && data.code === 0) {
-          console.log(data.result.carouselImagesUrlList)
           this.commodity = data.result
           this.commodity.businessCommodityCategoryIdArray = data.result.businessCommodityCategoryLevel
           this.commodityAvatar = data.result.businessCommodityAvatar
@@ -342,6 +490,97 @@ export default {
         } else {
           this.businessLoading = false
           this.$message.error(data.msg);
+        }
+      })
+    },
+    dataFormSubmit(){
+      this.$http({
+        url: this.$http.adornUrl('/businessCommodity/updateContractTime'),
+        method: 'post',
+        params: this.$http.adornParams({
+          businessCommodityId: this.businessCommodityId,
+          openContractTime: this.openContractTime,
+          contractEndTime: this.contractEndTime
+        })
+      }).then(({data}) => {
+        if (data && data.code === 0) {
+          this.$message({
+            message: "修改成功",
+            type: "success"
+          });
+          this.businessCommodityFlag = false
+        } else {
+          this.$message.error(data.msg)
+        }
+      })
+    },
+    handleExternalSupport() {
+      if (this.businessId) {
+        this.$router.push({
+          path: "BusinessCommodityExternalSupportList",
+          query: {
+            businessId: this.businessId,
+            businessName: this.businessName,
+            businessCommodityId: this.businessCommodityId,
+            businessCommodityName: this.businessCommodityName
+          }
+        });
+      }
+    },
+    handleExpand() {
+      if (this.businessId) {
+        this.$router.push({
+          path: "BusinessCommodityExpand",
+          query: {
+            businessId: this.businessId,
+            businessName: this.businessName,
+            businessCommodityId: this.businessCommodityId,
+            businessCommodityName: this.businessCommodityName
+          }
+        });
+      }
+    },
+    handleSpecialAmountDivide() {
+      this.dialogFormVisible = true;
+      this.$http({
+        url: this.$http.adornUrl(`/businessCommoditySpecialAmountDivide/info`),
+        method: 'get',
+        params: this.$http.adornParams({
+          businessCommodityId: this.businessCommodityId
+        })
+      }).then(({data}) => {
+        if (data && data.code === 0) {
+          this.specialAmountDivide = data.result
+        } else {
+          this.$message.error(data.msg);
+        }
+      })
+    },
+    handleContractTime() {
+      this.businessCommodityFlag = true
+      this.$http({
+        url: this.$http.adornUrl('/businessCommodity/findContractTime'),
+        method: 'get',
+        params: this.$http.adornParams({
+          businessCommodityId: this.businessCommodityId
+        })
+      }).then(({data}) => {
+        if (data && data.code === 0) {
+          this.openContractTime = String(data.result.openContractTime)
+          this.contractEndTime = data.result.contractEndTime
+        } else {
+          this.$message.error(data.msg)
+        }
+      })
+    },
+    handleCommodityTagBindCommodity() {
+      this.$router.push({
+        path: 'BusinessCommodityTagBindBusinessCommodityList',
+        query: {
+          businessId: this.businessId,
+          businessName: this.businessName,
+          businessCommodityId: this.businessCommodityId,
+          businessCommodityName: this.businessCommodityName
         }
       })
     },
@@ -395,9 +634,9 @@ export default {
               "openStock": this.commodity.openStock,
               "salesTotalCount": this.commodity.salesTotalCount,
               "salesCurrentMonthCount": this.commodity.salesCurrentMonthCount,
-              "currentPrice": this.commodity.currentPrice,
-              "originPrice": this.commodity.originPrice,
-              "costPrice": this.commodity.costPrice,
+              "currentPrice": this.commodity.isDiscountPay == '1'?0:this.commodity.currentPrice,
+              "originPrice": this.commodity.isDiscountPay == '1'?0:this.commodity.originPrice,
+              "costPrice": this.commodity.isDiscountPay == '1'?0:this.commodity.costPrice,
               "specsType": 1,
               "businessCommoditySubTitle": this.commodity.businessCommoditySubTitle,
               "priority": this.commodity.priority,
@@ -406,6 +645,9 @@ export default {
               "businessCommodityDescription":this.commodity.businessCommodityDescription,
               "detailContentUrl":this.commodity.detailContentUrl,
               'businessCommodityPosterFile': this.commodityPost,
+              "sellPercentage":this.commodity.sellPercentage,
+              "isDiscountPay":this.commodity.isDiscountPay,
+              "costPercentage":this.commodity.costPercentage,
               "detailFileArray":this.commodityDetailImage
             })
           }).then(({data}) => {

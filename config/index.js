@@ -26,7 +26,7 @@ module.exports = {
         }
       }
     },
-    // Various Dev Server settingshttp://111.229.144.56/
+    // Various Dev Server settingshttp://47.111.233.235/
     host: '192.168.2.128', // can be overwritten by process.env.HOST
     port: 8001, // can be overwritten by process.env.PORT, if port is in use, a free one will be determined
     autoOpenBrowser: true,

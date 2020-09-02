@@ -48,9 +48,9 @@ export default {
     data() {
         return {
             activeName:'11',
-          currentPage: this.$GlobalApi.Constants.DICT.PAGE,
-          pageSize: this.$GlobalApi.Constants.DICT.LIMIT,
-          total: this.$GlobalApi.Constants.DICT.TOTAL,
+          currentPage: 1,
+          pageSize: 10,
+          total: 0,
             merchantList:[],
         };
     },
@@ -60,12 +60,6 @@ export default {
     methods: {
         // 获取所有信息用户
         handleClick() {
-            if (!this.currentPage){
-                this.currentPage=1
-            }
-            if (!this.pageSize){
-                this.pageSize=10
-            }
           this.$http({
             url: this.$http.adornUrl(`/merchantAssetsWithdrawApply/pageByWithdrawStatus`),
             method: 'post',
@@ -78,8 +72,8 @@ export default {
             if (data && data.code === 0) {
               this.merchantList = data.result.data;
               this.total = data.result.pageModel.total;
-              this.currentPage = data.result.pageModel.currentPage;
-              this.pageSize = data.result.pageModel.pageSize;
+              // this.currentPage = data.result.pageModel.currentPage;
+              // this.pageSize = data.result.pageModel.pageSize;
             } else {
               this.$message.error(data.msg);
             }

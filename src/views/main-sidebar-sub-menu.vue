@@ -6,6 +6,7 @@
     <template slot="title">
       <icon-svg :name="menu.icon || ''" class="site-sidebar__menu-icon"></icon-svg>
       <span>{{ menu.mname }}</span>
+      <el-badge class="mark" :value="message.totleCount" :max="99" v-if="menu.mname === '消息管理'"></el-badge>
     </template>
     <sub-menu
       v-for="item in menu.list"
@@ -18,9 +19,17 @@
   <el-menu-item v-else :index="menu.menuId + ''" @click="gotoRouteHandle(menu)">
     <icon-svg :name="menu.icon || ''" class="site-sidebar__menu-icon"></icon-svg>
     <span>{{ menu.mname }}</span>
+    <el-badge class="mark" :value="message.storeCount" :max="99" v-if="menu.mname === '分销团长'"></el-badge>
+    <el-badge class="mark" :value="message.orderCount" :max="99" v-if="menu.mname === '订单退款'"></el-badge>
+    <el-badge class="mark" :value="message.agencyCount" :max="99" v-if="menu.mname === '代理加盟'"></el-badge>
+    <el-badge class="mark" :value="message.agentCount" :max="99" v-if="menu.mname === '店家入驻'"></el-badge>
+    <el-badge class="mark" :value="message.userCount" :max="99" v-if="menu.mname === '用户提现'"></el-badge>
+    <el-badge class="mark" :value="message.merchantCount" :max="99" v-if="menu.mname === '商户提现'"></el-badge>
+    <el-badge class="mark" :value="message.feedbackCount" :max="99" v-if="menu.mname === '用户反馈'"></el-badge>
+    <el-badge class="mark" :value="message.businessCount" :max="99" v-if="menu.mname === '将过期的商家'"></el-badge>
+    <el-badge class="mark" :value="message.commondityCount" :max="99" v-if="menu.mname === '将过期的商品'"></el-badge>
   </el-menu-item>
 </template>
-
 <script>
   import SubMenu from './main-sidebar-sub-menu'
   export default {
@@ -42,6 +51,20 @@
       sidebarLayoutSkin: {
         get () { return this.$store.state.common.sidebarLayoutSkin }
       }
+    },
+    data(){
+      return{
+        timer:0,
+        message: JSON.parse(localStorage.getItem("messageInfo"))
+      }
+    },
+    created(){
+      this.timer = setInterval(() => {
+        this.message = JSON.parse(localStorage.getItem("messageInfo"))
+      }, 0)
+    },
+    beforeDestroy(){
+      clearInterval(this.timer)
     },
     methods: {
       // 通过menuId与动态(菜单)路由进行匹配跳转至指定路由

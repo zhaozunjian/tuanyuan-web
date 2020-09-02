@@ -122,12 +122,6 @@ const mainRoutes = {
       meta:{title: '营业数据', isTab: true}
     },
     {
-      path: '/UpdateBusinessCommodityContractTime',
-      component: _import('modules/business/UpdateBusinessCommodityContractTime'),
-      name: 'UpdateBusinessCommodityContractTime',
-      meta:{title: '修改商品售卖时间限制', isTab: true}
-    },
-    {
       path: '/BusinessCommodityExternalSupportList',
       component: _import('modules/business/BusinessCommodityExternalSupportList'),
       name: 'BusinessCommodityExternalSupportList',
@@ -138,23 +132,6 @@ const mainRoutes = {
       component: _import('modules/business/BusinessCommodityExpand'),
       name: 'BusinessCommodityExpand',
       meta:{title: '商品扩展信息', isTab: true}
-    },
-    {
-      path: '/UpdateBusinessContractTime',
-      component: _import('modules/business/UpdateBusinessContractTime'),
-      name: 'UpdateBusinessContractTime',
-      meta:{title: '设置合作周期', isTab: true}
-    },{
-      path: '/UpdateBusiness',
-      component: _import('modules/business/UpdateBusiness'),
-      name: 'updateBusiness',
-      meta: {title: '商家详情', isTab: true}
-    }
-    ,{
-      path: '/UpdateBusinessCommodity',
-      component: _import('modules/businessCommodity/UpdateBusinessCommodity'),
-      name: 'UpdateBusinessCommodity',
-      meta: {title: '商品详情', isTab: true}
     }
     ,{
       path: '/SysOpertionUserBindBusinessList',
@@ -178,7 +155,7 @@ const mainRoutes = {
       path: '/updateBusinessOperation',
       component: _import('modules/operation/business/updateBusiness'),
       name: 'updateBusinessOperation',
-      meta: {title: '修改商家', isTab: true}
+      meta: {title: '商家详情', isTab: true}
     },
     {
       path: '/shoppingDistrictBindBusinessList',
@@ -226,7 +203,7 @@ const mainRoutes = {
       path: '/updateBusinessCommodityOperation',
       component: _import('modules/operation/business/updateBusinessCommodity'),
       name: 'updateBusinessCommodityOperation',
-      meta: {title: '修改商家商品', isTab: true}
+      meta: {title: '商家商品', isTab: true}
     },
     {
       path: '/updateBusinessCommodityBargain',

@@ -2,7 +2,7 @@
   <div class="fillcontain" v-loading="businessLoading">
     <el-card class="box-card" v-show="!openMap">
       <div class="text item">
-        <el-button @click="submitForm" icon="el-icon-document" size="small" type="primary">保存</el-button>
+        <el-button :disabled="flag" @click="submitForm" icon="el-icon-document" size="small" type="primary">保存</el-button>
         <el-button @click="handleShoppingDistrictBindBusinessList" icon="el-icon-document" size="small" type="primary">查看商圈</el-button>
         <el-button @click="handleBusinessTagBindBusinessList" icon="el-icon-document" size="small" type="primary">标签列表</el-button>
         <el-button @click="handleMerchantBindMerchantUsersList" icon="el-icon-document" size="small" type="primary">店员列表</el-button>
@@ -12,7 +12,7 @@
           <hr class="sd-hr"/>
           <el-row style="margin-top: 20px;" >
             <el-col :span="15" :offset="2">
-              <el-form :model="business" :rules="rules" ref="business" label-width="150px">
+              <el-form :model="business" :rules="rules" :disabled="flag" ref="business" label-width="150px">
                 <el-form-item label="商家名称" prop="businessName">
                   <el-input v-model="business.businessName"></el-input>
                 </el-form-item>
@@ -190,6 +190,25 @@
         </div>
       </div>
     </el-card>
+    <el-dialog
+      title="设置合作周期"
+      width="30%"
+      :visible.sync="businessContractFlag">
+      <el-form :model="form" size="small" ref="form" class="sd-form" label-width="100px">
+        <el-form-item label="合作周期结束时间(截止日期)" prop="contractEndTime">
+          <el-date-picker
+            v-model="contractEndTime"
+            type="date"
+            value-format="yyyy-MM-dd"
+            placeholder="选择日期">
+          </el-date-picker>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+      <el-button @click="businessContractFlag = false">取消</el-button>
+      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+    </span>
+    </el-dialog>
     <el-row v-if="openMap">
       <div class="map_wrap">
         <choose-address
@@ -246,6 +265,7 @@ export default {
       checkAll: false,
       businessId: "",
       businessName:'',
+      flag: false,
       weeks: weekOptions,
       businessAvatar: "",
       operateLicense: "",
@@ -344,7 +364,11 @@ export default {
           value: 10,
           label: "十级"
         }
-      ]
+      ],
+
+      businessContractFlag:false,
+      form: {},
+      contractEndTime: ''
     };
   },
   activated() {
@@ -352,10 +376,42 @@ export default {
       this.businessId = this.$route.query.businessId;
       this.businessName = this.$route.query.businessName;
       this.merchantId = this.$route.query.merchantId;
+      this.flag = this.$route.query.flag;
     }
     this.initData();
   },
   methods: {
+    dataFormSubmit() {
+      this.$confirm("确认修改该商家的合作周期结束时间吗?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(() => {
+        this.$http({
+          url: this.$http.adornUrl('/business/updateContractTime'),
+          method: 'post',
+          params: this.$http.adornParams({
+            businessId: this.businessId,
+            contractEndTime: this.contractEndTime
+          })
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.$message({
+              message: "修改成功",
+              type: "success"
+            });
+            this.businessContractFlag = false
+          } else {
+            this.$message.error(data.msg)
+          }
+        })
+      }).catch(() => {
+        this.$message({
+          type: "info",
+          message: "已取消操作"
+        });
+      });
+    },
     beforeAvatarUpload(file) {
       const isJPG = file.type === 'image/jpeg'
       const isGIF = file.type === 'image/gif'
@@ -538,11 +594,18 @@ export default {
       });
     },
     handleContractTime() {
-      this.$router.push({
-        name: "UpdateBusinessContractTime",
-        query: {
-          businessId: this.businessId,
-          businessName: this.businessName
+      this.businessContractFlag = true
+      this.$http({
+        url: this.$http.adornUrl('/business/findContractTime'),
+        method: 'get',
+        params: this.$http.adornParams({
+          businessId: this.businessId
+        })
+      }).then(({data}) => {
+        if (data && data.code === 0) {
+          this.contractEndTime = data.result.contractEndTime
+        } else {
+          this.$message.error(data.msg)
         }
       })
     },

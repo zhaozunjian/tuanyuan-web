@@ -27,6 +27,15 @@
         label="联系人手机"
         prop="contactPhone">
       </el-table-column>
+      <el-table-column
+        label="是否已读"
+        prop="isuse">
+        <template slot-scope="scope">
+          <el-tag :type="scope.row.isuse === 1 ? 'success' : 'danger'" effect="dark" size="mini">
+            {{scope.row.isuse === 1 ? '是' : '否'}}
+          </el-tag>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" width="120px">
         <template slot-scope="scope">
           <el-button @click="handleEdit(scope.row.usersFeedbackId)" size="small" type="text">查看</el-button>
@@ -38,12 +47,13 @@
       <pager :current-page="currentPage" :page-size="pageSize" :total="total"
              @current-change="handleCurrentChange" @handle-size-change="handleSizeChange" background/>
     </div>
-    <el-dialog title="反馈详情" :visible.sync="dialogVisibleEdit" width="30%">
+    <el-dialog title="反馈详情" :visible.sync="dialogVisibleEdit" width="30%" @close="getSubmit" >
       <div>
         <div class="editForm">
           <div><span>本条反馈的id：</span><span>{{editForm.usersFeedbackId}}</span></div>
           <div><span>联系人名称：</span><span>{{editForm.contactName}}</span></div>
           <div><span>联系人手机：</span><span>{{editForm.contactPhone}}</span></div>
+          <div><span>是否已读：</span><span>{{editForm.isuse == 1?'已读':'未读'}}</span></div>
           <div>
             <span>创建时间：</span><span>{{editForm.createTime |getTime(editForm.createTime)}}</span>
           </div>
@@ -62,7 +72,7 @@
         </div>
       </div>
       <span slot="footer" class="dialog-footer">
-            <el-button type="primary" @click="dialogVisibleEdit = false">确 定</el-button>
+            <el-button type="primary" @click="getSubmit">确 定</el-button>
         </span>
     </el-dialog>
   </el-card>
@@ -80,6 +90,7 @@ export default {
         total: this.$GlobalApi.Constants.DICT.TOTAL,
         feedbackList: [],
         contactName:'',
+        usersFeedbackId:'',
         tableHeight: this.$GlobalApi.getWinHeight() - 280,
         dialogVisibleEdit: false,
         editForm: {
@@ -91,6 +102,26 @@ export default {
       initData() {
           this.initUsersFeedbackList();
       },
+    getSubmit(){
+      this.dialogVisibleEdit = false
+      this.getUsersFeedbackUpdate();
+      this.initUsersFeedbackList();
+    },
+    getUsersFeedbackUpdate(){
+      this.$http({
+        url: this.$http.adornUrl(`/usersFeedback/update`),
+        method: 'post',
+        params: this.$http.adornParams({
+          usersFeedbackId: this.usersFeedbackId
+        })
+      }).then(({data}) => {
+        if (data && data.code === 0) {
+
+        } else {
+          this.$message.error(data.msg);
+        }
+      })
+    },
     getchangeInit(val){
       if (val === null || val === ''){
         this.initUsersFeedbackList();
@@ -115,6 +146,7 @@ export default {
         })
       },
       handleEdit(usersFeedbackId) {
+        this.usersFeedbackId = usersFeedbackId
         this.$http({
           url: this.$http.adornUrl(`/usersFeedback/info`),
           method: 'get',

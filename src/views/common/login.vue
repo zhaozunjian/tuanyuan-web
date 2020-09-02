@@ -32,7 +32,6 @@
 
 <script>
   import {getUUID} from '@/utils'
-
   export default {
     data() {
       return {
@@ -81,6 +80,7 @@
               if (data && data.code === 0) {
                 this.dictionariesData.set('userInfo', data.account)
                 this.$cookie.set('token', data.token)
+                this.getMessage()
                 this.$router.replace({name: 'report-GeneralSituation'})
                 this.loging = false
               } else {
@@ -96,6 +96,19 @@
       getCaptcha() {
         this.dataForm.uuid = getUUID()
         this.captchaPath = this.$http.adornUrl(`/captcha.jpg?uuid=${this.dataForm.uuid}`)
+      },
+      getMessage(){
+        this.$http({
+          url: this.$http.adornUrl('/message/list'),
+          method: 'get',
+          params: this.$http.adornParams({})
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            localStorage.setItem("messageInfo", JSON.stringify(data.vo))
+          } else {
+            this.$message.error(data.msg)
+          }
+        })
       }
     }
   }
