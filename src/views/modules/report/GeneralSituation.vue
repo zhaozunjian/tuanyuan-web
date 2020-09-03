@@ -30,17 +30,17 @@
       <el-card shadow="hover">
         <div style="width:50%; height:400px;float: left">
           <div style="width:100%; height:30px;text-align: right;padding-right: 30px;">
-            <el-button size="mini" @click="getlist(30)">30天</el-button>
-            <el-button size="mini" @click="getlist(7)" :autofocus="true">7天</el-button>
-          </div>
-          <div ref="echartmain" style="width:100%; height:350px;"></div>
-        </div>
-        <div style="width:50%; height:400px;float: right">
-          <div style="width:100%; height:30px;text-align: right;padding-right: 30px;">
             <el-button size="mini" @click="getMoneyList(30)">30天</el-button>
             <el-button size="mini" @click="getMoneyList(7)" :autofocus="true">7天</el-button>
           </div>
           <div id="moneymain" style="width:100%; height:350px;"></div>
+        </div>
+        <div style="width:50%; height:400px;float: right">
+          <div style="width:100%; height:30px;text-align: right;padding-right: 30px;">
+            <el-button size="mini" @click="getlist(30)">30天</el-button>
+            <el-button size="mini" @click="getlist(7)" :autofocus="true">7天</el-button>
+          </div>
+          <div ref="echartmain" style="width:100%; height:350px;"></div>
         </div>
       </el-card>
     </el-col>
@@ -70,7 +70,7 @@
         // 指定图表的配置项和数据
         var option = {
           title: {
-            text: '订单数据'
+            text: '新增用户'
           },
           tooltip: {
             trigger: 'axis',
@@ -82,7 +82,7 @@
             }
           },
           legend: {
-            data:['已完成','待使用']
+            data:['新增人数']
           },
           xAxis: {
             data: [],
@@ -90,14 +90,14 @@
           },
           yAxis: {
             type: 'value',
-            name: '数量/单'
+            name: '人数/个',
+            minInterval: 1, //设置成1保证坐标轴分割刻度显示成整数。
+            axisLabel: {
+              formatter: '{value} 个'
+            }
           },
           series: [{
-            name: '已完成',
-            type: 'line',
-            data: []
-          },{
-            name: '待使用',
+            name: '新增人数',
             type: 'line',
             data: []
           }]
@@ -118,8 +118,8 @@
             this.vivitorCount = data.result.vivitorCount
             this.moneyCount = data.result.moneyCount
             this.profit = data.result.profit
-            option.series[0].data = data.result.orderTotle.split(",");
-            option.series[1].data = data.result.orderUnusedTotle.split(",");
+            option.series[0].data = data.result.vivitorTotle.split(",");
+            // option.series[1].data = data.result.orderUnusedTotle.split(",");
             option.xAxis.data = data.result.weekDay.split(",");
             myChart.setOption(option);
           } else {
@@ -152,7 +152,10 @@
           },
           yAxis: {
             type: 'value',
-            name: '金额/元'
+            name: '金额/元',
+            axisLabel: {
+              formatter: '{value} 元'
+            }
           },
           series: [{
             name: '已完成',

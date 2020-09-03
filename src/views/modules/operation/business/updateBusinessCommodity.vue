@@ -4,11 +4,8 @@
       <div class="text item">
         <el-button :disabled="flag" @click="submitForm" icon="el-icon-document" size="small" type="primary">保存</el-button>
         <el-button @click="handleBargain" icon="el-icon-document" size="small" type="primary">先砍后付</el-button>
-        <el-button @click="handleDailyLimited" icon="el-icon-document" size="small" type="primary">每日限量</el-button>
-        <el-button @click="handleCommodityTagBindCommodity" icon="el-icon-document" size="small" type="primary">标签列表</el-button>
         <el-button @click="handleContractTime" icon="el-icon-document" size="small" type="primary">售卖时间限制</el-button>
         <el-button @click="handleSpecialAmountDivide" icon="el-icon-document" size="small" type="primary">修改分成</el-button>
-        <el-button @click="handleExpand" icon="el-icon-document" size="small" type="primary">扩展信息</el-button>
         <el-button @click="handleExternalSupport" icon="el-icon-document" size="small" type="primary">第三方支持</el-button>
         <hr class="sd-hr"/>
         <div style="width: 70%">
@@ -55,9 +52,9 @@
             <el-form-item label="商品描述" prop="businessCommodityDescription">
               <el-input type="textarea" autosize v-model="commodity.businessCommodityDescription"></el-input>
             </el-form-item>
-            <el-form-item label="详情url" prop="detailContentUrl">
-              <el-input v-model="commodity.detailContentUrl"></el-input>
-            </el-form-item>
+            <!--<el-form-item label="详情url" prop="detailContentUrl">-->
+              <!--<el-input v-model="commodity.detailContentUrl"></el-input>-->
+            <!--</el-form-item>-->
             <el-form-item label="推荐权重值" prop="priority">
               <el-select v-model="commodity.priority" placeholder="推荐权重值">
                 <el-option v-for="item in businessCommodityPriorityOptions" :key="item.value" :label="item.label" :value="item.value" />
@@ -89,12 +86,64 @@
             <el-form-item label="月销量">
               <el-input-number v-model="commodity.salesCurrentMonthCount" :min="0" :max="99999999"></el-input-number>
             </el-form-item>
-            <el-form-item label="详情内容">
-              <el-input type="textarea" autosize placeholder="详情内容" v-model="commodity.detailText"></el-input>
+            <!--<el-form-item label="详情内容">-->
+              <!--<el-input type="textarea" autosize placeholder="详情内容" v-model="commodity.detailText"></el-input>-->
+            <!--</el-form-item>-->
+            <!--<el-form-item label="购买须知">-->
+              <!--<el-input type="textarea" autosize placeholder="购买须知" v-model="commodity.noticeText"></el-input>-->
+            <!--</el-form-item>-->
+            <el-form-item label="是否开启每日限量">
+              <el-select v-model="openDailyLimited">
+                <el-option label="关闭每日限量" value="0"></el-option>
+                <el-option label="开启每日限量(开启后才可修改限量的数量)" value="1"></el-option>
+              </el-select>
             </el-form-item>
-            <el-form-item label="购买须知">
-              <el-input type="textarea" autosize placeholder="购买须知" v-model="commodity.noticeText"></el-input>
+            <el-form-item label="每日限量数" v-show="openDailyLimited==1">
+              <el-input-number v-model="dailyLimitedCount" :min="0" :max="99999999"></el-input-number>
             </el-form-item>
+            <el-form-item label="最大预约天数" v-show="openDailyLimited==1">
+              <el-input-number v-model="dailyLimitedMaxDay" :min="0" :max="99999999"></el-input-number>
+            </el-form-item>
+            <el-form-item v-show="openDailyLimited==1" label="是否开启用户限购">
+              <el-select v-model="openDailyLimitedUserPurchased">
+                <el-option label="关闭用户限购" value="0"></el-option>
+                <el-option label="开启用户限购" value="1"></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="用户每日限购的数量" v-show="openDailyLimited==1 && openDailyLimitedUserPurchased==1">
+              <el-input-number v-model="dailyLimitedUserPurchasedCount" :min="0" :max="99999999"></el-input-number>
+            </el-form-item>
+            <el-form-item label="商品标签">
+              <el-tag v-for="tag in businessTags" :key="tag.tagId" style="margin-right: 20px;"
+                      :closable="!flag" :disable-transitions="false" @close="handleClose(tag)">
+                {{tag.tagName}}
+              </el-tag>
+              <el-button size="small" v-if="isAuth('business:tag:add')" @click="addBindTag()">添加标签</el-button>
+            </el-form-item>
+
+            <el-form-item label="是否不允许退款" prop="isNoRefundAllowed">
+              <el-select v-model="formExpand.isNoRefundAllowed">
+                <el-option label="关闭(允许退款)" value="0"></el-option>
+                <el-option label="开启(不允许退款)" value="1"></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="是否开启商品订单消费截止日期限制" prop="isPayAutoExpired">
+              <el-select v-model="formExpand.isPayAutoExpired">
+                <el-option label="关闭" value="0"></el-option>
+                <el-option label="开启(开启后才可修改限制消费的时间)" value="1"></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="该商品订单消费截止日期" prop="payAutoExpiredTime" v-show="formExpand.isPayAutoExpired==1">
+              <div class="block">
+                <el-date-picker
+                  v-model="formExpand.payAutoExpiredTime"
+                  type="date"
+                  value-format="timestamp"
+                  placeholder="选择日期">
+                </el-date-picker>
+              </div>
+            </el-form-item>
+
             <el-form-item label="商品头像" prop="commodityAvatar">
               <el-upload
                 :action="$GlobalApi.getServerUrl('/system/file/businessCommodity/upload')"
@@ -215,6 +264,29 @@
             <el-button type="danger" @click="handleRestoreSpecialAmountDivide()">还原为默认分成</el-button>
           </el-form-item>
         </el-form>
+      </el-dialog>
+      <el-dialog class="code-dialog" width="50%" title="添加标签" :visible.sync="dialogAddFormVisible" @close="closeDialogTag">
+        <el-table
+          :data="addForm.businessCommodityTagListData"
+          tooltip-effect="dark" :height="$GlobalApi.getWinHeight() - 300"
+          @select="selectChange"
+          @select-all="selectAll"
+          ref="multipleTable">
+          <el-table-column
+            type="selection"
+            width="35">
+          </el-table-column>
+          <el-table-column
+            prop="businessCommodityTagName"
+            label="标签名称">
+          </el-table-column>
+        </el-table>
+        <pager :current-page="addCurrentPage" :page-size="addPageSize" :total="addTotal"
+               @current-change="handleAddCurrentChange" @handle-size-change="handleAddSizeChange" background/>
+        <div slot="footer" class="dialog-footer">
+          <el-button size="small" plain @click="dialogAddFormVisible=false">取 消</el-button>
+          <el-button size="small" type="primary" @click="handleAddBusinessCommodityTag()">确 定</el-button>
+        </div>
       </el-dialog>
     </el-card>
   </div>
@@ -354,11 +426,34 @@ export default {
         receiveShareUserIntegralReward: '',
         initiateShareShareReward: '',
         initiateShareAloneOneLevelReward: ''
+      },
+
+      //每日限量
+      openDailyLimited: '0',
+      dailyLimitedCount: 0,
+      dailyLimitedMaxDay: 0,
+      openDailyLimitedUserPurchased: '0',
+      dailyLimitedUserPurchasedCount: 0,
+      //商品标签
+      selectDataArrL:[],// 跨页多选所以的项，
+      addTotal: 0,
+      addCurrentPage: 1,
+      addPageSize: 10,
+      dialogAddFormVisible: false,
+      addForm: {
+        businessCommodityTagListData: [],
+      },
+      businessTags: [],
+
+      //扩展信息
+      formExpand: {
+        isPayAutoExpired: "0",
+        payAutoExpiredTime: '',
+        isNoRefundAllowed: "0"
       }
     };
   },
   activated() {
-    // this.checkBusinessCommodityId();
     if (this.$route.query.businessCommodityId) {
       this.businessCommodityId = this.$route.query.businessCommodityId;
       this.businessId = this.$route.query.businessId;
@@ -430,7 +525,27 @@ export default {
       if (this.businessCommodityId) {
         this.initCommodityCategory(this.businessId)
         this.initBusinessCommodity(this.businessId, this.businessCommodityId);
+        this.initBusinessDailyLimited(this.businessCommodityId);
+        this.initCommodityTagBindCommodityList();
+        this.initExpandInfo();
       }
+    },
+    initExpandInfo() {
+      this.$http({
+        url: this.$http.adornUrl('/businessCommodityExpand/info'),
+        method: 'get',
+        params: this.$http.adornParams({
+          businessCommodityId: this.businessCommodityId
+        })
+      }).then(({data}) => {
+        if (data && data.code === 0) {
+          this.formExpand = data.result
+          this.formExpand.isPayAutoExpired = String(data.result.isPayAutoExpired)
+          this.formExpand.isNoRefundAllowed = String(data.result.isNoRefundAllowed)
+        } else {
+          this.$message.error(data.msg)
+        }
+      })
     },
     initCommodityCategory(businessId) {
       this.$http({
@@ -460,8 +575,28 @@ export default {
       }
       return data;
     },
+    initBusinessDailyLimited(businessCommodityId){
+      this.$http({
+        url: this.$http.adornUrl(`/businessCommodity/findDailyLimited`),
+        method: 'get',
+        params: this.$http.adornParams({
+          businessCommodityId: businessCommodityId
+        })
+      }).then(({data}) => {
+        if (data && data.code === 0) {
+          this.openDailyLimited = String(data.result.openDailyLimited)
+          this.dailyLimitedCount = data.result.dailyLimitedCount
+          this.dailyLimitedMaxDay = data.result.dailyLimitedMaxDay
+          this.openDailyLimitedUserPurchased = String(data.result.openDailyLimitedUserPurchased)
+          this.dailyLimitedUserPurchasedCount = data.result.dailyLimitedUserPurchasedCount
+        } else {
+          this.$message.error(data.msg);
+        }
+      })
+    },
     initBusinessCommodity(businessId, businessCommodityId) {
       this.businessLoading = true
+      this.carouselFileList = []
       this.$http({
         url: this.$http.adornUrl(`/businessCommodity/findById`),
         method: 'get',
@@ -493,6 +628,21 @@ export default {
         }
       })
     },
+    initCommodityTagBindCommodityList() {
+      this.$http({
+        url: this.$http.adornUrl(`/businessCommodityTagBindBusinessCommodity/pageByBusinessCommodityId`),
+        method: 'post',
+        params: this.$http.adornParams({
+          businessCommodityId: this.businessCommodityId
+        })
+      }).then(({data}) => {
+        if (data && data.code === 0) {
+          this.businessTags = data.result
+        } else {
+          this.$message.error(data.msg);
+        }
+      })
+    },
     dataFormSubmit(){
       this.$http({
         url: this.$http.adornUrl('/businessCommodity/updateContractTime'),
@@ -518,19 +668,6 @@ export default {
       if (this.businessId) {
         this.$router.push({
           path: "BusinessCommodityExternalSupportList",
-          query: {
-            businessId: this.businessId,
-            businessName: this.businessName,
-            businessCommodityId: this.businessCommodityId,
-            businessCommodityName: this.businessCommodityName
-          }
-        });
-      }
-    },
-    handleExpand() {
-      if (this.businessId) {
-        this.$router.push({
-          path: "BusinessCommodityExpand",
           query: {
             businessId: this.businessId,
             businessName: this.businessName,
@@ -573,27 +710,133 @@ export default {
         }
       })
     },
-    handleCommodityTagBindCommodity() {
-      this.$router.push({
-        path: 'BusinessCommodityTagBindBusinessCommodityList',
-        query: {
-          businessId: this.businessId,
-          businessName: this.businessName,
-          businessCommodityId: this.businessCommodityId,
-          businessCommodityName: this.businessCommodityName
+    addBindTag() {
+      this.selectDataArrL = []
+      this.dialogAddFormVisible = true
+      this.initBusinessCommodityTagList()
+    },
+    closeDialogTag() {
+      this.selectDataArrL = []
+      this.dialogAddFormVisible = false
+    },
+    handleAddBusinessCommodityTag() {
+      let selectDataArrLAdd = this.selectDataArrL
+      let multipleSelectionLength = selectDataArrLAdd.length
+      if (multipleSelectionLength<=0) {
+        this.$message.error('请选择需绑定的标签');
+      }
+      let businessCommodityId = this.businessCommodityId
+      this.$confirm(`确认绑定名为${selectDataArrLAdd[0].businessCommodityTagName}等${multipleSelectionLength}个标签?`, "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "info"
+      }).then(() => {
+        selectDataArrLAdd.forEach(item => {
+          this.$http({
+            url: this.$http.adornUrl(`/businessCommodityTagBindBusinessCommodity/add`),
+            method: 'post',
+            params: this.$http.adornParams({
+              businessCommodityTagId: item.businessCommodityTagId,
+              businessCommodityId: businessCommodityId
+            })
+          }).then(({data}) => {
+            if (data && data.code === 0) {
+              this.$message({
+                message: `添加标签-${item.businessCommodityTagName},成功`,
+                type: "success"
+              })
+              this.initCommodityTagBindCommodityList()
+            } else {
+              this.$message.error(data.msg);
+            }
+          })
+        })
+        this.dialogAddFormVisible = false
+        Object.assign(this.addForm, this.$options.data().addForm)
+      }).catch((err)=>{
+        this.$message({
+          type: "info",
+          message: "已取消操作"
+        });
+      })
+    },
+    handleAddCurrentChange(val) {
+      this.addCurrentPage = val
+      this.initBusinessCommodityTagList()
+    },
+    handleAddSizeChange(val) {
+      this.addPageSize = val
+      this.initBusinessCommodityTagList()
+    },
+    initBusinessCommodityTagList() {
+      this.$http({
+        url: this.$http.adornUrl(`/businessCommodityTag/pageAll`),
+        method: 'post',
+        params: this.$http.adornParams({
+          currentPage: this.addCurrentPage,
+          pageSize: this.addPageSize
+        })
+      }).then(({data}) => {
+        if (data && data.code === 0) {
+          this.addForm.businessCommodityTagListData = data.result.data
+          this.addTotal = data.result.pageModel.total;
+
+          //请求到的数据多选后回显被选中
+          this.$nextTick(function () {
+            this.selectDataArrL.forEach((item) => {
+              this.addForm.businessCommodityTagListData.forEach((listitem) => {
+                if (item.businessCommodityTagId == listitem.businessCommodityTagId) {
+                  this.$refs.multipleTable.toggleRowSelection(listitem, true);
+                }
+              });
+            });
+          });
+        } else {
+          this.$message.error(data.msg);
         }
       })
     },
-    handleDailyLimited() {
-      this.$router.push({
-        path: "BusinessCommodityDailyLimited",
-        query: {
-          businessId: this.businessId,
-          businessName: this.businessName,
-          businessCommodityId: this.businessCommodityId,
-          businessCommodityName: this.businessCommodityName
+    //多选
+    selectChange(arr, row) {
+      let isHaveItem = this.selectDataArrL.find((item) => item.businessCommodityTagId == row.businessCommodityTagId);
+      if (isHaveItem) {
+        this.selectDataArrL = this.selectDataArrL.filter(
+          (item) => item.businessCommodityTagId != isHaveItem.businessCommodityTagId
+        );
+      } else {
+        this.selectDataArrL.push(row);
+      }
+    },
+    // 全选
+    selectAll(arr) {
+      if (arr.length > 0) {
+        this.addRows(arr)
+      } else {
+        this.removeRows(this.addForm.businessCommodityTagListData)
+      }
+    },
+    // 添加选中行
+    addRows(rows) {
+      for (let key of rows) {
+        // 如果选中的数据中没有这条就添加进去
+        if (
+          !this.selectDataArrL.find(
+            (item) => item.businessCommodityTagId === key.businessCommodityTagId
+          )
+        ) {
+          this.selectDataArrL.push(key);
         }
-      });
+      }
+    },
+    // 取消选中行
+    removeRows(rows) {
+      if (this.selectDataArrL.length > 0) {
+        for (let row of rows) {
+          this.selectDataArrL = this.selectDataArrL.filter(
+            (item) => item.businessCommodityTagId !== row.businessCommodityTagId
+          );
+        }
+      }
     },
     handleBargain() {
       this.$router.push({
@@ -605,6 +848,42 @@ export default {
           businessCommodityName: this.businessCommodityName
         }
       });
+    },
+    handleClose(row) {
+      let item = row
+      let businessCommodityTagId = item.tagId
+      let businessCommodityTagName = item.tagName
+      let businessId = this.businessId
+      let businessCommodityId = this.businessCommodityId
+      this.$confirm(`确认解除名为${businessCommodityTagName}的标签?`, "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "info"
+      }).then(res => {
+        this.$http({
+          url: this.$http.adornUrl(`/businessCommodityTagBindBusinessCommodity/remove`),
+          method: 'get',
+          params: this.$http.adornParams({
+            businessCommodityTagId: businessCommodityTagId,
+            businessCommodityId: businessCommodityId
+          })
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.$message({
+              message: "删除成功",
+              type: "success"
+            })
+            this.initBusinessTagBindList()
+          } else {
+            this.$message.error(data.msg);
+          }
+        })
+      }).catch(()=>{
+        this.$message({
+          type: "info",
+          message: "已取消操作"
+        });
+      })
     },
     submitForm() {
       this.$refs['commodity'].validate(async valid => {
@@ -652,10 +931,16 @@ export default {
             })
           }).then(({data}) => {
             if (data && data.code === 0) {
+              this.getBusinessDailyLimited()
+              this.submitExpand()
               this.$message({
                 message: "修改成功",
                 type: "success"
               });
+              this.commodityAvatar = ''
+              this.carouselFileList = []
+              this.commodityPost = ''
+              this.commodityDetailImage = ''
               this.$router.push({
                 path: "businessCommodityList",
                 query: {
@@ -663,7 +948,6 @@ export default {
                   businessName: this.commodity.businessName
                 }
               });
-              this.carouselFileList = []
             } else {
               this.$message.error(data.msg);
             }
@@ -677,6 +961,45 @@ export default {
           return false;
         }
       });
+    },
+    submitExpand() {
+      this.$http({
+        url: this.$http.adornUrl('/businessCommodityExpand/update'),
+        method: 'post',
+        params: this.$http.adornParams({
+          businessCommodityId: this.businessCommodityId,
+          isPayAutoExpired: this.formExpand.isPayAutoExpired,
+          payAutoExpiredTime: this.formExpand.payAutoExpiredTime,
+          isNoRefundAllowed: this.formExpand.isNoRefundAllowed
+        })
+      }).then(({data}) => {
+        if (data && data.code === 0) {
+
+        } else {
+          this.$message.error(data.msg)
+        }
+      })
+    },
+    //每日限量
+    getBusinessDailyLimited(){
+      this.$http({
+        url: this.$http.adornUrl(`/businessCommodity/updateDailyLimited`),
+        method: 'post',
+        params: this.$http.adornParams({
+          businessCommodityId: this.businessCommodityId,
+          openDailyLimited: this.openDailyLimited,
+          dailyLimitedCount: this.dailyLimitedCount,
+          dailyLimitedMaxDay: this.dailyLimitedMaxDay,
+          openDailyLimitedUserPurchased: this.openDailyLimitedUserPurchased,
+          dailyLimitedUserPurchasedCount: this.dailyLimitedUserPurchasedCount
+        })
+      }).then(({data}) => {
+        if (data && data.code === 0) {
+
+        } else {
+          this.$message.error(data.msg);
+        }
+      })
     },
     beforeAvatarUpload(file) {
       const isJPG = file.type === 'image/jpeg'

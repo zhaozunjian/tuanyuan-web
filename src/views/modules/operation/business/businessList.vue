@@ -164,18 +164,6 @@ export default {
         });
       }
     },
-
-    handleBusinessTagBindBusinessList() {
-      if (this.dataListSelections.length == 1){
-        this.$router.push({
-          name: "BusinessTagBindBusinessList",
-          query: {
-            businessId: this.dataListSelections[0].businessId,
-            businessName: this.dataListSelections[0].businessName
-          }
-        })
-      }
-    },
     getchangeInit(val){
       if (val === null || val === ''){
         this.initData();

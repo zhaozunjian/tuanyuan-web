@@ -21,7 +21,7 @@
     created(){
       this.timer = setInterval(() => {
         this.getMessage()
-      }, 3000)
+      }, 60000)
     },
     beforeDestroy(){
       clearInterval(this.timer)

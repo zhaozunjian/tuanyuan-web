@@ -4,7 +4,6 @@
       <div class="text item">
         <el-button :disabled="flag" @click="submitForm" icon="el-icon-document" size="small" type="primary">保存</el-button>
         <el-button @click="handleShoppingDistrictBindBusinessList" icon="el-icon-document" size="small" type="primary">查看商圈</el-button>
-        <el-button @click="handleBusinessTagBindBusinessList" icon="el-icon-document" size="small" type="primary">标签列表</el-button>
         <el-button @click="handleMerchantBindMerchantUsersList" icon="el-icon-document" size="small" type="primary">店员列表</el-button>
         <el-button @click="handleBusinessIncome" icon="el-icon-document" size="small" type="primary">营业数据</el-button>
         <el-button @click="handleContractTime" icon="el-icon-document" size="small" type="primary">合作周期</el-button>
@@ -129,6 +128,13 @@
                 <el-form-item label="起送费(最低消费)">
                   <el-input-number v-model="business.minStartDeliveryFee" :min="0" :max="99999999"></el-input-number>
                 </el-form-item>
+                <el-form-item label="商品标签">
+                  <el-tag v-for="tag in businessTags" :key="tag.tagId" style="margin-right: 20px;"
+                          :closable="!flag" :disable-transitions="false" @close="handleDelete(tag)">
+                    {{tag.tagName}}
+                  </el-tag>
+                  <el-button size="small" @click="addBindTag()">添加标签</el-button>
+                </el-form-item>
                 <el-form-item label="商家头像">
                   <el-upload
                     :action="$GlobalApi.getServerUrl('/system/file/business/upload')"
@@ -208,6 +214,28 @@
       <el-button @click="businessContractFlag = false">取消</el-button>
       <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
     </span>
+    </el-dialog>
+    <el-dialog class="code-dialog" width="45%" title="添加绑定标签" :visible.sync="dialogAddFormVisible" @close="closeDialog">
+      <el-table
+        :data="addForm.businessTagListData"
+        :height="$GlobalApi.getWinHeight() - 300"
+        tooltip-effect="dark"
+        style="width: 100%"
+        @select="selectChange"
+        @select-all="selectAll"
+        ref="multipleTable">
+        <el-table-column
+          type="selection"
+          width="35">
+        </el-table-column>
+        <el-table-column prop="businessTagName" label="标签名称"></el-table-column>
+      </el-table>
+      <pager :current-page="addCurrentPage" :page-size="addPageSize" :total="addTotal"
+             @current-change="handleAddCurrentChange" @handle-size-change="handleAddSizeChange" background/>
+      <div slot="footer" class="dialog-footer">
+        <el-button size="small" plain @click="dialogAddFormVisible=false">取 消</el-button>
+        <el-button size="small" type="primary" @click="handleAddBusinessTag()">确 定</el-button>
+      </div>
     </el-dialog>
     <el-row v-if="openMap">
       <div class="map_wrap">
@@ -368,7 +396,18 @@ export default {
 
       businessContractFlag:false,
       form: {},
-      contractEndTime: ''
+      contractEndTime: '',
+
+      //商家标签
+      dialogAddFormVisible:false,
+      addForm: {
+        businessTagListData: [],
+      },
+      selectDataArrL:[],
+      addTotal: 0,
+      addCurrentPage: 1,
+      addPageSize: 10,
+      businessTags:[]
     };
   },
   activated() {
@@ -379,8 +418,24 @@ export default {
       this.flag = this.$route.query.flag;
     }
     this.initData();
+    this.initBusinessTagBindList();
   },
   methods: {
+    initBusinessTagBindList() {
+      this.$http({
+        url: this.$http.adornUrl(`/businessTagBindBusiness/pageByBusinessId`),
+        method: 'post',
+        params: this.$http.adornParams({
+          businessId: this.businessId
+        })
+      }).then(({data}) => {
+        if (data && data.code === 0) {
+          this.businessTags = data.result
+        } else {
+          this.$message.error(data.msg);
+        }
+      })
+    },
     dataFormSubmit() {
       this.$confirm("确认修改该商家的合作周期结束时间吗?", "提示", {
         confirmButtonText: "确定",
@@ -524,6 +579,169 @@ export default {
     giveUpChooseHandle() {
       this.switchOpenMap();
     },
+    closeDialog() {
+      this.selectDataArrL = []
+      this.dialogAddFormVisible = false
+    },
+    addBindTag() {
+      this.selectDataArrL = []
+      this.dialogAddFormVisible = true
+      this.initBusinessTagList()
+    },
+    initBusinessTagList() {
+      this.$http({
+        url: this.$http.adornUrl(`/businessTag/pageAll`),
+        method: 'post',
+        params: this.$http.adornParams({
+          currentPage: this.addCurrentPage,
+          pageSize: this.addPageSize
+        })
+      }).then(({data}) => {
+        if (data && data.code === 0) {
+          this.addForm.businessTagListData = data.result.data
+          this.addTotal = data.result.pageModel.total;
+
+          //请求到的数据多选后回显被选中
+          this.$nextTick(function () {
+            this.selectDataArrL.forEach((item) => {
+              this.addForm.businessTagListData.forEach((listitem) => {
+                if (item.businessTagId == listitem.businessTagId) {
+                  this.$refs.multipleTable.toggleRowSelection(listitem, true);
+                }
+              });
+            });
+          });
+        } else {
+          this.$message.error(data.msg);
+        }
+      })
+    },
+    //多选
+    selectChange(arr, row) {
+      let isHaveItem = this.selectDataArrL.find((item) => item.businessTagId == row.businessTagId);
+      if (isHaveItem) {
+        this.selectDataArrL = this.selectDataArrL.filter(
+          (item) => item.businessTagId != isHaveItem.businessTagId
+        );
+      } else {
+        this.selectDataArrL.push(row);
+      }
+    },
+    // 全选
+    selectAll(arr) {
+      if (arr.length > 0) {
+        this.addRows(arr)
+      } else {
+        this.removeRows(this.addForm.businessCommodityTagListData)
+      }
+    },
+    // 添加选中行
+    addRows(rows) {
+      for (let key of rows) {
+        // 如果选中的数据中没有这条就添加进去
+        if (
+          !this.selectDataArrL.find(
+            (item) => item.businessTagId === key.businessTagId
+          )
+        ) {
+          this.selectDataArrL.push(key);
+        }
+      }
+    },
+    // 取消选中行
+    removeRows(rows) {
+      if (this.selectDataArrL.length > 0) {
+        for (let row of rows) {
+          this.selectDataArrL = this.selectDataArrL.filter(
+            (item) => item.businessTagId !== row.businessTagId
+          );
+        }
+      }
+    },
+    handleAddBusinessTag() {
+      let multipleSelectionAdd = this.selectDataArrL
+      let multipleSelectionLength = multipleSelectionAdd.length
+      if (multipleSelectionLength<=0) {
+        this.$message.error('请选择需绑定的标签');
+      }
+      let businessId = this.businessId
+      this.$confirm(`确认绑定名为${multipleSelectionAdd[0].businessTagName}等${multipleSelectionLength}个标签?`, "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "info"
+      }).then(() => {
+        multipleSelectionAdd.forEach(item => {
+          this.$http({
+            url: this.$http.adornUrl(`/businessTagBindBusiness/add`),
+            method: 'post',
+            params: this.$http.adornParams({
+              businessTagId: item.businessTagId,
+              businessId: businessId
+            })
+          }).then(({data}) => {
+            if (data && data.code === 0) {
+              this.$message({
+                message: `添加标签-${item.businessTagName},成功`,
+                type: "success"
+              })
+              this.initBusinessTagBindList()
+            } else {
+              this.$message.error(data.msg);
+            }
+          })
+        })
+        this.dialogAddFormVisible = false
+        Object.assign(this.addForm, this.$options.data().addForm)
+      }).catch((err)=>{
+        this.$message({
+          type: "info",
+          message: "已取消操作"
+        });
+      })
+    },
+    handleAddCurrentChange(val) {
+      this.addCurrentPage = val
+      this.initBusinessTagList()
+    },
+    handleAddSizeChange() {
+      this.addPageSize = val;
+      this.initBusinessTagList()
+    },
+    handleDelete(row) {
+      let item = row
+      let businessTagId = item.tagId
+      let businessTagName = item.tagName
+      let businessId = this.businessId
+      this.$confirm(`确认解除名为${businessTagName}的标签?`, "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "info"
+      }).then(res => {
+        this.$http({
+          url: this.$http.adornUrl(`/businessTagBindBusiness/remove`),
+          method: 'get',
+          params: this.$http.adornParams({
+            businessTagId: businessTagId,
+            businessId: businessId
+          })
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.$message({
+              message: "删除成功",
+              type: "success"
+            })
+            this.initBusinessTagBindList()
+          } else {
+            this.$message.error(data.msg);
+          }
+        })
+      }).catch(()=>{
+        this.$message({
+          type: "info",
+          message: "已取消操作"
+        });
+      })
+    },
     initData() {
       if (this.businessId) {
         this.businessLoading = true
@@ -626,15 +844,6 @@ export default {
           businessName: this.businessName
         }
       });
-    },
-    handleBusinessTagBindBusinessList() {
-      this.$router.push({
-        name: "BusinessTagBindBusinessList",
-        query: {
-          businessId: this.businessId,
-          businessName: this.businessName
-        }
-      })
     },
     submitForm() {
       this.$refs['business'].validate(async valid => {

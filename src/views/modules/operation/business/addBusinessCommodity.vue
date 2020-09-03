@@ -38,9 +38,9 @@
             <el-form-item label="商品描述" prop="businessCommodityDescription">
               <el-input type="textarea" autosize v-model="commodity.businessCommodityDescription" placeholder="请输入商品描述"></el-input>
             </el-form-item>
-            <el-form-item label="商品详情url" prop="detailContentUrl">
-              <el-input v-model="commodity.detailContentUrl" placeholder="请输入商品详情url"></el-input>
-            </el-form-item>
+            <!--<el-form-item label="商品详情url" prop="detailContentUrl">-->
+              <!--<el-input v-model="commodity.detailContentUrl" placeholder="请输入商品详情url"></el-input>-->
+            <!--</el-form-item>-->
             <el-form-item label="消费类型(必填)" prop="conSumType">
               <el-select v-model="commodity.conSumType" placeholder="请选择消费类型" :disabled="commodity.isDiscountPay == '1'">
                 <el-option label="核销" value="1"></el-option>
@@ -85,12 +85,12 @@
             <el-form-item label="月销量">
               <el-input-number v-model="commodity.salesCurrentMonthCount" :min="0" :max="99999999"></el-input-number>
             </el-form-item>
-            <el-form-item label="详情内容" prop="detailText">
-              <el-input type="textarea" autosize placeholder="请输入详情内容" v-model="commodity.detailText"></el-input>
-            </el-form-item>
-            <el-form-item label="购买须知" prop="noticeText">
-              <el-input type="textarea" autosize placeholder="请输入购买须知" v-model="commodity.noticeText"></el-input>
-            </el-form-item>
+            <!--<el-form-item label="详情内容" prop="detailText">-->
+              <!--<el-input type="textarea" autosize placeholder="请输入详情内容" v-model="commodity.detailText"></el-input>-->
+            <!--</el-form-item>-->
+            <!--<el-form-item label="购买须知" prop="noticeText">-->
+              <!--<el-input type="textarea" autosize placeholder="请输入购买须知" v-model="commodity.noticeText"></el-input>-->
+            <!--</el-form-item>-->
             <el-form-item label="商品头像">
               <el-upload
                 :action="$GlobalApi.getServerUrl('/system/file/businessCommodity/upload')"

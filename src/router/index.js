@@ -126,12 +126,6 @@ const mainRoutes = {
       component: _import('modules/business/BusinessCommodityExternalSupportList'),
       name: 'BusinessCommodityExternalSupportList',
       meta:{title: '商品的第三方平台购买支持', isTab: true}
-    },
-    {
-      path: '/BusinessCommodityExpand',
-      component: _import('modules/business/BusinessCommodityExpand'),
-      name: 'BusinessCommodityExpand',
-      meta:{title: '商品扩展信息', isTab: true}
     }
     ,{
       path: '/SysOpertionUserBindBusinessList',
@@ -162,24 +156,6 @@ const mainRoutes = {
       component: _import('modules/operation/business/shoppingDistrictBindBusinessList'),
       name: 'shoppingDistrictBindBusinessList',
       meta: {title: '商圈列表', isTab: true}
-    },
-    {
-      path: '/BusinessCommodityTagBindBusinessCommodityList',
-      component: _import('modules/operation/business/BusinessCommodityTagBindBusinessCommodityList'),
-      name: 'BusinessCommodityTagBindBusinessCommodityList',
-      meta: {title: '商品标签', isTab: true}
-    },
-    {
-      path: '/BusinessCommodityDailyLimited',
-      component: _import('modules/operation/business/BusinessCommodityDailyLimited'),
-      name: 'BusinessCommodityDailyLimited',
-      meta: {title: '每日限量', isTab: true}
-    },
-    {
-      path: '/BusinessTagBindBusinessList',
-      component: _import('modules/operation/business/BusinessTagBindBusinessList'),
-      name: 'BusinessTagBindBusinessList',
-      meta: {title: '商家标签', isTab: true}
     },
     {
       path: '/businessIncome',
