@@ -191,8 +191,7 @@
           }).then(({data}) => {
             if (data && data.code === 0) {
               clearLoginInfo()
-              this.dictionariesData.remove()
-              localStorage.removeItem("messageInfo")
+              this.dictionariesData.clear()
               this.$router.push({name: 'login'})
             }
           })
@@ -203,7 +202,7 @@
         let UserInfo = this.$GlobalApi.getUserInfo()
         let type = await this.$GlobalApi.confirmMsg('此操作将永久删除当前记录, 是否继续?', '提示', 1)
         if (type == true) {
-          this.dictionariesData.remove()
+          this.dictionariesData.clear()
           this.dictionariesData.set('userInfo', UserInfo)
           this.$message.success("清除成功")
         } else {

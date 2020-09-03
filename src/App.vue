@@ -28,6 +28,9 @@
     },
     methods:{
       getMessage(){
+        if (this.$GlobalApi.getUserInfo() === undefined){
+          return;
+        }
         this.$http({
           url: this.$http.adornUrl('/message/list'),
           method: 'get',
