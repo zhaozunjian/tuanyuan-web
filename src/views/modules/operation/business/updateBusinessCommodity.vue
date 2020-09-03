@@ -873,7 +873,7 @@ export default {
               message: "删除成功",
               type: "success"
             })
-            this.initBusinessTagBindList()
+            this.initCommodityTagBindCommodityList()
           } else {
             this.$message.error(data.msg);
           }
