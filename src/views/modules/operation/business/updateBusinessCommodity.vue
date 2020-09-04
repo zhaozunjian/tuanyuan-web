@@ -71,7 +71,7 @@
                 <el-input-number v-model="commodity.originPrice" :min="0" :precision="2" :max="99999999"></el-input-number>
               </el-form-item>
             </template>
-            <el-form-item label="是否开启库存限制">
+            <el-form-item label="库存限制">
               <el-select v-model.trim="commodity.openStock" :disabled="commodity.isDiscountPay == '1'">
                 <el-option label="开启" value="1"></el-option>
                 <el-option label="不开启(无限库存)" value="2"></el-option>
@@ -92,7 +92,7 @@
             <!--<el-form-item label="购买须知">-->
               <!--<el-input type="textarea" autosize placeholder="购买须知" v-model="commodity.noticeText"></el-input>-->
             <!--</el-form-item>-->
-            <el-form-item label="是否开启每日限量">
+            <el-form-item label="每日限量">
               <el-select v-model="openDailyLimited">
                 <el-option label="关闭每日限量" value="0"></el-option>
                 <el-option label="开启每日限量(开启后才可修改限量的数量)" value="1"></el-option>
@@ -127,13 +127,13 @@
                 <el-option label="开启(不允许退款)" value="1"></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="是否开启商品订单消费截止日期限制" prop="isPayAutoExpired">
+            <el-form-item label="商品订单日期限制" prop="isPayAutoExpired">
               <el-select v-model="formExpand.isPayAutoExpired">
                 <el-option label="关闭" value="0"></el-option>
                 <el-option label="开启(开启后才可修改限制消费的时间)" value="1"></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="该商品订单消费截止日期" prop="payAutoExpiredTime" v-show="formExpand.isPayAutoExpired==1">
+            <el-form-item label="商品截止日期" prop="payAutoExpiredTime" v-show="formExpand.isPayAutoExpired==1">
               <div class="block">
                 <el-date-picker
                   v-model="formExpand.payAutoExpiredTime"
