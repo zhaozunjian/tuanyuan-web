@@ -2,7 +2,7 @@
   <div class="fillcontain" v-loading="businessLoading">
     <el-card class="box-card" v-show="!openMap">
       <div class="text item">
-        <el-button :disabled="flag" @click="submitForm" icon="el-icon-document" size="small" type="primary">保存</el-button>
+        <!--<el-button :disabled="flag" @click="submitForm" icon="el-icon-document" size="small" type="primary">保存</el-button>-->
         <el-button @click="handleShoppingDistrictBindBusinessList" icon="el-icon-document" size="small" type="primary">查看商圈</el-button>
         <el-button @click="handleMerchantBindMerchantUsersList" icon="el-icon-document" size="small" type="primary">店员列表</el-button>
         <el-button @click="handleBusinessIncome" icon="el-icon-document" size="small" type="primary">营业数据</el-button>
@@ -199,6 +199,9 @@
                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                     <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过2MB</div>
                   </el-upload>
+                </el-form-item>
+                <el-form-item>
+                  <el-button :disabled="flag" type="primary" style="width:120px;" @click="submitForm()">保存</el-button>
                 </el-form-item>
               </el-form>
             </el-col>

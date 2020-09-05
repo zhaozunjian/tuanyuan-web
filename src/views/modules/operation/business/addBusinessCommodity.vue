@@ -2,8 +2,8 @@
   <div id="personnel-detail">
     <el-card class="box-card">
       <div class="text item">
-        <el-button @click="submitForm" icon="el-icon-document" size="small" type="primary">保存</el-button>
-        <hr class="sd-hr"/>
+        <!--<el-button @click="submitForm" icon="el-icon-document" size="small" type="primary">保存</el-button>-->
+        <!--<hr class="sd-hr"/>-->
         <div style="width: 70%">
           <el-form :model="commodity" :rules="rules" ref="commodity" label-width="180px">
             <el-form-item label="所属商家ID" prop="businessId">
@@ -144,6 +144,9 @@
                 <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                 <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过2MB</div>
               </el-upload>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" style="width:120px;" @click="submitForm()">保存</el-button>
             </el-form-item>
           </el-form>
         </div>

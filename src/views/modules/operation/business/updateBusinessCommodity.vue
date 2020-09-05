@@ -2,7 +2,7 @@
   <div id="personnel-detail" v-loading="businessLoading">
     <el-card class="box-card">
       <div class="text item">
-        <el-button :disabled="flag" @click="submitForm" icon="el-icon-document" size="small" type="primary">保存</el-button>
+        <!--<el-button :disabled="flag" @click="submitForm" icon="el-icon-document" size="small" type="primary">保存</el-button>-->
         <el-button @click="handleBargain" icon="el-icon-document" size="small" type="primary">先砍后付</el-button>
         <el-button @click="handleContractTime" icon="el-icon-document" size="small" type="primary">售卖时间限制</el-button>
         <el-button @click="handleSpecialAmountDivide" icon="el-icon-document" size="small" type="primary">修改分成</el-button>
@@ -191,6 +191,9 @@
                 <img :src="imageServerUrl + commodityDetailImage" class="commodityAvatar" v-if="commodityDetailImage">
                 <i v-else class="el-icon-plus avatar-uploader-icon"></i>
               </el-upload>
+            </el-form-item>
+            <el-form-item>
+              <el-button :disabled="flag" type="primary" style="width:120px;" @click="submitForm()">保存</el-button>
             </el-form-item>
           </el-form>
         </div>
