@@ -75,27 +75,6 @@
           </el-dialog>
         </el-form-item>
       </el-card>
-
-      <el-card body-style="padding:10px" class="box-card" shadow="never" v-if="isEdit">
-        <span class="clearfix">
-          <i class="el-icon-document"></i>
-          <span>系统信息</span>
-        </span>
-        <hr class="sd-hr">
-        <el-form-item label="录入人" prop="inputter" style="width: 50%;float: left;" v-if="isEdit">
-          <el-input disabled placeholder="修改人" size="small" v-model="dataForm.inputter"></el-input>
-        </el-form-item>
-        <el-form-item label="录入时间" prop="inputtime" style="width: 50%;float: left;" v-if="isEdit">
-          <el-input disabled placeholder="修改人" size="small" v-model="dataForm.inputtime"></el-input>
-        </el-form-item>
-        <el-form-item label="修改人" prop="modifier" style="width: 50%;float: left;" v-if="isEdit">
-          <el-input disabled placeholder="修改人" size="small" v-model="dataForm.modifier"></el-input>
-        </el-form-item>
-        <el-form-item label="修改时间" prop="modifytime" style="width: 50%;float: left;" v-if="isEdit">
-          <el-input disabled placeholder="修改人" size="small" v-model="dataForm.modifytime"></el-input>
-        </el-form-item>
-        <div class="sd-clear"></div>
-      </el-card>
     </el-form>
     <span class="dialog-footer" slot="footer">
       <el-button @click="visible = false">取消</el-button>
@@ -134,11 +113,7 @@
         dataForm: {
           roleId: '',
           roleName: '',
-          isuse: 1,
-          inputter: '',
-          inputtime: '',
-          modifytime: '',
-          modifier: ''
+          isuse: 1
         },
         dataRule: {
           roleName: [

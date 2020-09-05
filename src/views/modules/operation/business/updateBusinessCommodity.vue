@@ -9,10 +9,7 @@
         <el-button @click="handleExternalSupport" icon="el-icon-document" size="small" type="primary">第三方支持</el-button>
         <hr class="sd-hr"/>
         <div style="width: 70%">
-          <el-form
-            :model="commodity" :disabled="flag"
-            :rules="rules"
-            ref="commodity"
+          <el-form :model="commodity" :disabled="flag" :rules="rules" ref="commodity"
             label-width="180px">
             <el-form-item label="所属商家ID" prop="businessId">
               <span>{{this.commodity.businessId}}</span>
@@ -427,7 +424,6 @@ export default {
         initiateShareShareReward: '',
         initiateShareAloneOneLevelReward: ''
       },
-
       //每日限量
       openDailyLimited: '0',
       dailyLimitedCount: 0,
@@ -444,7 +440,6 @@ export default {
         businessCommodityTagListData: [],
       },
       businessTags: [],
-
       //扩展信息
       formExpand: {
         isPayAutoExpired: "0",

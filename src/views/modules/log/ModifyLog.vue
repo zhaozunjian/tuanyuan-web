@@ -1,14 +1,38 @@
 <template>
   <el-card body-style="padding:10px;height:100%;" shadow="never">
-    <div slot="header" >
-      <el-cascader
-        v-model="busine" class="sd-width-150" size="small" :options="busineArray" @change="busineChange" :props="{ expandTrigger: 'hover' }"></el-cascader>
-      <el-button type="primary" size="small" icon="el-icon-search" class="sd-mag-l-10" @click="getlist()" >查询</el-button>
+    <!--<div slot="header" >-->
+      <!--<el-cascader-->
+        <!--v-model="busine" class="sd-width-150" size="small" :options="busineArray" @change="busineChange" :props="{ expandTrigger: 'hover' }"></el-cascader>-->
+      <!--<el-button type="primary" size="small" icon="el-icon-search" class="sd-mag-l-10" @click="getlist()" >查询</el-button>-->
+    <!--</div>-->
+    <el-table
+      v-loading="vLoading"
+      :height="$GlobalApi.getWinHeight() - 240"
+      size="small"
+      :data="listData"
+      stripe
+      highlight-current-row
+      :header-cell-style="$GlobalApi.rowClass"
+      border
+      :cell-style="$GlobalApi.cellClass">
+      <el-table-column prop="id" label="ID" width="150px" show-overflow-tooltip />
+      <el-table-column prop="typeName" label="操作类型"/>
+      <el-table-column prop="userName" label="操作者"/>
+      <el-table-column prop="operateTime" label="操作时间"/>
+      <el-table-column prop="operateIp" label="操作IP"/>
+      <el-table-column label="操作" width="160">
+        <template slot-scope="scope">
+          <el-button @click="detailHandle(scope.row)" size="small" type="text">详情</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <div class="sd-rightpage">
+      <!-- 分页标签 -->
+      <pager :current-page="currPage" @current-change="getcurrentPage" :total="totalCount"
+             @handle-size-change="getpageSize" :page-size="pageSize" background/>
     </div>
-    <div v-show="userFlag">
+    <el-dialog class="code-dialog" width="60%" title="提现详情" :visible.sync="userFlag">
       <el-table
-        v-loading="vLoading"
-        :height="$GlobalApi.getWinHeight() - 268"
         size="small"
         :data="modifylogtableData"
         stripe
@@ -16,11 +40,7 @@
         :header-cell-style="$GlobalApi.rowClass"
         border
         :cell-style="$GlobalApi.cellClassNoEdit">
-        <el-table-column prop="id" label="ID" width="150px" show-overflow-tooltip />
-        <el-table-column prop="userName" label="操作者" width="120px"/>
-        <el-table-column prop="operateTime" label="操作时间" width="140px"/>
-        <el-table-column prop="operateIp" label="操作IP" width="120px"/>
-        <el-table-column prop="nickName" label="用户提现名称" width="120px"/>
+        <el-table-column prop="nickName" label="提现名称" width="120px"/>
         <el-table-column label="提现金额" >
           <el-table-column
             prop="withdrawAmount"
@@ -182,189 +202,187 @@
           </el-table-column>
         </el-table-column>
       </el-table>
-    </div>
-    <div v-show="merchantFlag">
-      <el-table
-        v-loading="vLoading"
-        :height="$GlobalApi.getWinHeight() - 268"
-        size="small"
-        :data="modifylogtableData"
-        stripe
-        highlight-current-row
-        :header-cell-style="$GlobalApi.rowClass"
-        border
-        :cell-style="$GlobalApi.cellClassNoEdit">
-        <el-table-column prop="id" label="ID" width="150px" show-overflow-tooltip />
-        <el-table-column prop="userName" label="操作者" width="120px"/>
-        <el-table-column prop="operateTime" label="操作时间" width="140px"/>
-        <el-table-column prop="operateIp" label="操作IP" width="120px"/>
-        <el-table-column prop="nickName" label="商户提现名称" width="120px"/>
-        <el-table-column label="提现金额" >
-          <el-table-column
-            prop="withdrawAmount"
-            label="原记录">
-            <template slot-scope="scope">
-              <span :class="scope.row.withdrawAmount == scope.row.newWithdrawAmount ? '':'logClass'">{{scope.row.withdrawAmount}}</span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            prop="newWithdrawAmount"
-            label="新记录">
-            <template slot-scope="scope">
-              <span :class="scope.row.withdrawAmount == scope.row.newWithdrawAmount ? '':'logClass'">{{scope.row.newWithdrawAmount}}</span>
-            </template>
-          </el-table-column>
-        </el-table-column>
-        <el-table-column label="提现状态" >
-          <el-table-column
-            prop="withdrawStatus"
-            label="原记录" width="110">
-            <template slot-scope="scope">
-              <span :class="scope.row.noShareAloneOneLevelReward == scope.row.withdrawStatus ? '':'logClass'">{{scope.row.withdrawStatus}}</span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            prop="newWithdrawStatus"
-            label="新记录" width="110">
-            <template slot-scope="scope">
-              <span :class="scope.row.newWithdrawStatus == scope.row.withdrawStatus ? '':'logClass'">{{scope.row.newWithdrawStatus}}</span>
-            </template>
-          </el-table-column>
-        </el-table-column>
-        <el-table-column label="申请状态" >
-          <el-table-column
-            prop="applyStatus"
-            label="原记录">
-            <template slot-scope="scope">
-              <span :class="scope.row.applyStatus == scope.row.newApplyStatus ? '':'logClass'">{{scope.row.applyStatus}}</span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            prop="newApplyStatus"
-            label="新记录">
-            <template slot-scope="scope">
-              <span :class="scope.row.newApplyStatus == scope.row.applyStatus ? '':'logClass'">{{scope.row.newApplyStatus}}</span>
-            </template>
-          </el-table-column>
-        </el-table-column>
-        <el-table-column label="结果状态" >
-          <el-table-column
-            prop="resultStatus"
-            label="原记录">
-            <template slot-scope="scope">
-              <span :class="scope.row.resultStatus == scope.row.newNoShareMultipleTwoLevelReward ? '':'logClass'">{{scope.row.resultStatus}}</span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            prop="newResultStatus"
-            label="新记录">
-            <template slot-scope="scope">
-              <span :class="scope.row.newResultStatus == scope.row.resultStatus ? '':'logClass'">{{scope.row.newResultStatus}}</span>
-            </template>
-          </el-table-column>
-        </el-table-column>
-        <el-table-column label="提现途径" >
-          <el-table-column
-            prop="withdrawWay"
-            label="原记录">
-            <template slot-scope="scope">
-              <span :class="scope.row.withdrawWay == scope.row.newWithdrawWay ? '':'logClass'">{{scope.row.withdrawWay}}</span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            prop="newWithdrawWay"
-            label="新记录">
-            <template slot-scope="scope">
-              <span :class="scope.row.newWithdrawWay == scope.row.withdrawWay ? '':'logClass'">{{scope.row.newWithdrawWay}}</span>
-            </template>
-          </el-table-column>
-        </el-table-column>
-        <el-table-column label="银行卡号" >
-          <el-table-column
-            prop="cardNumber"
-            label="原记录" width="160">
-            <template slot-scope="scope">
-              <span :class="scope.row.cardNumber == scope.row.newCardNumber ? '':'logClass'">{{scope.row.cardNumber}}</span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            prop="newCardNumber"
-            label="新记录" width="160">
-            <template slot-scope="scope">
-              <span :class="scope.row.newCardNumber == scope.row.cardNumber ? '':'logClass'">{{scope.row.newCardNumber}}</span>
-            </template>
-          </el-table-column>
-        </el-table-column>
-        <el-table-column label="持卡人姓名" >
-          <el-table-column
-            prop="cardHolder"
-            label="原记录" width="100">
-            <template slot-scope="scope">
-              <span :class="scope.row.cardHolder == scope.row.newCardHolder ? '':'logClass'">{{scope.row.cardHolder}}</span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            prop="newCardHolder"
-            label="新记录" width="100">
-            <template slot-scope="scope">
-              <span :class="scope.row.newCardHolder == scope.row.cardHolder ? '':'logClass'">{{scope.row.newCardHolder}}</span>
-            </template>
-          </el-table-column>
-        </el-table-column>
-        <el-table-column label="银行名称" >
-          <el-table-column
-            prop="bankName"
-            label="原记录" width="130">
-            <template slot-scope="scope">
-              <span :class="scope.row.bankName == scope.row.newBankName ? '':'logClass'">{{scope.row.bankName}}</span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            prop="newBankName"
-            label="新记录" width="130">
-            <template slot-scope="scope">
-              <span :class="scope.row.newBankName == scope.row.bankName ? '':'logClass'">{{scope.row.newBankName}}</span>
-            </template>
-          </el-table-column>
-        </el-table-column>
-        <el-table-column label="交易成交号" >
-          <el-table-column
-            prop="transactionId"
-            label="原记录" width="110">
-            <template slot-scope="scope">
-              <span :class="scope.row.transactionId == scope.row.newTransactionId ? '':'logClass'">{{scope.row.transactionId}}</span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            prop="newTransactionId"
-            label="新记录" width="110">
-            <template slot-scope="scope">
-              <span :class="scope.row.newTransactionId == scope.row.transactionId ? '':'logClass'">{{scope.row.newTransactionId}}</span>
-            </template>
-          </el-table-column>
-        </el-table-column>
-        <!--<el-table-column label="支付信息" >-->
+      <div slot="footer" class="dialog-footer">
+        <el-button size="small" type="primary" @click="userFlag=false">确 定</el-button>
+      </div>
+    </el-dialog>
+    <!--<el-dialog class="code-dialog" width="50%" title="商户提现详情" :visible.sync="merchantFlag">-->
+      <!--<el-table-->
+        <!--size="small"-->
+        <!--:data="modifylogtableData"-->
+        <!--stripe-->
+        <!--highlight-current-row-->
+        <!--:header-cell-style="$GlobalApi.rowClass"-->
+        <!--border-->
+        <!--:cell-style="$GlobalApi.cellClassNoEdit">-->
+        <!--<el-table-column prop="nickName" label="商户提现名称" width="120px"/>-->
+        <!--<el-table-column label="提现金额" >-->
           <!--<el-table-column-->
-            <!--prop="withdrawCallbackMessageText"-->
-            <!--label="原记录" width="110">-->
+            <!--prop="withdrawAmount"-->
+            <!--label="原记录">-->
             <!--<template slot-scope="scope">-->
-              <!--<span :class="scope.row.withdrawCallbackMessageText == scope.row.newWithdrawCallbackMessageText ? '':'logClass'">{{scope.row.withdrawCallbackMessageText}}</span>-->
+              <!--<span :class="scope.row.withdrawAmount == scope.row.newWithdrawAmount ? '':'logClass'">{{scope.row.withdrawAmount}}</span>-->
             <!--</template>-->
           <!--</el-table-column>-->
           <!--<el-table-column-->
-            <!--prop="newWithdrawCallbackMessageText"-->
-            <!--label="新记录" width="110">-->
+            <!--prop="newWithdrawAmount"-->
+            <!--label="新记录">-->
             <!--<template slot-scope="scope">-->
-              <!--<span :class="scope.row.newWithdrawCallbackMessageText == scope.row.withdrawCallbackMessageText ? '':'logClass'">{{scope.row.newWithdrawCallbackMessageText}}</span>-->
+              <!--<span :class="scope.row.withdrawAmount == scope.row.newWithdrawAmount ? '':'logClass'">{{scope.row.newWithdrawAmount}}</span>-->
             <!--</template>-->
           <!--</el-table-column>-->
         <!--</el-table-column>-->
-      </el-table>
-    </div>
-    <div v-show="busine.length == 1">
+        <!--<el-table-column label="提现状态" >-->
+          <!--<el-table-column-->
+            <!--prop="withdrawStatus"-->
+            <!--label="原记录" width="110">-->
+            <!--<template slot-scope="scope">-->
+              <!--<span :class="scope.row.noShareAloneOneLevelReward == scope.row.withdrawStatus ? '':'logClass'">{{scope.row.withdrawStatus}}</span>-->
+            <!--</template>-->
+          <!--</el-table-column>-->
+          <!--<el-table-column-->
+            <!--prop="newWithdrawStatus"-->
+            <!--label="新记录" width="110">-->
+            <!--<template slot-scope="scope">-->
+              <!--<span :class="scope.row.newWithdrawStatus == scope.row.withdrawStatus ? '':'logClass'">{{scope.row.newWithdrawStatus}}</span>-->
+            <!--</template>-->
+          <!--</el-table-column>-->
+        <!--</el-table-column>-->
+        <!--<el-table-column label="申请状态" >-->
+          <!--<el-table-column-->
+            <!--prop="applyStatus"-->
+            <!--label="原记录">-->
+            <!--<template slot-scope="scope">-->
+              <!--<span :class="scope.row.applyStatus == scope.row.newApplyStatus ? '':'logClass'">{{scope.row.applyStatus}}</span>-->
+            <!--</template>-->
+          <!--</el-table-column>-->
+          <!--<el-table-column-->
+            <!--prop="newApplyStatus"-->
+            <!--label="新记录">-->
+            <!--<template slot-scope="scope">-->
+              <!--<span :class="scope.row.newApplyStatus == scope.row.applyStatus ? '':'logClass'">{{scope.row.newApplyStatus}}</span>-->
+            <!--</template>-->
+          <!--</el-table-column>-->
+        <!--</el-table-column>-->
+        <!--<el-table-column label="结果状态" >-->
+          <!--<el-table-column-->
+            <!--prop="resultStatus"-->
+            <!--label="原记录">-->
+            <!--<template slot-scope="scope">-->
+              <!--<span :class="scope.row.resultStatus == scope.row.newNoShareMultipleTwoLevelReward ? '':'logClass'">{{scope.row.resultStatus}}</span>-->
+            <!--</template>-->
+          <!--</el-table-column>-->
+          <!--<el-table-column-->
+            <!--prop="newResultStatus"-->
+            <!--label="新记录">-->
+            <!--<template slot-scope="scope">-->
+              <!--<span :class="scope.row.newResultStatus == scope.row.resultStatus ? '':'logClass'">{{scope.row.newResultStatus}}</span>-->
+            <!--</template>-->
+          <!--</el-table-column>-->
+        <!--</el-table-column>-->
+        <!--<el-table-column label="提现途径" >-->
+          <!--<el-table-column-->
+            <!--prop="withdrawWay"-->
+            <!--label="原记录">-->
+            <!--<template slot-scope="scope">-->
+              <!--<span :class="scope.row.withdrawWay == scope.row.newWithdrawWay ? '':'logClass'">{{scope.row.withdrawWay}}</span>-->
+            <!--</template>-->
+          <!--</el-table-column>-->
+          <!--<el-table-column-->
+            <!--prop="newWithdrawWay"-->
+            <!--label="新记录">-->
+            <!--<template slot-scope="scope">-->
+              <!--<span :class="scope.row.newWithdrawWay == scope.row.withdrawWay ? '':'logClass'">{{scope.row.newWithdrawWay}}</span>-->
+            <!--</template>-->
+          <!--</el-table-column>-->
+        <!--</el-table-column>-->
+        <!--<el-table-column label="银行卡号" >-->
+          <!--<el-table-column-->
+            <!--prop="cardNumber"-->
+            <!--label="原记录" width="160">-->
+            <!--<template slot-scope="scope">-->
+              <!--<span :class="scope.row.cardNumber == scope.row.newCardNumber ? '':'logClass'">{{scope.row.cardNumber}}</span>-->
+            <!--</template>-->
+          <!--</el-table-column>-->
+          <!--<el-table-column-->
+            <!--prop="newCardNumber"-->
+            <!--label="新记录" width="160">-->
+            <!--<template slot-scope="scope">-->
+              <!--<span :class="scope.row.newCardNumber == scope.row.cardNumber ? '':'logClass'">{{scope.row.newCardNumber}}</span>-->
+            <!--</template>-->
+          <!--</el-table-column>-->
+        <!--</el-table-column>-->
+        <!--<el-table-column label="持卡人姓名" >-->
+          <!--<el-table-column-->
+            <!--prop="cardHolder"-->
+            <!--label="原记录" width="100">-->
+            <!--<template slot-scope="scope">-->
+              <!--<span :class="scope.row.cardHolder == scope.row.newCardHolder ? '':'logClass'">{{scope.row.cardHolder}}</span>-->
+            <!--</template>-->
+          <!--</el-table-column>-->
+          <!--<el-table-column-->
+            <!--prop="newCardHolder"-->
+            <!--label="新记录" width="100">-->
+            <!--<template slot-scope="scope">-->
+              <!--<span :class="scope.row.newCardHolder == scope.row.cardHolder ? '':'logClass'">{{scope.row.newCardHolder}}</span>-->
+            <!--</template>-->
+          <!--</el-table-column>-->
+        <!--</el-table-column>-->
+        <!--<el-table-column label="银行名称" >-->
+          <!--<el-table-column-->
+            <!--prop="bankName"-->
+            <!--label="原记录" width="130">-->
+            <!--<template slot-scope="scope">-->
+              <!--<span :class="scope.row.bankName == scope.row.newBankName ? '':'logClass'">{{scope.row.bankName}}</span>-->
+            <!--</template>-->
+          <!--</el-table-column>-->
+          <!--<el-table-column-->
+            <!--prop="newBankName"-->
+            <!--label="新记录" width="130">-->
+            <!--<template slot-scope="scope">-->
+              <!--<span :class="scope.row.newBankName == scope.row.bankName ? '':'logClass'">{{scope.row.newBankName}}</span>-->
+            <!--</template>-->
+          <!--</el-table-column>-->
+        <!--</el-table-column>-->
+        <!--<el-table-column label="交易成交号" >-->
+          <!--<el-table-column-->
+            <!--prop="transactionId"-->
+            <!--label="原记录" width="110">-->
+            <!--<template slot-scope="scope">-->
+              <!--<span :class="scope.row.transactionId == scope.row.newTransactionId ? '':'logClass'">{{scope.row.transactionId}}</span>-->
+            <!--</template>-->
+          <!--</el-table-column>-->
+          <!--<el-table-column-->
+            <!--prop="newTransactionId"-->
+            <!--label="新记录" width="110">-->
+            <!--<template slot-scope="scope">-->
+              <!--<span :class="scope.row.newTransactionId == scope.row.transactionId ? '':'logClass'">{{scope.row.newTransactionId}}</span>-->
+            <!--</template>-->
+          <!--</el-table-column>-->
+        <!--</el-table-column>-->
+        <!--&lt;!&ndash;<el-table-column label="支付信息" >&ndash;&gt;-->
+        <!--&lt;!&ndash;<el-table-column&ndash;&gt;-->
+        <!--&lt;!&ndash;prop="withdrawCallbackMessageText"&ndash;&gt;-->
+        <!--&lt;!&ndash;label="原记录" width="110">&ndash;&gt;-->
+        <!--&lt;!&ndash;<template slot-scope="scope">&ndash;&gt;-->
+        <!--&lt;!&ndash;<span :class="scope.row.withdrawCallbackMessageText == scope.row.newWithdrawCallbackMessageText ? '':'logClass'">{{scope.row.withdrawCallbackMessageText}}</span>&ndash;&gt;-->
+        <!--&lt;!&ndash;</template>&ndash;&gt;-->
+        <!--&lt;!&ndash;</el-table-column>&ndash;&gt;-->
+        <!--&lt;!&ndash;<el-table-column&ndash;&gt;-->
+        <!--&lt;!&ndash;prop="newWithdrawCallbackMessageText"&ndash;&gt;-->
+        <!--&lt;!&ndash;label="新记录" width="110">&ndash;&gt;-->
+        <!--&lt;!&ndash;<template slot-scope="scope">&ndash;&gt;-->
+        <!--&lt;!&ndash;<span :class="scope.row.newWithdrawCallbackMessageText == scope.row.withdrawCallbackMessageText ? '':'logClass'">{{scope.row.newWithdrawCallbackMessageText}}</span>&ndash;&gt;-->
+        <!--&lt;!&ndash;</template>&ndash;&gt;-->
+        <!--&lt;!&ndash;</el-table-column>&ndash;&gt;-->
+        <!--&lt;!&ndash;</el-table-column>&ndash;&gt;-->
+      <!--</el-table>-->
+      <!--<div slot="footer" class="dialog-footer">-->
+        <!--<el-button size="small" type="primary" @click="merchantFlag=false">确 定</el-button>-->
+      <!--</div>-->
+    <!--</el-dialog>-->
+    <el-dialog class="code-dialog" width="60%" title="金额分成详情" :visible.sync="moneyFlag">
       <el-table
-        v-loading="vLoading"
-        :height="$GlobalApi.getWinHeight() - 268"
         size="small"
         :data="modifylogtableData"
         stripe
@@ -372,10 +390,6 @@
         :header-cell-style="$GlobalApi.rowClass"
         border
         :cell-style="$GlobalApi.cellClassNoEdit">
-        <el-table-column prop="id" label="ID" width="150px" show-overflow-tooltip />
-        <el-table-column prop="userName" label="操作者"/>
-        <el-table-column prop="operateTime" label="操作时间" width="140px"/>
-        <el-table-column prop="operateIp" label="操作IP" width="120px"/>
         <el-table-column label="总毛利率" >
           <el-table-column
             prop="totalProfit"
@@ -615,12 +629,10 @@
           </el-table-column>
         </el-table-column>
       </el-table>
-    </div>
-    <div class="sd-rightpage">
-      <!-- 分页标签 -->
-      <pager :current-page="currPage" @current-change="getcurrentPage" :total="totalCount"
-             @handle-size-change="getpageSize" :page-size="pageSize" background/>
-    </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button size="small" type="primary" @click="moneyFlag=false">确 定</el-button>
+      </div>
+    </el-dialog>
   </el-card>
 </template>
 
@@ -628,44 +640,15 @@
   export default {
     data() {
       return {
+        listData:[],
         vLoading:false,
         //表格
         modifylogtableData: [],
-        busineArray:[{
-          value:3101,
-          label:'分成配置'
-        },{
-          value:11,
-          label:'用户提现',
-          children: [{
-            value:1101,
-            label:'同意'
-          },{
-            value:1102,
-            label:'拒绝'
-          },{
-            value:1103,
-            label:'人工确认'
-          }]
-        },{
-          value:21,
-          label:'商户提现',
-          children: [{
-            value:2101,
-            label:'同意'
-          },{
-            value:2102,
-            label:'拒绝'
-          },{
-            value:2103,
-            label:'已到账'
-          }]
-        }],
         currPage:1,
         pageSize:10,
         totalCount:0,
-        busine:[3101],
         userFlag:false,
+        moneyFlag:false,
         merchantFlag:false
       }
     },
@@ -673,38 +656,40 @@
       this.getlist();
     },
     methods: {
-      busineChange(val){
-        this.userFlag = false;
-        this.merchantFlag = false;
+      detailHandle(row){
         this.modifylogtableData = []
-        if (val.length == 2){
-          if (val[0] == 11){
-            this.userFlag = true;
+        this.$http({
+          url: this.$http.adornUrl('/sys/manage/log/info'),
+          method: 'get',
+          params: this.$http.adornParams({
+            id: row.id,
+            type: row.type
+          })
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.modifylogtableData.push(data.vo)
+            if (row.type === 3101) {
+              this.moneyFlag = true;
+            }else {
+              this.userFlag = true
+            }
+          } else {
+            this.$message.error(data.msg);
           }
-          if (val[0] == 21){
-            this.merchantFlag = true;
-          }
-        }
+        })
       },
       getlist () {
-        let temp = 0;
-        if (this.busine.length == 1){
-          temp = this.busine[0]
-        }else {
-          temp = this.busine[1]
-        }
         this.vLoading = true
         this.$http({
           url: this.$http.adornUrl('/sys/manage/log/list'),
           method: 'get',
           params: this.$http.adornParams({
             page:this.currPage,
-            size:this.pageSize,
-            type:temp
+            size:this.pageSize
           })
         }).then(({data}) => {
           if (data && data.code === 0) {
-            this.modifylogtableData = data.page.list
+            this.listData = data.page.list
             this.totalCount = data.page.totalCount
           } else {
             this.$message.error(data.msg);

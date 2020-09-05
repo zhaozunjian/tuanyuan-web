@@ -33,12 +33,15 @@
                     <el-option v-for="item in businessPriorityOptions" :key="item.value" :label="item.label" :value="item.value" />
                   </el-select>
                 </el-form-item>
-                <el-form-item label="商家类别(必填且不可修改)" prop="businessCategoryIdArray">
-                  <el-cascader
-                    v-model="business.businessCategoryIdArray"
-                    :options="businessCategoryOptions"
-                    :props="{ expandTrigger: 'hover' }"
-                  ></el-cascader>
+                <el-form-item label="商家类别" prop="businessCategoryIdArray">
+                  <!--<el-cascader-->
+                    <!--v-model="business.businessCategoryIdArray"-->
+                    <!--:options="businessCategoryOptions"-->
+                    <!--:props="{ expandTrigger: 'hover' }"-->
+                  <!--&gt;</el-cascader>-->
+                  <el-select v-model="business.businessCategoryId" placeholder="商家类别">
+                    <el-option v-for="item in businessCategoryOptions" :key="item.value" :label="item.label" :value="item.value" />
+                  </el-select>
                 </el-form-item>
                 <el-form-item label="选择地理位置" prop>
                   <el-row>
@@ -251,7 +254,7 @@ export default {
         detailFileArray: '',
         operateLicenseFile: '',
         healthLicenseFile: '',
-        businessCategoryIdArray: [],
+        businessCategoryId: '',
         lng: null,
         lat: null,
         cityCode: null,
@@ -288,7 +291,7 @@ export default {
         addressSpecific: [
           { required: true, message: "请输入具体地址", trigger: "blur" }
         ],
-        businessCategoryIdArray: [
+        businessCategoryId: [
           { required: true, message: "请输入商家类别", trigger: "blur" }
         ],
         // businessContactPhone: [{validator: this.$Utils.validPhone, required: true, trigger: 'change'}],
@@ -494,7 +497,7 @@ export default {
               "businessContactPhone":this.business.businessContactPhone,
               "detailContentUrl":this.business.detailContentUrl,
               "priority":this.business.priority,
-              "businessCategoryIdArray":this.business.businessCategoryIdArray,
+              "businessCategoryId":this.business.businessCategoryId,
               "lng": this.business.lng,
               "lat": this.business.lat,
               "adCode": this.business.adCode,

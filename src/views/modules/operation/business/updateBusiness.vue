@@ -37,8 +37,18 @@
                     <el-option v-for="item in businessPriorityOptions" :key="item.value" :label="item.label" :value="item.value" />
                   </el-select>
                 </el-form-item>
-                <el-form-item label="商家类别">
-                  <span>{{this.business.businessRootCategoryName!=''?this.business.businessRootCategoryName+'/':''+ this.business.businessCategoryName}}</span>
+                <!--<el-form-item label="商家类别">-->
+                  <!--<span>{{this.business.businessRootCategoryName!=''?this.business.businessRootCategoryName+'/':''+ this.business.businessCategoryName}}</span>-->
+                <!--</el-form-item>-->
+                <el-form-item label="商家类别" prop="businessCategoryIdArray">
+                  <!--<el-cascader-->
+                    <!--v-model="business.businessCategoryId"-->
+                    <!--:options="businessCategoryOptions"-->
+                    <!--:props="{ expandTrigger: 'hover' }"-->
+                  <!--&gt;</el-cascader>-->
+                  <el-select v-model="business.businessCategoryId" placeholder="商家类别">
+                    <el-option v-for="item in businessCategoryOptions" :key="item.value" :label="item.label" :value="item.value" />
+                  </el-select>
                 </el-form-item>
                 <el-form-item label="选择地理位置" prop>
                   <el-row>
@@ -310,6 +320,7 @@ export default {
         businessRootCategoryName: "",
         businessCategoryName: "",
         priority: 5,
+        businessCategoryIdArray: [],
         averagePrice: "",
         addressProbably: "",
         addressSpecific: "",
@@ -342,6 +353,9 @@ export default {
         businessDetailImage: [
           { required: true, message: "请选择详情图片", trigger: "blur" }
         ],
+        businessCategoryId: [
+          { required: true, message: "请输入商家类别", trigger: "blur" }
+        ],
         // businessContactPhone: [{validator: this.$Utils.validPhone, required: true, trigger: 'change'}],
       },
       gaodeLocation: {
@@ -351,6 +365,7 @@ export default {
       openMap: false,
       businessLoading: false,
       businessCategoryName: "",
+      businessCategoryOptions: [],
       businessPriorityOptions: [
         {
           value: 1,
@@ -397,7 +412,6 @@ export default {
       businessContractFlag:false,
       form: {},
       contractEndTime: '',
-
       //商家标签
       dialogAddFormVisible:false,
       addForm: {
@@ -417,6 +431,7 @@ export default {
       this.merchantId = this.$route.query.merchantId;
       this.flag = this.$route.query.flag;
     }
+    this.initCategoryData();
     this.initData();
     this.initBusinessTagBindList();
   },
@@ -742,6 +757,32 @@ export default {
         });
       })
     },
+    initCategoryData() {
+      this.$http({
+        url: this.$http.adornUrl('/sys/businessCategory/findAll'),
+        method: 'get',
+        params: this.$http.adornParams({})
+      }).then(({data}) => {
+        if (data && data.code === 0) {
+          this.businessCategoryOptions = this.getTreeData(data.result);
+        } else {
+          this.$message.error(data.msg)
+        }
+      })
+    },
+    getTreeData(data) {
+      // 循环遍历json数据
+      for (var i = 0; i < data.length; i++) {
+        if (data[i].children.length < 1) {
+          // children若为空数组，则将children设为undefined
+          data[i].children = undefined;
+        } else {
+          // children若不为空数组，则继续 递归调用 本方法
+          this.getTreeData(data[i].children);
+        }
+      }
+      return data;
+    },
     initData() {
       if (this.businessId) {
         this.businessLoading = true
@@ -873,7 +914,7 @@ export default {
               "businessContactPhone":this.business.businessContactPhone,
               "detailContentUrl":this.business.detailContentUrl,
               "priority":this.business.priority,
-              "businessCategoryIdArray":this.business.businessCategoryIdArray,
+              "businessCategoryId":this.business.businessCategoryId,
               "lng": this.business.lng,
               "lat": this.business.lat,
               "adCode": this.business.adCode,

@@ -36,14 +36,6 @@
         </template>
       </el-table-column>
       <el-table-column
-        prop="inputter"
-        label="录入人">
-      </el-table-column>
-      <el-table-column
-        prop="inputtime"
-        label="录入时间">
-      </el-table-column>
-      <el-table-column
         fixed="right"
         label="操作">
         <template slot-scope="scope">

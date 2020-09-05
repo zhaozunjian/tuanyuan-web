@@ -138,7 +138,6 @@
         })
       },
       submitForm() {
-        console.log(this.editForm)
         this.$http({
           url: this.$http.adornUrl('/headquarter/update'),
           method: 'post',
