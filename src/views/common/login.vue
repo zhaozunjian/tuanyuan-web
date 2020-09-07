@@ -59,6 +59,7 @@
       }
     },
     created() {
+      localStorage.removeItem("messageInfo")
       this.getCaptcha()
     },
     methods: {

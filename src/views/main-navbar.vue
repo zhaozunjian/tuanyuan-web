@@ -192,6 +192,7 @@
             if (data && data.code === 0) {
               clearLoginInfo()
               this.dictionariesData.clear()
+              localStorage.removeItem("messageInfo")
               this.$router.push({name: 'login'})
             }
           })

@@ -8,10 +8,9 @@
       :data="bindBusinessList"
       :header-cell-style="$GlobalApi.rowClass"
       :height="$GlobalApi.getWinHeight() - 280"
-      border
+      border v-loading="bindBusinessFlag"
       highlight-current-row
-      size="small"
-      stripe>
+      size="small" stripe>
       <el-table-column prop="businessName" label="商家名称"></el-table-column>
       <el-table-column label="关联绑定的时间">
         <template slot-scope="scope">
@@ -20,8 +19,7 @@
       </el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
-          <el-button size="small" type="text"
-                     @click="handleUnbind(scope.row.businessId)">
+          <el-button size="small" type="text" @click="handleUnbind(scope.row.businessId)">
             解除关联
           </el-button>
         </template>
@@ -39,21 +37,18 @@
       <el-input class="sd-input-150" clearable placeholder="请输入商家名称" size="small" @change="getBusiness" v-model.trim="addForm.searchContent"/>
       <el-button @click="getUnBindBusinessList()" class="sd-mag-l-10" icon="el-icon-search" size="small" type="primary">查询</el-button>
       <el-table style="margin-top: 20px;" :data="addForm.unBindBusinessList" :cell-style="$GlobalApi.cellClass"
-                :header-cell-style="$GlobalApi.rowClass"
-                :height="$GlobalApi.getWinHeight() - 300" border highlight-current-row
-                size="small" stripe>
+                :header-cell-style="$GlobalApi.rowClass" @selection-change="handleSelectionChange"
+                :height="$GlobalApi.getWinHeight() - 300" border highlight-current-row size="small" stripe>
+        <el-table-column type="selection" width="35"></el-table-column>
         <el-table-column property="businessName" label="商家名称"></el-table-column>
-        <el-table-column
-          label="操作">
-          <template slot-scope="scope">
-            <el-button size="small" type="text" @click="handleBind(scope.row.businessId)">
-              关联
-            </el-button>
-          </template>
-        </el-table-column>
+        <el-table-column property="addressProbably" label="商家地址" show-tooltip-when-overflow></el-table-column>
       </el-table>
       <pager :current-page="addCurrentPage" :page-size="addPageSize" :total="addTotal"
              @current-change="handleAddCurrentChange" @handle-size-change="handleAddSizeAddChange" background/>
+      <div slot="footer" class="dialog-footer">
+        <el-button size="small" plain @click="dialogFormVisibleAdd=false">取 消</el-button>
+        <el-button size="small" type="primary" @click="handleBind()">确 定</el-button>
+      </div>
     </el-dialog>
   </el-card>
 </template>
@@ -63,6 +58,7 @@
 export default {
   data() {
     return {
+      bindBusinessFlag:false,
       sysOperationUserId: '',
       sysOperationUserLoginName: '',
       bindBusinessList: [],
@@ -77,6 +73,7 @@ export default {
       addCurrentPage: 1,
       addPageSize: 10,
       addTotal: 0,
+      businessList:[],
     }
   },
   mounted() {
@@ -92,6 +89,7 @@ export default {
     },
     initBindBusinessList() {
       if (this.sysOperationUserId){
+        this.bindBusinessFlag = true
         this.$http({
           url: this.$http.adornUrl(`/sysOperationUserBindBusiness/pageBindBusinessList`),
           method: 'post',
@@ -104,7 +102,9 @@ export default {
           if (data && data.code === 0) {
             this.bindBusinessList = data.result.data
             this.listTotal = data.result.pageModel.total
+            this.bindBusinessFlag = false
           } else {
+            this.bindBusinessFlag = false
             this.$message.error(data.msg);
           }
         })
@@ -170,13 +170,19 @@ export default {
         }
       })
     },
-    handleBind(businessId) {
+    handleSelectionChange(val){
+      this.businessList = val
+    },
+    handleBind() {
+      var businessId = this.businessList.map(item => {
+        return item.businessId
+      })
       this.$http({
         url: this.$http.adornUrl(`/sysOperationUserBindBusiness/bind`),
         method: 'get',
         params: this.$http.adornParams({
-          businessId:businessId,
-          sysOperationUserId:this.sysOperationUserId
+          businessId: businessId.join(','),
+          sysOperationUserId: this.sysOperationUserId
         })
       }).then(({data}) => {
         if (data && data.code === 0) {

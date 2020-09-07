@@ -37,6 +37,7 @@
         :options="administrativeAreaOptions"
         :props="{ expandTrigger: 'hover' }" size="small"
       ></el-cascader>
+      <el-input class="sd-input-150" clearable placeholder="请输入商圈名称" size="small" @change="getchangeInit" v-model.trim="addForm.shoppingDistrictName"/>
       <el-button @click="initAddShoppingDistrictBindBusinessList(addAdministrativeAreaArray[addAdministrativeAreaArray.length-1])" class="sd-mag-l-10" icon="el-icon-search" size="small" type="primary">查询</el-button>
       <el-table
         ref="singleTable"
@@ -69,7 +70,8 @@ export default {
       addCurrentPage: 1,
       addPageSize: 10,
       addForm: {
-          administrativeAreaArrayAdd: [],
+          administrativeAreaArrayAdd: ["800","801"],
+          shoppingDistrictName:'',
           shoppingDistrictListAddForm: [],
           chooseShoppingDistrict: null
       },
@@ -84,10 +86,11 @@ export default {
   },
   methods: {
     initData() {
-        this.businessId = this.$route.query.businessId
-        this.businessName = this.$route.query.businessName
-        this.initAdministrativeAreaArray()
-        this.initShoppingDistrictBindBusinessList()
+      this.businessId = this.$route.query.businessId
+      this.businessName = this.$route.query.businessName
+      this.initAdministrativeAreaArray()
+      this.initShoppingDistrictBindBusinessList()
+      this.initAddShoppingDistrictBindBusinessList(this.addForm.administrativeAreaArrayAdd[this.addForm.administrativeAreaArrayAdd.length-1])
     },
     initAdministrativeAreaArray() {
       this.$http({
@@ -116,13 +119,7 @@ export default {
       return data;
     },
     initShoppingDistrictBindBusinessList() {
-        if (!this.listCurrentPage) {
-            this.listCurrentPage = 1
-        }
-        if (!this.listPageSize) {
-            this.listPageSize = 10
-        }
-        let businessId = this.businessId
+      let businessId = this.businessId
       this.$http({
         url: this.$http.adornUrl(`/shoppingDistrictBindBusiness/pageByBusinessId`),
         method: 'post',
@@ -189,17 +186,12 @@ export default {
         })
     },
     initAddShoppingDistrictBindBusinessList(administrativeAreaId) {
-        // if (!this.addCurrentPage) {
-        //     this.addCurrentPage = 1;
-        // }
-        // if (!this.addPageSize) {
-        //     this.addPageSize = 5;
-        // }
       this.$http({
         url: this.$http.adornUrl(`/shoppingDistrict/pageByAdministrativeAreaId`),
         method: 'post',
         params: this.$http.adornParams({
           administrativeAreaId: administrativeAreaId,
+          shoppingDistrictName: this.addForm.shoppingDistrictName,
           currentPage: this.addCurrentPage,
           pageSize: this.addPageSize
         })
@@ -257,6 +249,11 @@ export default {
             let administrativeAreaId = this.addAdministrativeAreaArray[this.addAdministrativeAreaArray.length-1]
             this.initAddShoppingDistrictBindBusinessList(administrativeAreaId)
         }
+    },
+    getchangeInit(val){
+      if (val === null || val === ''){
+        this.initAddShoppingDistrictBindBusinessList(this.addForm.administrativeAreaArrayAdd[this.addForm.administrativeAreaArrayAdd.length-1])
+      }
     },
     handleAddSizeChange(val) {
       this.addPageSize = val;
