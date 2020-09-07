@@ -59,7 +59,7 @@
       }
     },
     created() {
-      localStorage.removeItem("messageInfo")
+      this.dictionariesData.clear()
       this.getCaptcha()
     },
     methods: {
