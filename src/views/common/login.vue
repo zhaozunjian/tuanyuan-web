@@ -8,19 +8,20 @@
           <div class="totle">团猿后台管理系统</div>
         </div>
         <el-form-item prop="userName" class="sd-pad">
-          <el-input class="sd-pad" v-model="dataForm.userName" placeholder="帐号"/>
+          <el-input class="sd-pad" prefix-icon="el-icon-user" clearable v-model="dataForm.userName" placeholder="帐号"/>
         </el-form-item>
-        <span class="svg-container"><icon-svg name="password"></icon-svg></span>
         <el-form-item prop="password">
-          <el-input class="sd-pad" v-model="dataForm.password" type="password" placeholder="密码"/>
+          <el-input class="sd-pad" prefix-icon="el-icon-lock" clearable v-model="dataForm.password" placeholder="密码" show-password/>
         </el-form-item>
         <el-form-item class="sd-pad" prop="captcha">
           <el-row :gutter="20">
             <el-col :span="14">
-              <el-input v-model="dataForm.captcha" class="captcha" placeholder="验证码"></el-input>
+              <el-input v-model="dataForm.captcha" clearable class="captcha" placeholder="验证码">
+                <icon-svg name="yzm" slot="prefix" class="el-input__icon"></icon-svg>
+              </el-input>
             </el-col>
             <el-col :span="10" class="login-captcha">
-            <img :src="captchaPath" @click="getCaptcha()" alt="">
+              <img :src="captchaPath" @click="getCaptcha()" alt="">
             </el-col>
           </el-row>
         </el-form-item>
@@ -125,7 +126,7 @@
      color: $col;
    }
   .el-row{
-    margin-top: 16px;
+    /*margin-top: 16px;*/
   }
 </style>
 <style rel="stylesheet/scss" lang="scss" scoped>

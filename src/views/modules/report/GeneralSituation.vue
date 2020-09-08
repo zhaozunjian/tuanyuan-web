@@ -1,5 +1,5 @@
 <template>
-  <div v-show="$GlobalApi.getUserInfo().roleId == 10">
+  <div v-show="$GlobalApi.getUserInfo().roleId == 10" v-loading="flag">
     <el-col class="sd-main" style="width: 42.5%">
       <el-card shadow="hover" class="main-flow paddig">
         <div>
@@ -56,6 +56,7 @@
     name: "GeneralSituation",
     data() {
       return {
+        flag: false,
         orderCount: 0,
         orderUnCount: 0,
         orderOver: 0,
@@ -194,8 +195,10 @@
     },
     mounted(){
       if (this.$GlobalApi.getUserInfo().roleId == 10) {
+        this.flag = true
         this.getlist(7);
         this.getMoneyList(7);
+        this.flag = false
       }
     }
   }
