@@ -250,17 +250,15 @@
         <el-button size="small" type="primary" @click="handleAddBusinessTag()">确 定</el-button>
       </div>
     </el-dialog>
-    <el-row v-if="openMap">
-      <div class="map_wrap">
-        <choose-address
-          @confirmAddress="confirmAddressHandle"
-          @giveUpChoose="giveUpChooseHandle"
-          :lng="business.lng"
-          :lat="business.lat"
-          :initPosition="true"
-        />
-      </div>
-    </el-row>
+    <div class="map_wrap" v-if="openMap">
+      <choose-address
+        @confirmAddress="confirmAddressHandle"
+        @giveUpChoose="giveUpChooseHandle"
+        :lng="business.lng"
+        :lat="business.lat"
+        :initPosition="true"
+      />
+    </div>
   </div>
 </template>
 

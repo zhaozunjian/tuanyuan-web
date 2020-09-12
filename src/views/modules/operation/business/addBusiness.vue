@@ -1,5 +1,5 @@
 <template>
-  <div class="fillcontain">
+  <div>
     <el-card class="box-card" v-show="!openMap">
       <div class="text item">
         <div class="box">
@@ -194,15 +194,12 @@
         </div>
       </div>
     </el-card>
-    <el-row v-if="openMap">
-      <div class="map_wrap">
-        <choose-address
-          @confirmAddress="confirmAddressHandle"
-          @giveUpChoose="giveUpChooseHandle"
-          :initPosition="false"
-        />
-      </div>
-    </el-row>
+    <div class="map_wrap" v-if="openMap">
+      <choose-address
+        @confirmAddress="confirmAddressHandle"
+        @giveUpChoose="giveUpChooseHandle"
+        :initPosition="false"/>
+    </div>
   </div>
 </template>
 
@@ -347,7 +344,8 @@ export default {
   created() {
     this.initData();
   },
-  mounted() {},
+  mounted() {
+  },
   methods: {
     initData() {
       this.$http({
@@ -600,10 +598,10 @@ export default {
 
 <style scoped>
 
-.map_wrap {
-  width: 100%;
-  height: 800px;
-}
+  .map_wrap {
+    width: 100%;
+    height: 800px;
+  }
 .businessAvatar{
   width: 400px;
 }

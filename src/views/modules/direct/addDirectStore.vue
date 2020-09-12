@@ -88,15 +88,13 @@
         </div>
       </div>
     </el-card>
-    <el-row v-if="openMap">
-      <div class="map_wrap">
-        <choose-address
-          @confirmAddress="confirmAddressHandle"
-          @giveUpChoose="giveUpChooseHandle"
-          :initPosition="false"
-        />
-      </div>
-    </el-row>
+    <div class="map_wrap" v-if="openMap">
+      <choose-address
+        @confirmAddress="confirmAddressHandle"
+        @giveUpChoose="giveUpChooseHandle"
+        :initPosition="false"
+      />
+    </div>
   </div>
 </template>
 

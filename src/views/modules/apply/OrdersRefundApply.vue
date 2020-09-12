@@ -19,9 +19,19 @@
       <el-table-column prop="usersNickName" label="退款申请的用户昵称"></el-table-column>
       <el-table-column prop="refundAmount" label="申请的退款金额"></el-table-column>
       <el-table-column prop="isArriveDescription" label="到账状态"></el-table-column>
-      <el-table-column prop="createTime" label="申请时间">
+      <el-table-column prop="createTime" label="申请时间" v-if="ordersRefundResultStatus==0">
         <template slot-scope="scope">
           <span>{{scope.row.createTime | getTime(scope.row.createTime)}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="endTime" label="处理时间" v-if="ordersRefundResultStatus==1">
+        <template slot-scope="scope">
+          <span>{{scope.row.endTime | getTime(scope.row.endTime)}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="endTime" label="处理时间" v-if="ordersRefundResultStatus==2">
+        <template slot-scope="scope">
+          <span>{{scope.row.endTime | getTime(scope.row.endTime)}}</span>
         </template>
       </el-table-column>
       <el-table-column prop="resultStatusDescription" label="结果状态">
