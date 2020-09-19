@@ -5,7 +5,7 @@
                class="login-form" auto-complete="on" label-position="left">
         <div class="title-container">
           <!--<img class="sd-float yzwl" src="../../assets/img/login/logo.png" alt="">-->
-          <div class="totle">团猿后台管理系统</div>
+          <div class="totle">团猿管理系统</div>
         </div>
         <el-form-item prop="userName" class="sd-pad">
           <el-input class="sd-pad" prefix-icon="el-icon-user" clearable v-model="dataForm.userName" placeholder="帐号"/>
@@ -16,8 +16,7 @@
         <el-form-item class="sd-pad" prop="captcha">
           <el-row :gutter="20">
             <el-col :span="14">
-              <el-input v-model="dataForm.captcha" clearable class="captcha" placeholder="验证码">
-                <icon-svg name="yzm" slot="prefix" class="el-input__icon"></icon-svg>
+              <el-input v-model="dataForm.captcha" prefix-icon="el-icon-message" clearable class="captcha" placeholder="验证码">
               </el-input>
             </el-col>
             <el-col :span="10" class="login-captcha">
@@ -136,7 +135,9 @@
     position: fixed;
     height: 100%;
     width: 100%;
-    background-image: url("../../assets/img/login/login_bg.png");
+    background: url("../../assets/img/login/login_bg.png") no-repeat;
+    overflow: hidden;
+    background-size:cover;
     .login-form {
       width: 520px;
       max-width: 100%;
@@ -154,6 +155,7 @@
     }
     .title-container {
       position: relative;
+      background-size:cover;
     }
     .thirdparty-button {
       position: absolute;
@@ -166,6 +168,7 @@
     float: left;
     width: 50%;
     height: 50%;
+    background-size:cover;
   }
 
   .totle {
@@ -174,6 +177,7 @@
     color: white;
     padding-bottom: 80px;
     text-align: center;
+    background-size:cover;
   }
 
   .yzwl {

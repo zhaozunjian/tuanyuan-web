@@ -72,6 +72,7 @@
                 if (data && data.code === 0) {
                   this.userList = data.result.data;
                   this.total = data.result.pageModel.total;
+                  this.getMessage()
                   // this.currentPage = data.result.pageModel.currentPage;
                   // this.pageSize = data.result.pageModel.pageSize;
                 } else {
@@ -79,6 +80,19 @@
                 }
               })
             },
+          getMessage(){
+            this.$http({
+              url: this.$http.adornUrl('/message/list'),
+              method: 'get',
+              params: this.$http.adornParams({})
+            }).then(({data}) => {
+              if (data && data.code === 0) {
+                localStorage.setItem("messageInfo", JSON.stringify(data.vo))
+              } else {
+                this.$message.error(data.msg)
+              }
+            })
+          },
             // 同意申请
             handleAgree(usersAssetsWithdrawApplyId){
                this.$confirm('此操作将会同意这次申请,同意后将无法拒绝并需要到账确认, 是否继续?', '提示', {

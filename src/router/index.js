@@ -19,7 +19,13 @@ const _import = require('./import-' + process.env.NODE_ENV)
 // 全局路由(无需嵌套上左右整体布局)
 const globalRoutes = [
   {path: '/404', component: _import('common/404'), name: '404', meta: {title: '404未找到'}},
-  {path: '/login', component: _import('common/login'), name: 'login', meta: {title: '登录'}}
+  {path: '/login', component: _import('common/login'), name: 'login', meta: {title: '登录'}},
+  {path: '/mblogin', component: _import('common/mblogin'), name: 'mblogin', meta: {navShow: false}},
+  {path: '/mbmain', component: _import('app/mbmain'), name: 'mbmain', meta: {navShow: true}},
+  {path: '/business', component: _import('app/business'), name: 'business', meta: {navShow: true}},
+  {path: '/order', component: _import('app/order'), name: 'order', meta: {navShow: true}},
+  {path: '/myuser', component: _import('app/myuser'), name: 'myuser', meta: {navShow: true}},
+
 ]
 
 // 主入口路由(需嵌套上左右整体布局)
@@ -199,13 +205,41 @@ const mainRoutes = {
       name: 'merchantBindMerchantUsersList',
       meta: {title: '店员列表', isTab: true}
     },
+    {
+      path: '/addSupermarket',
+      component: _import('modules/supermarket/addSupermarket'),
+      name: 'addSupermarket',
+      meta: {title: '添加超市', isTab: true}
+    },
+    {
+      path: '/updateSupermarket',
+      component: _import('modules/supermarket/updateSupermarket'),
+      name: 'updateSupermarket',
+      meta: {title: '超市详情', isTab: true}
+    },
+    {
+      path: '/supermarketCommodity',
+      component: _import('modules/supermarket/supermarketCommodity'),
+      name: 'supermarketCommodity',
+      meta: {title: '超市商品', isTab: true}
+    },
+    {
+      path: '/updateSupermarketCommodity',
+      component: _import('modules/supermarket/updateSupermarketCommodity'),
+      name: 'updateSupermarketCommodity',
+      meta: {title: '商品详情', isTab: true}
+    },
   ],
   beforeEnter (to, from, next) {
     let token = Vue.cookie.get('token')
     if (!token || !/\S/.test(token)) {
       storage.clear()
       clearLoginInfo()
-      next({name: 'login'})
+      if (navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)) {
+        next({name: 'mblogin'})
+      }else {
+        next({name: 'login'})
+      }
     }
     next()
   }
@@ -222,6 +256,11 @@ router.beforeEach((to, from, next) => {
   // 添加动态(菜单)路由
   // 1. 已经添加 or 全局路由, 直接访问
   // 2. 获取菜单列表, 添加并保存本地存储
+  if (to.name == 'login') {
+    if (navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)) {
+      router.push({ name: 'mblogin'});
+    }
+  }
   if (router.options.isAddDynamicMenuRoutes || fnCurrentRouteType(to, globalRoutes) === 'global') {
     next()
   } else {
@@ -243,7 +282,11 @@ router.beforeEach((to, from, next) => {
       }
     }).catch((e) => {
       console.log(`%c${e} 请求菜单列表和权限失败，跳转至登录页！！`, 'color:blue')
-      router.push({name: 'login'})
+      if (navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)) {
+        router.push({ name: 'mblogin'});
+      }else {
+        router.push({name: 'login'})
+      }
     })
   }
 })

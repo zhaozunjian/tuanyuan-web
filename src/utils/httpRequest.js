@@ -65,7 +65,11 @@ http.interceptors.response.use(response => {
   }
   if (response.data && response.data.code === 401) { // 401, token失效
     clearLoginInfo()
-    router.push({ name: 'login' })
+    if (navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)) {
+      router.push({ name: 'mblogin'});
+    }else {
+      router.push({ name: 'login' })
+    }
   }
   return response
 }, error => {

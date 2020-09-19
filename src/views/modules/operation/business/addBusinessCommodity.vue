@@ -449,8 +449,8 @@
           });
         }
       },
-      async submitForm() {
-        this.$refs['commodity'].validate(async valid => {
+      submitForm() {
+        this.$refs['commodity'].validate(valid => {
           if (valid) {
             var str = "";
             for (var i = 0; i < this.carouselFileList.length; i++) {

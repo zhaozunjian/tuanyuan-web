@@ -16,14 +16,15 @@
     props: {
       lng: null,
       lat: null,
-      initPosition: false
+      initPosition: false,
     },
     data() {
       return {
-        searchKeyWord: ""
+        flag: false
       };
     },
-    created() {},
+    created() {
+    },
     mounted() {
       let that = this;
       let container = this.$refs.gaodeContainer;
@@ -86,7 +87,10 @@
             placeSearch.setCityLimit(true);
             placeSearch.search(e.poi.name);
           });
-          AMap.event.addListener(map, "mousemove", function(e){
+          var btn = document.getElementById("keyword")
+          // 绑定事件
+          AMap.event.addDomListener(btn, "click", function(ev) {
+            // DOM 被点击时触发，ev 为原生事件
             if (document.getElementById('keyword').value == ''){
               placeSearch.clear();
               map.clearMap();
@@ -112,11 +116,16 @@
           contextMenu.addItem(
             "标记该位置",
             function(e) {
-              map.clearMap();
-              placeSearch.clear();
-              if (marker) {
-                map.remove(marker);
-              }
+              // map.clearMap();
+              // placeSearch.clear();
+              // if (marker) {
+              //   map.remove(marker);
+              // }
+              // marker = new AMap.Marker({
+              //   map: map,
+              //   position: contextMenuPositon //基点位置
+              // });
+              // map.add(marker);
               let lng = contextMenuPositon.getLng()
               let lat = contextMenuPositon.getLat()
               let lnglat = [lng, lat];
@@ -129,15 +138,6 @@
                   placeSearch.search(result.regeocode.formattedAddress);
                 }
               });
-              marker = new AMap.Marker({
-                map: map,
-                position: new AMap.LngLat(
-                  contextMenuPositon.getLng(),
-                  contextMenuPositon.getLat()
-                ) // 经纬度对象
-              });
-              console.log(marker.getMap())
-              map.add(marker);
             },
             3
           );

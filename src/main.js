@@ -16,10 +16,14 @@ import '@/assets/scss/search-bottom.css'
 import GlobalApi from './assets/js/common.js'
 import TableTreeColumn from '@/components/table-tree-column'
 import ChooseAddress from '@/components/ChooseAddress'
+import SelectSuperMarket from '@/components/SelectSuperMarket'
 import pager from './components/Pager'
 import { Calendar } from 'element-ui';
 import Amap from 'vue-amap'
 import less from 'less'
+import Mint from 'mint-ui';
+import 'mint-ui/lib/style.css';
+Vue.use(Mint);
 Vue.use(less)
 
 import 'xe-utils'
@@ -74,6 +78,7 @@ window.SITE_CONFIG['storeState'] = cloneDeep(store.state);
 
 Vue.component("pager",pager);
 Vue.component("ChooseAddress",ChooseAddress);
+Vue.component("SelectSuperMarket",SelectSuperMarket);
 Vue.component("TableTreeColumn",TableTreeColumn);
 
 Date.prototype.Format = function(fmt)
