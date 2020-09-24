@@ -130,7 +130,7 @@
                     :on-success="upImgSuccess"
                     :show-file-list="false"
                     class="avatar-uploader">
-                    <img :src="imageServerUrl + supermarket.bavatar" class="businessAvatar" v-if="supermarket.businessAvatar">
+                    <img :src="imageServerUrl + supermarket.bavatar" class="businessAvatar" v-if="supermarket.bavatar">
                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                     <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过2MB</div>
                   </el-upload>
@@ -482,8 +482,6 @@
                 })
               })
               this.gaodeLocation.formattedAddress = this.supermarket.addressProbably;
-              // this.businessAvatar =data.vo.bavatar;
-              // this.businessDetailImage =data.vo.detailContentImages;
               this.operateLicense = data.vo.operateLicenseFile
               this.healthLicense = data.vo.healthLicenseFile
               this.businessLoading = false

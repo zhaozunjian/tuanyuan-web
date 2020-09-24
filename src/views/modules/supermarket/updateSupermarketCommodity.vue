@@ -2,8 +2,7 @@
   <div id="personnel-detail">
     <el-card class="box-card">
       <div class="text item">
-        <el-button @click="libraryDialog = true" icon="el-icon-document" size="small" type="primary">模板导入</el-button>
-        <hr class="sd-hr"/>
+        <!--<hr class="sd-hr"/>-->
         <div style="width: 70%">
           <el-form :model="commodity" :rules="rules" ref="commodity" label-width="180px">
             <el-form-item label="所属超市ID" prop="supermarketId">
@@ -17,14 +16,18 @@
                 <el-option v-for="item in supermarketCommodityCustomCategoryIdList" :key="item.id" :label="item.cname" :value="item.id" />
               </el-select>
             </el-form-item>
+            <el-form-item label="模板导入">
+              <el-button @click="libraryDialog = true" icon="el-icon-document" size="small" type="primary">模板导入</el-button>
+            </el-form-item>
             <el-form-item label="商品名称" prop="cname">
-              <el-input v-model="commodity.cname" placeholder="请输入商品名称"></el-input>
+              <el-input v-model="commodity.cname" style="width: 80%" placeholder="请输入商品名称" :disabled="liabryFlag"></el-input>
+              <el-button @click="liabryFlag = false" size="small">编辑</el-button>
             </el-form-item>
             <el-form-item label="商品副标题" prop="csubTitle">
-              <el-input v-model="commodity.csubTitle" placeholder="请输入商品副标题"></el-input>
+              <el-input v-model="commodity.csubTitle" placeholder="请输入商品副标题" :disabled="liabryFlag"></el-input>
             </el-form-item>
             <el-form-item label="商品描述" prop="cdescription">
-              <el-input type="textarea" autosize v-model="commodity.cdescription" placeholder="请输入商品描述"></el-input>
+              <el-input type="textarea" autosize v-model="commodity.cdescription" placeholder="请输入商品描述" :disabled="liabryFlag"></el-input>
             </el-form-item>
             <el-form-item label="推荐权重值" prop="weight">
               <el-input v-model.trim="commodity.weight" type="number"></el-input>
@@ -39,12 +42,9 @@
               <el-input-number v-model="commodity.originPrice" :min="0" :precision="2" :max="99999999"></el-input-number>
             </el-form-item>
             <el-form-item label="出售单位" prop="units">
-              <div style="width: 100%;display: flex;">
-                <el-input v-model="commodity.units" clearable placeholder="出售数量" style="width: 100px;"></el-input>
-                <el-select v-model="commodity.unit" placeholder="出售单位" style="width: 100px;margin-left: 10px;">
-                  <el-option v-for="item in unitsList" :key="item.value" :label="item.label" :value="item.label" />
-                </el-select>
-              </div>
+              <el-select v-model="commodity.units" placeholder="出售单位">
+                <el-option v-for="item in unitsList" :key="item.id" :label="item.tname" :value="item.id" />
+              </el-select>
             </el-form-item>
             <el-form-item label="是否开启库存限制">
               <el-select v-model.trim="commodity.openStock">
@@ -62,7 +62,7 @@
               <el-input-number v-model="commodity.salesCurrentMonthCount" :min="0" :max="99999999"></el-input-number>
             </el-form-item>
             <el-form-item label="商品头像" prop="cavatar">
-              <el-upload
+              <el-upload :disabled="liabryFlag"
                 :action="$GlobalApi.getServerUrl('/system/file/supermarketCommodity/upload')"
                 :before-upload="beforeAvatarUpload"
                 :headers="$GlobalApi.getUserToken()"
@@ -74,6 +74,15 @@
                 <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                 <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过2MB</div>
               </el-upload>
+              <!--<el-upload-->
+                <!--class="avatar-uploader"-->
+                <!--action="https://jsonplaceholder.typicode.com/posts/"-->
+                <!--:before-upload="beforeAvatarUpload"-->
+                <!--:show-file-list="false">-->
+                <!--<img v-if="commodity.cavatar" :src="commodity.cavatar" class="businessAvatar" />-->
+                <!--<i v-else class="el-icon-plus avatar-uploader-icon"></i>-->
+                <!--<div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过2MB</div>-->
+              <!--</el-upload>-->
             </el-form-item>
             <el-form-item>
               <el-button type="primary" style="width:120px;" @click="submitForm()">保存</el-button>
@@ -91,44 +100,9 @@
   export default {
     data() {
       return {
-        unitsList:[{
-          label:'/g',
-          value:'11',
-        },{
-          label:'/kg',
-          value:'5',
-        },{
-          label:'/支',
-          value:'1',
-        },{
-          label:'/瓶',
-          value:'2',
-        },{
-          label:'/包',
-          value:'3',
-        },{
-          label:'/提',
-          value:'4',
-        },{
-          label:'/罐',
-          value:'6',
-        },{
-          label:'/桶',
-          value:'7',
-        },{
-          label:'/盒',
-          value:'8',
-        },{
-          label:'/袋',
-          value:'9',
-        },{
-          label:'/个',
-          value:'10',
-        },{
-          label:'/根',
-          value:'12',
-        }],
+        unitsList:[],
         libraryDialog:false,
+        liabryFlag: true,
         imageServerUrl:SERVER_CONSTANT.imageServerUrl,
         imageHttpsServerUrl:SERVER_CONSTANT.imageHttpsServerUrl,
         supermarketName:"",
@@ -143,7 +117,6 @@
           cdescription: "",
           weight: 0,
           units: "",
-          unit: "/g",
           cavatar: "",
           costPrice: 0.00,
           originPrice: 0.00,
@@ -153,6 +126,9 @@
           salesTotalCount: '',
           salesCurrentMonthCount: 0,
         },
+        cavatar:'',
+        cavatarImage:'',
+        tempflag:false,
         rules: {
           weight: [
             { required: true, message: "请选择推荐权重值", trigger: "blur" }
@@ -214,6 +190,17 @@
             this.$message.error(data.msg)
           }
         })
+        this.$http({
+          url: this.$http.adornUrl(`/supermarketCommodityUnit/list`),
+          method: 'get',
+          params: this.$http.adornParams({})
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.unitsList = data.list
+          } else {
+            this.$message.error(data.msg);
+          }
+        })
       },
       initBusiness(id) {
         this.$http({
@@ -225,14 +212,29 @@
         }).then(({data}) => {
           if (data && data.code === 0) {
             this.commodity = data.vo
-            var strings = data.vo.units.split("/");
-            this.commodity.units = strings[0]
-            this.commodity.unit = "/"+strings[1]
+            this.commodity.cavatar = this.imageServerUrl + data.vo.bavatar
+            this.tempflag = false;
           } else {
             this.$message.error(data.msg);
           }
         })
       },
+      // beforeAvatarUpload(file) {
+      //   this.tempflag = true;
+      //   this.cavatar = file;
+      //   const isLt2M = file.size / 1024 / 1024 < 2;
+      //   if (!isLt2M) {
+      //     this.$message.error("上传图片大小不能超过 2MB!");
+      //     return false;
+      //   }
+      //   const freader = new FileReader();
+      //   freader.readAsDataURL(file);
+      //   const self = this;
+      //   freader.onload = function(e) {
+      //     self.commodity.cavatar = e.target.result;
+      //   };
+      //   return isLt2M;
+      // },
       beforeAvatarUpload(file) {
         const isJPG = file.type === 'image/jpeg'
         const isGIF = file.type === 'image/gif'
@@ -260,6 +262,20 @@
       submitForm() {
         this.$refs['commodity'].validate(valid => {
           if (valid) {
+            // if (this.tempflag){
+            //   //图片上传
+            //   let submitFormData = new FormData();
+            //   submitFormData.append(
+            //     "file",this.cavatar
+            //   );
+            //   postByFormDataApi('/system/file/supermarketCommodity/upload', submitFormData).then(res => {
+            //     if (res.data.code === 0) {
+            //       this.cavatarImage = res.data.url;
+            //     } else {
+            //       this.$message.error(data.msg);
+            //     }
+            //   })
+            // }
             this.$http({
               url: this.$http.adornUrl(this.isEdit?`/supermarketCommodity/update`:'/supermarketCommodity/add'),
               method: 'post',
@@ -272,7 +288,7 @@
                 "salesCurrentMonthCount": this.commodity.salesCurrentMonthCount,
                 "openStock": this.commodity.openStock,
                 "cavatar": this.commodity.cavatar,
-                "units": this.commodity.units + this.commodity.unit,
+                "units": this.commodity.units,
                 "currentPrice": this.commodity.currentPrice,
                 "originPrice": this.commodity.originPrice,
                 "costPrice": this.commodity.costPrice,

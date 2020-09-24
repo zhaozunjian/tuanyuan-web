@@ -9,7 +9,7 @@
       <!--ul里面几个scoller就是无限滚动的几个api-->
     <ul class="mui-table-view" v-infinite-scroll="loadMore" :infinite-scroll-disabled="moreLoading" infinite-scroll-distance="0" infinite-scroll-immediate-check="false">
         <!--li数据遍历循环部分-->
-        <mt-cell is-link :title="item.businessName" v-for="(item, index) in list" :key="index">
+        <mt-cell is-link :title="item.businessName" v-for="(item, index) in list" :key="index" @click.native="handleEdit(item.businessId)">
           <span>{{item.businessCategoryName}}</span>
         </mt-cell>
         <!--底部判断是加载图标还是提示“全部加载”-->
@@ -69,6 +69,14 @@
             }
             this.moreLoading = this.allLoaded;
           })
+        },
+        handleEdit(businessId){
+          this.$router.push({
+            name: "businessEdit",
+            query: {
+              businessId: businessId
+            }
+          });
         }
       }
     }

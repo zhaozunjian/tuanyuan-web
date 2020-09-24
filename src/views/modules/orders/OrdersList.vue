@@ -102,6 +102,43 @@
                 <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
             </span>
     </el-dialog>
+    <el-dialog
+      title="超市订单详情"
+      :visible.sync="dialogVisible3"
+      width="30%"
+    >
+      <div>
+        <div class="businessRecord">
+          <div><span>商户名称:</span><span>{{supermarketRecord.businessName}}</span></div>
+          <div><span>购买商品名称:</span><span>{{supermarketRecord.businessCommodityName}}</span></div>
+          <div><span>购买商品数量:</span><span>{{supermarketRecord.payQuantity}}</span></div>
+          <div><span>订单号:</span><span>{{supermarketRecord.ordersNumber}}</span></div>
+          <div><span>订单状态:</span><span>{{supermarketRecord.ordersDetailStatusDescription}}</span></div>
+          <div>
+            <span>订单创建时间:</span><span>{{supermarketRecord.createTime |getTime(supermarketRecord.createTime)}}</span>
+          </div>
+          <div><span>订单完成时间:</span><span>{{supermarketRecord.deliveryTime |getTime(supermarketRecord.deliveryTime)}}</span>
+          </div>
+          <div><span>商户此订单所得金额:</span><span>{{supermarketRecord.merchantObtainAmount}}元</span></div>
+          <div><span>商户类型:</span>
+            <span v-if="supermarketRecord.merchantType===1">美食酒店商家</span>
+            <span v-else-if="supermarketRecord.merchantType===2">超市</span>
+            <span v-else>直营店</span>
+          </div>
+          <div><span>支付方式:</span><span>{{supermarketRecord.payMeans===1?'在线支付':'积分支付'}}</span></div>
+          <div><span>用户昵称:</span><span>{{supermarketRecord.payUsersNickName}}</span></div>
+          <div>
+            <span>备注:</span>
+            <span v-if="businessRecord.remark">{{supermarketRecord.remark}}</span>
+            <span v-else>暂无备注</span>
+          </div>
+          <div><span>实际付款金额:</span><span>{{supermarketRecord.paymentAmount}}</span></div>
+        </div>
+      </div>
+      <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="dialogVisible3 = false">确 定</el-button>
+            </span>
+    </el-dialog>
     <!--            直营店订单详情-->
     <el-dialog
       title="生鲜订单详情"
@@ -161,6 +198,7 @@
 
 const merchantTypeBusiness = 1
 const merchantTypeDirects = 3
+const merchantTypeSupermarket = 2
 
 export default {
     data() {
@@ -173,8 +211,10 @@ export default {
           ordersList: [],
             dialogVisible: false,
             dialogVisible2: false,
+          dialogVisible3: false,
             businessRecord: {},
-            directsRecord: {}
+            directsRecord: {},
+            supermarketRecord: {}
         }
     },
     mounted() {
@@ -212,7 +252,7 @@ export default {
         },
         handleEdit(merchantType, ordersId) {
             if (merchantTypeBusiness === merchantType) {
-                this.dialogVisible = true
+              this.dialogVisible = true
               this.$http({
                 url: this.$http.adornUrl(`/orders/businessRecord/detailByOrdersId`),
                 method: 'get',
@@ -241,8 +281,21 @@ export default {
                   this.$message.error(data.msg);
                 }
               })
-            } else {
-
+            } else if (merchantTypeSupermarket === merchantType) {
+              this.dialogVisible3 = true
+              this.$http({
+                url: this.$http.adornUrl(`/orders/supermaketRecord/detailByOrdersId`),
+                method: 'get',
+                params: this.$http.adornParams({
+                  ordersId: ordersId
+                })
+              }).then(({data}) => {
+                if (data && data.code === 0) {
+                  this.supermarketRecord = data.result
+                } else {
+                  this.$message.error(data.msg);
+                }
+              })
             }
         },
         // 切换分页

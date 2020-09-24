@@ -16,6 +16,7 @@ import '@/assets/scss/search-bottom.css'
 import GlobalApi from './assets/js/common.js'
 import TableTreeColumn from '@/components/table-tree-column'
 import ChooseAddress from '@/components/ChooseAddress'
+import MbChooseAddress from '@/components/MbChooseAddress'
 import SelectSuperMarket from '@/components/SelectSuperMarket'
 import pager from './components/Pager'
 import { Calendar } from 'element-ui';
@@ -78,6 +79,7 @@ window.SITE_CONFIG['storeState'] = cloneDeep(store.state);
 
 Vue.component("pager",pager);
 Vue.component("ChooseAddress",ChooseAddress);
+Vue.component("MbChooseAddress",MbChooseAddress);
 Vue.component("SelectSuperMarket",SelectSuperMarket);
 Vue.component("TableTreeColumn",TableTreeColumn);
 

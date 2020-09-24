@@ -31,7 +31,7 @@
               </el-form-item>
               <el-form-item label="品牌商头像">
                 <el-upload
-                  :action="$GlobalApi.getServerUrl('/system/file/business/upload')"
+                  :action="$GlobalApi.getServerUrl('/system/file/headquarter/upload')"
                   :before-upload="beforeAvatarUpload"
                   :headers="$GlobalApi.getUserToken()"
                   :on-error="upImgError"

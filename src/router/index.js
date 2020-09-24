@@ -19,12 +19,13 @@ const _import = require('./import-' + process.env.NODE_ENV)
 // 全局路由(无需嵌套上左右整体布局)
 const globalRoutes = [
   {path: '/404', component: _import('common/404'), name: '404', meta: {title: '404未找到'}},
-  {path: '/login', component: _import('common/login'), name: 'login', meta: {title: '登录'}},
+  {path: '/login', component: _import('common/login'), name: 'login', meta: {title: '登录',navShow: false}},
   {path: '/mblogin', component: _import('common/mblogin'), name: 'mblogin', meta: {navShow: false}},
   {path: '/mbmain', component: _import('app/mbmain'), name: 'mbmain', meta: {navShow: true}},
   {path: '/business', component: _import('app/business'), name: 'business', meta: {navShow: true}},
   {path: '/order', component: _import('app/order'), name: 'order', meta: {navShow: true}},
   {path: '/myuser', component: _import('app/myuser'), name: 'myuser', meta: {navShow: true}},
+  {path: '/businessEdit', component: _import('app/businessEdit'), name: 'businessEdit', meta: {navShow: false}},
 
 ]
 

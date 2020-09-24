@@ -139,11 +139,12 @@
       if (this.$route.query.supermarketId) {
         this.supermarketId = this.$route.query.supermarketId;
         this.supermarketName = this.$route.query.supermarketName;
+        this.ifDirect();
+        this.getCategoryList();
       }
     },
     created() {
-      this.ifDirect();
-      this.getCategoryList();
+
     },
     methods: {
       /*
