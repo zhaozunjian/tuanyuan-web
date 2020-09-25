@@ -123,28 +123,22 @@
 
                 <el-form-item label="超市头像" prop="bavatar">
                   <el-upload
-                    :action="$GlobalApi.getServerUrl('/system/file/supermarket/upload')"
+                    class="avatar-uploader"
+                    action="https://www.mocky.io/v2/5185415ba171ea3a00704eed/posts/"
                     :before-upload="beforeAvatarUpload"
-                    :headers="$GlobalApi.getUserToken()"
-                    :on-error="upImgError"
-                    :on-success="upImgSuccess"
-                    :show-file-list="false"
-                    class="avatar-uploader">
-                    <img :src="imageServerUrl + supermarket.bavatar" class="businessAvatar" v-if="supermarket.bavatar">
+                    :show-file-list="false">
+                    <img v-if="supermarket.bavatar" :src="supermarket.bavatar" class="businessAvatar"/>
                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                     <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过2MB</div>
                   </el-upload>
                 </el-form-item>
-                <el-form-item label="超市详情图片" prop="detailContentImages">
+                <el-form-item label="超市详情图片">
                   <el-upload
-                    :action="$GlobalApi.getServerUrl('/system/file/supermarket/upload')"
+                    class="avatar-uploader"
+                    action="https://www.mocky.io/v2/5185415ba171ea3a00704eed/posts/"
                     :before-upload="beforeDetailImageUpload"
-                    :headers="$GlobalApi.getUserToken()"
-                    :on-error="upImgDetailError"
-                    :on-success="upImgDetailSuccess"
-                    :show-file-list="false"
-                    class="avatar-uploader">
-                    <img :src="imageServerUrl + supermarket.detailContentImages" class="businessAvatar" v-if="supermarket.detailContentImages">
+                    :show-file-list="false">
+                    <img v-if="supermarket.detailContentImages" :src="supermarket.detailContentImages" class="businessAvatar"/>
                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                     <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过2MB</div>
                   </el-upload>
@@ -152,26 +146,21 @@
                 <el-form-item label="营业执照图片">
                   <el-upload
                     class="avatar-uploader"
-                    :action="$GlobalApi.getServerUrl('/system/file/supermarket/upload')"
+                    action="https://www.mocky.io/v2/5185415ba171ea3a00704eed/posts/"
                     :before-upload="beforeoperateImageUpload"
-                    :headers="$GlobalApi.getUserToken()"
-                    :on-error="upImgoperateError"
-                    :on-success="upImgoperateSuccess"
                     :show-file-list="false">
-                    <img v-if="operateLicense" :src="imageServerUrl + operateLicense" class="businessAvatar" />
+                    <img v-if="operateLicense" :src="operateLicense" class="businessAvatar"/>
                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                     <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过2MB</div>
                   </el-upload>
                 </el-form-item>
                 <el-form-item label="卫生许可图片">
-                  <el-upload class="avatar-uploader"
-                             :action="$GlobalApi.getServerUrl('/system/file/supermarket/upload')"
-                             :before-upload="beforehealthImageUpload"
-                             :headers="$GlobalApi.getUserToken()"
-                             :on-error="upImghealthError"
-                             :on-success="upImghealthSuccess"
-                             :show-file-list="false">
-                    <img v-if="healthLicense" :src="imageServerUrl + healthLicense" class="businessAvatar" />
+                  <el-upload
+                    class="avatar-uploader"
+                    action="https://www.mocky.io/v2/5185415ba171ea3a00704eed/posts/"
+                    :before-upload="beforehealthImageUpload"
+                    :show-file-list="false">
+                    <img v-if="healthLicense" :src="healthLicense" class="businessAvatar"/>
                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                     <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过2MB</div>
                   </el-upload>
@@ -198,6 +187,7 @@
 </template>
 
 <script>
+  import { postByFormDataApi } from "@/utils/api";
   const weekOptions = [
     {
       name: "周一",
@@ -236,7 +226,11 @@
         supermarketId: "",
         weeks: weekOptions,
         operateLicense: "",
+        operateLicenseFile: "",
         healthLicense: "",
+        healthLicenseFile: "",
+        bavatarFile:'',
+        detailFile:'',
         supermarket: {
           id: null,
           bname: "",
@@ -341,100 +335,64 @@
     },
     methods: {
       beforeAvatarUpload(file) {
-        const isJPG = file.type === 'image/jpeg'
-        const isGIF = file.type === 'image/gif'
-        const isPNG = file.type === 'image/png'
-        const isBMP = file.type === 'image/bmp'
-        const isLt20M = file.size / 20480 / 20480 < 20
-        if (!isJPG && !isGIF && !isPNG && !isBMP) {
-          this.$message.error('上传图片必须是JPG/GIF/PNG/BMP 格式!')
+        this.bavatarFile = file;
+        const isLt2M = file.size / 1024 / 1024 < 2;
+        if (!isLt2M) {
+          this.$message.error("上传图片大小不能超过 2MB!");
+          return false;
         }
-        if (!isLt20M) {
-          this.$message.error('上传图片大小不能超过 20MB!')
-        }
-        return (isJPG || isGIF || isPNG || isBMP) && isLt20M
-      },
-      upImgSuccess (res, file) {
-        if (res && res.code === 0) {
-          this.supermarket.bavatar = res.url
-        } else {
-          this.$message.error(data.msg)
-        }
-      },
-      upImgError (err, file, fileList) {
-        this.supermarket.bavatar = './src/assets/img/img_err.png';
-      },
-      upImgDetailSuccess (res, file) {
-        if (res && res.code === 0) {
-          this.supermarket.detailContentImages = res.url
-        } else {
-          this.$message.error(data.msg)
-        }
-      },
-      upImgDetailError (err, file, fileList) {
-        this.supermarket.detailContentImages = './src/assets/img/img_err.png';
+        const freader = new FileReader();
+        freader.readAsDataURL(file);
+        const self = this;
+        freader.onload = function(e) {
+          self.supermarket.bavatar = e.target.result;
+        };
+        return isLt2M;
       },
       beforeDetailImageUpload(file) {
-        const isJPG = file.type === 'image/jpeg'
-        const isGIF = file.type === 'image/gif'
-        const isPNG = file.type === 'image/png'
-        const isBMP = file.type === 'image/bmp'
-        const isLt20M = file.size / 20480 / 20480 < 20
-        if (!isJPG && !isGIF && !isPNG && !isBMP) {
-          this.$message.error('上传图片必须是JPG/GIF/PNG/BMP 格式!')
+        this.detailFile = file;
+        const isLt2M = file.size / 1024 / 1024 < 2;
+        if (!isLt2M) {
+          this.$message.error("上传图片大小不能超过 2MB!");
+          return false;
         }
-        if (!isLt20M) {
-          this.$message.error('上传图片大小不能超过 20MB!')
-        }
-        return (isJPG || isGIF || isPNG || isBMP) && isLt20M
-      },
-      upImghealthSuccess (res, file) {
-        if (res && res.code === 0) {
-          this.healthLicense = res.url
-        } else {
-          this.$message.error(data.msg)
-        }
-      },
-      upImgoperateSuccess (res, file) {
-        if (res && res.code === 0) {
-          this.operateLicense = res.url
-        } else {
-          this.$message.error(data.msg)
-        }
-      },
-      upImghealthError (err, file, fileList) {
-        this.healthLicense = './src/assets/img/img_err.png';
-      },
-      upImgoperateError (err, file, fileList) {
-        this.operateLicense = './src/assets/img/img_err.png';
-      },
-      beforehealthImageUpload(file) {
-        const isJPG = file.type === 'image/jpeg'
-        const isGIF = file.type === 'image/gif'
-        const isPNG = file.type === 'image/png'
-        const isBMP = file.type === 'image/bmp'
-        const isLt20M = file.size / 20480 / 20480 < 20
-        if (!isJPG && !isGIF && !isPNG && !isBMP) {
-          this.$message.error('上传图片必须是JPG/GIF/PNG/BMP 格式!')
-        }
-        if (!isLt20M) {
-          this.$message.error('上传图片大小不能超过 20MB!')
-        }
-        return (isJPG || isGIF || isPNG || isBMP) && isLt20M
+        const freader = new FileReader();
+        freader.readAsDataURL(file);
+        const self = this;
+        freader.onload = function(e) {
+          self.supermarket.detailContentImages = e.target.result;
+        };
+        return isLt2M;
       },
       beforeoperateImageUpload(file) {
-        const isJPG = file.type === 'image/jpeg'
-        const isGIF = file.type === 'image/gif'
-        const isPNG = file.type === 'image/png'
-        const isBMP = file.type === 'image/bmp'
-        const isLt20M = file.size / 20480 / 20480 < 20
-        if (!isJPG && !isGIF && !isPNG && !isBMP) {
-          this.$message.error('上传图片必须是JPG/GIF/PNG/BMP 格式!')
+        this.operateLicenseFile = file;
+        const isLt2M = file.size / 1024 / 1024 < 2;
+        if (!isLt2M) {
+          this.$message.error("上传图片大小不能超过 2MB!");
+          return false;
         }
-        if (!isLt20M) {
-          this.$message.error('上传图片大小不能超过 20MB!')
+        const freader = new FileReader();
+        freader.readAsDataURL(file);
+        const self = this;
+        freader.onload = function(e) {
+          self.operateLicense = e.target.result;
+        };
+        return isLt2M;
+      },
+      beforehealthImageUpload(file) {
+        this.healthLicenseFile = file;
+        const isLt2M = file.size / 1024 / 1024 < 2;
+        if (!isLt2M) {
+          this.$message.error("上传图片大小不能超过 2MB!");
+          return false;
         }
-        return (isJPG || isGIF || isPNG || isBMP) && isLt20M
+        const freader = new FileReader();
+        freader.readAsDataURL(file);
+        const self = this;
+        freader.onload = function(e) {
+          self.healthLicense = e.target.result;
+        };
+        return isLt2M;
       },
       switchOpenMap() {
         this.openMap = !this.openMap;
@@ -486,37 +444,90 @@
             dayOperateTimeJson.forEach(item => {
               dayOperateTimeArr.push(item.startTime + '-' + item.endTime)
             })
-            this.$http({
-              url: this.$http.adornUrl('/supermarket/add'),
-              method: 'post',
-              data: this.$http.adornData({
-                "id":this.supermarket.id,
-                "bavatar":this.supermarket.bavatar,
-                "deliveryDistance":this.supermarket.deliveryDistance,
-                "averagePrice":this.supermarket.averagePrice,
-                "operateLicense":this.operateLicense,
-                "healthLicense":this.healthLicense,
-                "dayOperateTimeJson":dayOperateTimeArr,
-                "weekOperateTimeJson":this.supermarket.weekOperateTimeJson,
-                "bname":this.supermarket.bname,
-                "bdescription":this.supermarket.bdescription,
-                "btitle":this.supermarket.btitle,
-                "contactPhone":this.supermarket.contactPhone,
-                "priority":this.supermarket.priority,
-                "lng": this.supermarket.lng,
-                "lat": this.supermarket.lat,
-                "adCode": this.supermarket.adCode,
-                "cityCode":this.supermarket.cityCode,
-                "deliveryFee":this.supermarket.deliveryFee,
-                "deliveryStartMinAmount":this.supermarket.deliveryStartMinAmount,
-                "addressSpecific":this.supermarket.addressSpecific,
-                "addressProbably":this.supermarket.addressProbably,
-                "salesCurrentMonthCount":this.supermarket.salesCurrentMonthCount,
-                "salesTotalCount":this.supermarket.salesTotalCount,
-                "detailContentImages":this.supermarket.detailContentImages
-              })
-            }).then(({data}) => {
-              if (data && data.code === 0) {
+            //图片上传
+            let submitFormData = new FormData();
+            if (this.operateLicenseFile){
+              submitFormData.append(
+                "operateLicenseFile",this.operateLicenseFile
+              );
+            }
+            if (this.healthLicenseFile){
+              submitFormData.append(
+                "healthLicenseFile",this.healthLicenseFile
+              );
+            }
+            if (this.bavatarFile){
+              submitFormData.append(
+                "bavatarFile",this.bavatarFile
+              );
+            }
+            if (this.detailFile){
+              submitFormData.append(
+                "detailContentImages",this.detailFile
+              );
+            }
+            submitFormData.append(
+              "id",this.supermarket.id
+            );
+            submitFormData.append(
+              "deliveryDistance",this.supermarket.deliveryDistance
+            );
+            submitFormData.append(
+              "averagePrice",this.supermarket.averagePrice
+            );
+            submitFormData.append(
+              "dayOperateTimeJson",dayOperateTimeArr
+            );
+            submitFormData.append(
+              "weekOperateTimeJson",this.supermarket.weekOperateTimeJson
+            );
+            submitFormData.append(
+              "bname",this.supermarket.bname
+            );
+            submitFormData.append(
+              "bdescription",this.supermarket.bdescription
+            );
+            submitFormData.append(
+              "btitle",this.supermarket.btitle
+            );
+            submitFormData.append(
+              "contactPhone",this.supermarket.contactPhone
+            );
+            submitFormData.append(
+              "priority",this.supermarket.priority
+            );
+            submitFormData.append(
+              "lng",this.supermarket.lng
+            );
+            submitFormData.append(
+              "lat",this.supermarket.lat
+            );
+            submitFormData.append(
+              "adCode",this.supermarket.adCode
+            );
+            submitFormData.append(
+              "cityCode",this.supermarket.cityCode
+            );
+            submitFormData.append(
+              "deliveryFee",this.supermarket.deliveryFee
+            );
+            submitFormData.append(
+              "deliveryStartMinAmount",this.supermarket.deliveryStartMinAmount
+            );
+            submitFormData.append(
+              "addressSpecific",this.supermarket.addressSpecific
+            );
+            submitFormData.append(
+              "addressProbably",this.supermarket.addressProbably
+            );
+            submitFormData.append(
+              "salesCurrentMonthCount",this.supermarket.salesCurrentMonthCount
+            );
+            submitFormData.append(
+              "salesTotalCount",this.supermarket.salesTotalCount
+            );
+            postByFormDataApi('/supermarket/add', submitFormData).then(res => {
+              if (res.data.code === 0) {
                 this.$message({
                   message: "添加成功",
                   type: "success"
@@ -525,7 +536,7 @@
                 this.supermarket.bavatar = ''
                 this.supermarket.detailContentImages = ''
               } else {
-                this.$message.error(data.msg)
+                this.$message.error(res.data.msg);
               }
             })
           } else {

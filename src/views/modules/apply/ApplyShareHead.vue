@@ -19,12 +19,12 @@
           <span>{{scope.row.createTime | getTime(scope.row.createTime)}}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作"  width="180px" v-if="applyStatus==1">
-        <template slot-scope="scope">
-          <el-button size="small" type="text" @click="handleAgree(scope.row)">同意</el-button>
-          <el-button size="small" type="text" @click="handleRefuse(scope.row)">拒绝</el-button>
-        </template>
-      </el-table-column>
+      <!--<el-table-column label="操作"  width="180px" v-if="applyStatus==1">-->
+        <!--<template slot-scope="scope">-->
+          <!--<el-button size="small" type="text" @click="handleAgree(scope.row)">同意</el-button>-->
+          <!--<el-button size="small" type="text" @click="handleRefuse(scope.row)">拒绝</el-button>-->
+        <!--</template>-->
+      <!--</el-table-column>-->
     </el-table>
     <div class="sd-rightpage">
       <pager :current-page="currentPage" :page-size="pageSize" :total="total"

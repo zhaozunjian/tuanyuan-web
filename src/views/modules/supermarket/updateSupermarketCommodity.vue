@@ -43,7 +43,7 @@
             </el-form-item>
             <el-form-item label="出售单位" prop="units">
               <el-select v-model="commodity.units" placeholder="出售单位">
-                <el-option v-for="item in unitsList" :key="item.id" :label="item.tname" :value="item.id" />
+                <el-option v-for="item in unitsList" :key="item.id" :label="item.tname" :value="item.tname" />
               </el-select>
             </el-form-item>
             <el-form-item label="是否开启库存限制">
@@ -61,28 +61,30 @@
             <el-form-item label="月销量">
               <el-input-number v-model="commodity.salesCurrentMonthCount" :min="0" :max="99999999"></el-input-number>
             </el-form-item>
-            <el-form-item label="商品头像" prop="cavatar">
-              <el-upload :disabled="liabryFlag"
-                :action="$GlobalApi.getServerUrl('/system/file/supermarketCommodity/upload')"
-                :before-upload="beforeAvatarUpload"
-                :headers="$GlobalApi.getUserToken()"
-                :on-error="upImgError"
-                :on-success="upImgSuccess"
-                :show-file-list="false"
-                class="avatar-uploader">
-                <img :src="imageServerUrl + commodity.cavatar" class="commodityAvatar" v-if="commodity.cavatar">
-                <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过2MB</div>
-              </el-upload>
-              <!--<el-upload-->
-                <!--class="avatar-uploader"-->
-                <!--action="https://jsonplaceholder.typicode.com/posts/"-->
+            <!--<el-form-item label="商品头像" prop="cavatar">-->
+              <!--<el-upload :disabled="liabryFlag"-->
+                <!--:action="$GlobalApi.getServerUrl('/system/file/supermarketCommodity/upload')"-->
                 <!--:before-upload="beforeAvatarUpload"-->
-                <!--:show-file-list="false">-->
-                <!--<img v-if="commodity.cavatar" :src="commodity.cavatar" class="businessAvatar" />-->
+                <!--:headers="$GlobalApi.getUserToken()"-->
+                <!--:on-error="upImgError"-->
+                <!--:on-success="upImgSuccess"-->
+                <!--:show-file-list="false"-->
+                <!--class="avatar-uploader">-->
+                <!--<img :src="imageServerUrl + commodity.cavatar" class="commodityAvatar" v-if="commodity.cavatar">-->
                 <!--<i v-else class="el-icon-plus avatar-uploader-icon"></i>-->
                 <!--<div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过2MB</div>-->
               <!--</el-upload>-->
+            <!--</el-form-item>-->
+            <el-form-item label="商品头像" prop="cavatar">
+              <el-upload
+                class="avatar-uploader"
+                action="https://www.mocky.io/v2/5185415ba171ea3a00704eed/posts/"
+                :before-upload="beforeAvatarUpload2"
+                :show-file-list="false">
+                <img v-if="commodity.cavatar" :src="commodity.cavatar" class="businessAvatar" />
+                <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过2MB</div>
+              </el-upload>
             </el-form-item>
             <el-form-item>
               <el-button type="primary" style="width:120px;" @click="submitForm()">保存</el-button>
@@ -96,6 +98,7 @@
 </template>
 
 <script>
+  import { postByFormDataApi } from "@/utils/api";
   import * as SERVER_CONSTANT from "@/assets/js/serverConstant";
   export default {
     data() {
@@ -126,9 +129,9 @@
           salesTotalCount: '',
           salesCurrentMonthCount: 0,
         },
-        cavatar:'',
         cavatarImage:'',
-        tempflag:false,
+        cavatarFile:'',
+        flag: false,
         rules: {
           weight: [
             { required: true, message: "请选择推荐权重值", trigger: "blur" }
@@ -156,10 +159,12 @@
       selectedLibrary(data) {
         if (data && data.length > 0) {
           let obj = data[0];
-          this.commodity.cavatar = obj.cavatar
+          this.commodity.cavatar = this.imageServerUrl + obj.cavatar
+          this.cavatarFile = obj.cavatar
           this.commodity.cdescription = obj.cdescription
           this.commodity.cname = obj.cname
           this.commodity.csubTitle = obj.csubTitle
+          this.flag = false
         }
       },
       initData() {
@@ -212,29 +217,30 @@
         }).then(({data}) => {
           if (data && data.code === 0) {
             this.commodity = data.vo
-            this.commodity.cavatar = this.imageServerUrl + data.vo.bavatar
-            this.tempflag = false;
+            this.cavatarFile = data.vo.cavatar
+            this.commodity.cavatar = this.imageServerUrl + data.vo.cavatar
+            this.flag = false
           } else {
             this.$message.error(data.msg);
           }
         })
       },
-      // beforeAvatarUpload(file) {
-      //   this.tempflag = true;
-      //   this.cavatar = file;
-      //   const isLt2M = file.size / 1024 / 1024 < 2;
-      //   if (!isLt2M) {
-      //     this.$message.error("上传图片大小不能超过 2MB!");
-      //     return false;
-      //   }
-      //   const freader = new FileReader();
-      //   freader.readAsDataURL(file);
-      //   const self = this;
-      //   freader.onload = function(e) {
-      //     self.commodity.cavatar = e.target.result;
-      //   };
-      //   return isLt2M;
-      // },
+      beforeAvatarUpload2(file) {
+        this.cavatarImage = file;
+        const isLt2M = file.size / 1024 / 1024 < 2;
+        if (!isLt2M) {
+          this.$message.error("上传图片大小不能超过 2MB!");
+          return false;
+        }
+        const freader = new FileReader();
+        freader.readAsDataURL(file);
+        const self = this;
+        freader.onload = function(e) {
+          self.commodity.cavatar = e.target.result;
+        };
+        this.flag = true
+        return isLt2M;
+      },
       beforeAvatarUpload(file) {
         const isJPG = file.type === 'image/jpeg'
         const isGIF = file.type === 'image/gif'
@@ -260,45 +266,68 @@
         this.commodity.cavatar = './src/assets/img/img_err.png';
       },
       submitForm() {
-        this.$refs['commodity'].validate(valid => {
+        this.$refs['commodity'].validate(async valid => {
           if (valid) {
-            // if (this.tempflag){
-            //   //图片上传
-            //   let submitFormData = new FormData();
-            //   submitFormData.append(
-            //     "file",this.cavatar
-            //   );
-            //   postByFormDataApi('/system/file/supermarketCommodity/upload', submitFormData).then(res => {
-            //     if (res.data.code === 0) {
-            //       this.cavatarImage = res.data.url;
-            //     } else {
-            //       this.$message.error(data.msg);
-            //     }
-            //   })
-            // }
-            this.$http({
-              url: this.$http.adornUrl(this.isEdit?`/supermarketCommodity/update`:'/supermarketCommodity/add'),
-              method: 'post',
-              data: this.$http.adornData({
-                "id":this.id,
-                "supermarketId": this.supermarketId,
-                "supermarketCommodityCustomCategoryId": this.commodity.supermarketCommodityCustomCategoryId,
-                "stockCount": this.commodity.stockCount,
-                "salesTotalCount": this.commodity.salesTotalCount,
-                "salesCurrentMonthCount": this.commodity.salesCurrentMonthCount,
-                "openStock": this.commodity.openStock,
-                "cavatar": this.commodity.cavatar,
-                "units": this.commodity.units,
-                "currentPrice": this.commodity.currentPrice,
-                "originPrice": this.commodity.originPrice,
-                "costPrice": this.commodity.costPrice,
-                "csubTitle":this.commodity.csubTitle,
-                "cname":this.commodity.cname,
-                "weight":this.commodity.weight,
-                "cdescription":this.commodity.cdescription,
-              })
-            }).then(({data}) => {
-              if (data && data.code === 0) {
+            //图片上传
+            let submitFormData = new FormData();
+            if (this.cavatarImage){
+              submitFormData.append(
+                "file",this.cavatarImage
+              );
+            }
+            if (this.cavatarFile){
+              submitFormData.append(
+                "cavate",this.cavatarFile
+              );
+            }
+
+            submitFormData.append(
+              "id",this.id
+            );
+            submitFormData.append(
+              "supermarketId",this.supermarketId
+            );
+            submitFormData.append(
+              "supermarketCommodityCustomCategoryId",this.commodity.supermarketCommodityCustomCategoryId
+            );
+            submitFormData.append(
+              "stockCount",this.commodity.stockCount
+            );
+            submitFormData.append(
+              "salesTotalCount",this.commodity.salesTotalCount
+            );
+            submitFormData.append(
+              "salesCurrentMonthCount",this.commodity.salesCurrentMonthCount
+            );
+            submitFormData.append(
+              "openStock",this.commodity.openStock
+            );
+            submitFormData.append(
+              "units",this.commodity.units
+            );
+            submitFormData.append(
+              "currentPrice",this.commodity.currentPrice
+            );
+            submitFormData.append(
+              "originPrice",this.commodity.originPrice
+            );
+            submitFormData.append(
+              "costPrice",this.commodity.costPrice
+            );
+            submitFormData.append(
+              "csubTitle",this.commodity.csubTitle
+            );
+            submitFormData.append(
+              "cname",this.commodity.cname
+            );
+            submitFormData.append(
+              "weight",this.commodity.weight
+            );
+            submitFormData.append(
+              "cdescription",this.commodity.cdescription
+            );
+            postByFormDataApi(this.isEdit?`/supermarketCommodity/update`:'/supermarketCommodity/add', submitFormData).then(res => {
+              if (res.data.code === 0) {
                 this.$message({
                   message: this.isEdit?"修改成功":"添加成功",
                   type: "success"
@@ -311,9 +340,8 @@
                   }
                 });
                 this.$refs['commodity'].resetFields();
-                this.commodity.cavatar = ''
               } else {
-                this.$message.error(data.msg);
+                this.$message.error(res.data.msg);
               }
             })
           } else {

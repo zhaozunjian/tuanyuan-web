@@ -86,15 +86,24 @@
           <el-input v-model="dataForm.cdescription" placeholder="商品描述"></el-input>
         </el-form-item>
         <el-form-item label="商品头像" prop="cavatar">
+          <!--<el-upload-->
+            <!--:action="$GlobalApi.getServerUrl('/system/file/supermarketCommodity/upload')"-->
+            <!--:before-upload="beforeAvatarUpload"-->
+            <!--:headers="$GlobalApi.getUserToken()"-->
+            <!--:on-error="upImgError"-->
+            <!--:on-success="upImgSuccess"-->
+            <!--:show-file-list="false"-->
+            <!--class="avatar-uploader">-->
+            <!--<img :src="imageServerUrl + dataForm.cavatar" style="width: 200px;" v-if="dataForm.cavatar">-->
+            <!--<i v-else class="el-icon-plus avatar-uploader-icon"></i>-->
+            <!--<div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过2MB</div>-->
+          <!--</el-upload>-->
           <el-upload
-            :action="$GlobalApi.getServerUrl('/system/file/supermarketCommodity/upload')"
+            class="avatar-uploader"
+            action="https://www.mocky.io/v2/5185415ba171ea3a00704eed/posts/"
             :before-upload="beforeAvatarUpload"
-            :headers="$GlobalApi.getUserToken()"
-            :on-error="upImgError"
-            :on-success="upImgSuccess"
-            :show-file-list="false"
-            class="avatar-uploader">
-            <img :src="imageServerUrl + dataForm.cavatar" style="width: 200px;" v-if="dataForm.cavatar">
+            :show-file-list="false">
+            <img v-if="dataForm.cavatar" :src="dataForm.cavatar" style="width: 200px;"/>
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
             <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过2MB</div>
           </el-upload>
@@ -109,6 +118,7 @@
 </template>
 
 <script>
+  import { postByFormDataApi } from "@/utils/api";
   import * as SERVER_CONSTANT from "@/assets/js/serverConstant";
   export default {
     data () {
@@ -129,6 +139,8 @@
           cdescription:'',
           cavatar:'',
         },
+        cavatarImage:'',
+        cavatarFile:'',
         dataRule:{
           cname: [
             { required: true, message: "请选择商品名称", trigger: "blur" }
@@ -155,44 +167,49 @@
         }
       },
       beforeAvatarUpload(file) {
-        const isJPG = file.type === 'image/jpeg'
-        const isGIF = file.type === 'image/gif'
-        const isPNG = file.type === 'image/png'
-        const isBMP = file.type === 'image/bmp'
-        const isLt20M = file.size / 20480 / 20480 < 20
-        if (!isJPG && !isGIF && !isPNG && !isBMP) {
-          this.$message.error('上传图片必须是JPG/GIF/PNG/BMP 格式!')
+        this.cavatarImage = file;
+        const isLt2M = file.size / 1024 / 1024 < 2;
+        if (!isLt2M) {
+          this.$message.error("上传图片大小不能超过 2MB!");
+          return false;
         }
-        if (!isLt20M) {
-          this.$message.error('上传图片大小不能超过 20MB!')
-        }
-        return (isJPG || isGIF || isPNG || isBMP) && isLt20M
-      },
-      upImgSuccess (res, file) {
-        if (res && res.code === 0) {
-          this.dataForm.cavatar = res.url
-        } else {
-          this.$message.error(data.msg)
-        }
-      },
-      upImgError (err, file, fileList) {
-        this.dataForm.cavatar = './src/assets/img/img_err.png';
+        const freader = new FileReader();
+        freader.readAsDataURL(file);
+        const self = this;
+        freader.onload = function(e) {
+          self.dataForm.cavatar = e.target.result;
+        };
+        return isLt2M;
       },
       dataFormSubmit(){
         this.$refs['dataForm'].validate(valid => {
           if (valid) {
-            this.$http({
-              url: this.$http.adornUrl(this.id == null?`/supermarketCommodityLibrary/add`:'/supermarketCommodityLibrary/update'),
-              method: 'post',
-              data: this.$http.adornData({
-                "id":this.id,
-                "cname": this.dataForm.cname,
-                "cavatar": this.dataForm.cavatar,
-                "csubTitle":this.dataForm.csubTitle,
-                "cdescription":this.dataForm.cdescription,
-              })
-            }).then(({data}) => {
-              if (data && data.code === 0) {
+            //图片上传
+            let submitFormData = new FormData();
+            if (this.cavatarImage){
+              submitFormData.append(
+                "file",this.cavatarImage
+              );
+            }
+            if (this.cavatarFile){
+              submitFormData.append(
+                "cavate",this.cavatarFile
+              );
+            }
+            submitFormData.append(
+              "id",this.id
+            );
+            submitFormData.append(
+              "cdescription",this.dataForm.cdescription
+            );
+            submitFormData.append(
+              "csubTitle",this.dataForm.csubTitle
+            );
+            submitFormData.append(
+              "cname",this.dataForm.cname
+            );
+            postByFormDataApi(this.id == null?`/supermarketCommodityLibrary/add`:'/supermarketCommodityLibrary/update', submitFormData).then(res => {
+              if (res.data.code === 0) {
                 this.$message({
                   message: this.id == null?"添加成功":"修改成功",
                   type: "success"
@@ -201,7 +218,7 @@
                 this.getDataList();
                 this.$refs['dataForm'].resetFields();
               } else {
-                this.$message.error(data.msg);
+                this.$message.error(res.data.msg);
               }
             })
           } else {
@@ -256,6 +273,8 @@
             if (data && data.code === 0) {
               this.dataForm = data.vo
               this.libartyFlag = true;
+              this.cavatarFile = data.vo.cavatar
+              this.dataForm.cavatar = this.imageServerUrl + data.vo.cavatar
             } else {
               this.$message.error(data.msg)
             }

@@ -59,7 +59,6 @@
       }
     },
     created() {
-      this.dictionariesData.clear()
       this.getCaptcha()
     },
     methods: {
