@@ -61,6 +61,7 @@
     },
     created() {
       this.getUserInfo()
+      this.getMessage()
     },
     mounted() {
       this.resetDocumentClientHeight()
@@ -72,6 +73,19 @@
         window.onresize = () => {
           this.documentClientHeight = document.documentElement['clientHeight']
         }
+      },
+      getMessage(){
+        this.$http({
+          url: this.$http.adornUrl('/message/list'),
+          method: 'get',
+          params: this.$http.adornParams({})
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            localStorage.setItem("messageInfo", JSON.stringify(data.vo))
+          } else {
+            this.$message.error(data.msg)
+          }
+        })
       },
       // 获取当前管理员信息
       getUserInfo() {

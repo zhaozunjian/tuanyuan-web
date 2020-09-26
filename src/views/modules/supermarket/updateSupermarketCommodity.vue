@@ -275,6 +275,9 @@
                 "file",this.cavatarImage
               );
             }
+            submitFormData.append(
+              "flag",this.flag
+            );
             if (this.cavatarFile){
               submitFormData.append(
                 "cavate",this.cavatarFile

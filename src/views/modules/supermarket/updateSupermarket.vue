@@ -23,6 +23,13 @@
                     <el-option v-for="item in businessPriorityOptions" :key="item.value" :label="item.label" :value="item.value" />
                   </el-select>
                 </el-form-item>
+                <el-form-item label="满减金额">
+                  <el-tag v-for="tag in supermarketEnough" :key="tag.id" style="margin-right: 20px;"
+                          closable :disable-transitions="false" @close="handleClose2(tag)">
+                    满{{tag.buyEnoughAmount}}减{{tag.reductionAmount}}
+                  </el-tag>
+                  <el-button size="small" @click="addSupermarketEnough()">添加满减</el-button>
+                </el-form-item>
                 <el-form-item label="选择地理位置" prop>
                   <el-row>
                     <el-col :span="12">
@@ -120,7 +127,13 @@
                 <el-form-item label="配送费">
                   <el-input-number v-model="supermarket.deliveryFee" :min="0" :max="99999999"></el-input-number>
                 </el-form-item>
-
+                <el-form-item label="商品标签">
+                  <el-tag v-for="tag in businessTags" :key="tag.id" style="margin-right: 20px;"
+                          :closable="!flag" :disable-transitions="false" @close="handleClose(tag)">
+                    {{tag.tname}}
+                  </el-tag>
+                  <el-button size="small" @click="addBindTag()">添加标签</el-button>
+                </el-form-item>
                 <el-form-item label="超市头像" prop="bavatar">
                   <el-upload
                     class="avatar-uploader"
@@ -173,6 +186,47 @@
           </el-row>
         </div>
       </div>
+      <el-dialog class="code-dialog" width="50%" title="添加标签" :visible.sync="dialogAddFormVisible" @close="closeDialogTag">
+        <el-table
+          :data="addForm.businessCommodityTagListData"
+          tooltip-effect="dark" :height="$GlobalApi.getWinHeight() - 300"
+          @select="selectChange"
+          @select-all="selectAll"
+          ref="multipleTable">
+          <el-table-column
+            type="selection"
+            width="35">
+          </el-table-column>
+          <el-table-column
+            prop="tname"
+            label="标签名称">
+          </el-table-column>
+        </el-table>
+        <pager :current-page="addCurrentPage" :page-size="addPageSize" :total="addTotal"
+               @current-change="handleAddCurrentChange" @handle-size-change="handleAddSizeChange" background/>
+        <div slot="footer" class="dialog-footer">
+          <el-button size="small" plain @click="dialogAddFormVisible=false">取 消</el-button>
+          <el-button size="small" type="primary" @click="handleAddBusinessCommodityTag()">确 定</el-button>
+        </div>
+      </el-dialog>
+      <el-dialog class="code-dialog" width="50%" title="添加满减" :visible.sync="dialogAddFormVisible2" @close="closeDialog">
+        <el-table
+          :data="addEnoughForm"
+          tooltip-effect="dark" :height="$GlobalApi.getWinHeight() - 300"
+          @select="selectChange2"
+          @select-all="selectAll2"
+          ref="multipleTable2">
+          <el-table-column type="selection" width="35"></el-table-column>
+          <el-table-column label="目标的金额" prop="buyEnoughAmount"></el-table-column>
+          <el-table-column label="减少的金额" prop="reductionAmount"></el-table-column>
+        </el-table>
+        <pager :current-page="currentPage" :page-size="pageSize" :total="addEnoughTotal"
+               @current-change="handleAddCurrentChange2" @handle-size-change="handleAddSizeChange2" background/>
+        <div slot="footer" class="dialog-footer">
+          <el-button size="small" plain @click="dialogAddFormVisible2=false">取 消</el-button>
+          <el-button size="small" type="primary" @click="handleAddSupermarketBuyEnoughReduction()">确 定</el-button>
+        </div>
+      </el-dialog>
     </el-card>
     <div class="map_wrap" v-if="openMap">
       <choose-address
@@ -334,6 +388,23 @@
             label: "十级"
           }
         ],
+        businessTags:[],
+        selectDataArrL:[],// 跨页多选所以的项，
+        addTotal: 0,
+        addCurrentPage: 1,
+        addPageSize: 10,
+        dialogAddFormVisible: false,
+        addForm: {
+          businessCommodityTagListData: [],
+        },
+        //满减
+        supermarketEnough:[],
+        selectDataArrL2:[],// 跨页多选所以的项，
+        addEnoughTotal: 0,
+        currentPage: 1,
+        pageSize: 10,
+        dialogAddFormVisible2: false,
+        addEnoughForm: [],
       };
     },
     activated() {
@@ -342,7 +413,11 @@
         this.bName = this.$route.query.bName;
         this.flag = this.$route.query.flag;
       }
-      this.initData();
+      if (this.supermarketId) {
+        this.initData();
+        this.initBuyData();
+        this.initSupermarketTagBindCommodityList();
+      }
     },
     methods: {
       beforeAvatarUpload(file) {
@@ -408,6 +483,125 @@
       switchOpenMap() {
         this.openMap = !this.openMap;
       },
+      handleClose2(row) {
+        let item = row
+        for(var i = 0; i < this.supermarketEnough.length; i++){
+          if(this.supermarketEnough[i].id == item.id){
+            this.supermarketEnough.splice(i,1);
+          }
+        }
+      },
+      addSupermarketEnough(){
+        this.selectDataArrL2 = []
+        this.dialogAddFormVisible2 = true
+        this.initSupermarketBuyEnoughReductionList()
+      },
+      initSupermarketBuyEnoughReductionList(){
+        this.$http({
+          url: this.$http.adornUrl(`/supermarketBuyEnoughReduction/page`),
+          method: 'get',
+          params: this.$http.adornParams({
+            page: this.currentPage,
+            size: this.pageSize
+          })
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.addEnoughForm = data.page.list
+            this.addEnoughTotal = data.page.totalCount;
+
+            //请求到的数据多选后回显被选中
+            this.$nextTick(function () {
+              this.selectDataArrL2.forEach((item) => {
+                this.addEnoughForm.forEach((listitem) => {
+                  if (item.id == listitem.id) {
+                    this.$refs.multipleTable2.toggleRowSelection(listitem, true);
+                  }
+                });
+              });
+            });
+          } else {
+            this.$message.error(data.msg);
+          }
+        })
+      },
+      //多选
+      selectChange2(arr, row) {
+        let isHaveItem = this.selectDataArrL2.find((item) => item.id == row.id);
+        if (isHaveItem) {
+          this.selectDataArrL2 = this.selectDataArrL2.filter(
+            (item) => item.id != isHaveItem.id
+          );
+        } else {
+          this.selectDataArrL2.push(row);
+        }
+      },
+      // 全选
+      selectAll2(arr) {
+        if (arr.length > 0) {
+          this.addRows2(arr)
+        } else {
+          this.removeRows2(this.addEnoughForm)
+        }
+      },
+      // 添加选中行
+      addRows2(rows) {
+        for (let key of rows) {
+          // 如果选中的数据中没有这条就添加进去
+          if (
+            !this.selectDataArrL2.find(
+              (item) => item.id === key.id
+            )
+          ) {
+            this.selectDataArrL2.push(key);
+          }
+        }
+      },
+      // 取消选中行
+      removeRows2(rows) {
+        if (this.selectDataArrL2.length > 0) {
+          for (let row of rows) {
+            this.selectDataArrL2 = this.selectDataArrL2.filter(
+              (item) => item.id !== row.id
+            );
+          }
+        }
+      },
+      handleAddSupermarketBuyEnoughReduction() {
+        let selectDataArrLAdd = this.selectDataArrL2
+        let multipleSelectionLength = selectDataArrLAdd.length
+        if (multipleSelectionLength<=0) {
+          this.$message.error('请选择需绑定的满减折扣券');
+        }
+        //移除重复数据
+        selectDataArrLAdd.forEach(item => {
+          for(var i = 0; i < this.supermarketEnough.length; i++){
+            if(item.id == this.supermarketEnough[i].id){
+              this.supermarketEnough.splice(i,1);
+            }
+          }
+        })
+        //添加数据
+        selectDataArrLAdd.forEach(item => {
+          this.supermarketEnough.push({
+            id: item.id,
+            buyEnoughAmount: item.buyEnoughAmount,
+            reductionAmount: item.reductionAmount,
+          })
+        })
+        this.dialogAddFormVisible2 = false
+      },
+      handleAddCurrentChange2(val) {
+        this.currentPage = val
+        this.initSupermarketBuyEnoughReductionList()
+      },
+      handleAddSizeChange2(val) {
+        this.pageSize = val
+        this.initSupermarketBuyEnoughReductionList()
+      },
+      closeDialog() {
+        this.selectDataArrL2 = []
+        this.dialogAddFormVisible2 = false
+      },
       confirmAddressHandle(lng, lat, formattedAddress, lnglatResult) {
         this.supermarket.lng = lng;
         this.supermarket.lat = lat;
@@ -443,10 +637,16 @@
                 })
               })
               this.gaodeLocation.formattedAddress = this.supermarket.addressProbably;
-              this.supermarket.operateLicense = this.imageServerUrl + data.vo.operateLicense
-              this.supermarket.healthLicense = this.imageServerUrl + data.vo.healthLicense
               this.supermarket.bavatar = this.imageServerUrl + data.vo.bavatar
-              this.supermarket.detailContentImages = this.imageServerUrl + data.vo.detailContentImages
+              if (data.vo.operateLicense){
+                this.supermarket.operateLicense = this.imageServerUrl + data.vo.operateLicense
+              }
+              if (data.vo.healthLicense){
+                this.supermarket.healthLicense = this.imageServerUrl + data.vo.healthLicense
+              }
+              if (data.vo.detailContentImages){
+                this.supermarket.detailContentImages = this.imageServerUrl + data.vo.detailContentImages
+              }
 
               this.operateLicense = data.vo.operateLicense
               this.healthLicense = data.vo.healthLicense
@@ -459,6 +659,197 @@
             }
           })
         }
+      },
+      initBuyData() {
+        this.$http({
+          url: this.$http.adornUrl('/supermarketBuyEnoughReductionBindSupermarket/list'),
+          method: 'get',
+          params: this.$http.adornParams({
+            supermarketId: this.supermarketId
+          })
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.supermarketEnough = data.list
+          } else {
+            this.$message.error(data.msg)
+          }
+        })
+      },
+      addBindTag() {
+        this.selectDataArrL = []
+        this.dialogAddFormVisible = true
+        this.initBusinessCommodityTagList()
+      },
+      initBusinessCommodityTagList() {
+        this.$http({
+          url: this.$http.adornUrl(`/supermarketTag/page`),
+          method: 'get',
+          params: this.$http.adornParams({
+            page: this.addCurrentPage,
+            size: this.addPageSize
+          })
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.addForm.businessCommodityTagListData = data.page.list
+            this.addTotal = data.page.totalCount;
+
+            //请求到的数据多选后回显被选中
+            this.$nextTick(function () {
+              this.selectDataArrL.forEach((item) => {
+                this.addForm.businessCommodityTagListData.forEach((listitem) => {
+                  if (item.id == listitem.id) {
+                    this.$refs.multipleTable.toggleRowSelection(listitem, true);
+                  }
+                });
+              });
+            });
+          } else {
+            this.$message.error(data.msg);
+          }
+        })
+      },
+      //多选
+      selectChange(arr, row) {
+        let isHaveItem = this.selectDataArrL.find((item) => item.id == row.id);
+        if (isHaveItem) {
+          this.selectDataArrL = this.selectDataArrL.filter(
+            (item) => item.id != isHaveItem.id
+          );
+        } else {
+          this.selectDataArrL.push(row);
+        }
+      },
+      // 全选
+      selectAll(arr) {
+        if (arr.length > 0) {
+          this.addRows(arr)
+        } else {
+          this.removeRows(this.addForm.businessCommodityTagListData)
+        }
+      },
+      // 添加选中行
+      addRows(rows) {
+        for (let key of rows) {
+          // 如果选中的数据中没有这条就添加进去
+          if (
+            !this.selectDataArrL.find(
+              (item) => item.id === key.id
+            )
+          ) {
+            this.selectDataArrL.push(key);
+          }
+        }
+      },
+      // 取消选中行
+      removeRows(rows) {
+        if (this.selectDataArrL.length > 0) {
+          for (let row of rows) {
+            this.selectDataArrL = this.selectDataArrL.filter(
+              (item) => item.id !== row.id
+            );
+          }
+        }
+      },
+      handleAddBusinessCommodityTag() {
+        let selectDataArrLAdd = this.selectDataArrL
+        let multipleSelectionLength = selectDataArrLAdd.length
+        if (multipleSelectionLength<=0) {
+          this.$message.error('请选择需绑定的标签');
+        }
+        this.$confirm(`确认绑定名为${selectDataArrLAdd[0].tname}等${multipleSelectionLength}个标签?`, "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "info"
+        }).then(() => {
+          selectDataArrLAdd.forEach(item => {
+            this.$http({
+              url: this.$http.adornUrl(`/supermarketTagBindSupermarket/add`),
+              method: 'post',
+              params: this.$http.adornParams({
+                supermarketTagId: item.id,
+                supermarketId: this.supermarketId
+              })
+            }).then(({data}) => {
+              if (data && data.code === 0) {
+                this.$message({
+                  message: `添加标签-${item.tname},成功`,
+                  type: "success"
+                })
+                this.initSupermarketTagBindCommodityList()
+              } else {
+                this.$message.error(data.msg);
+              }
+            })
+          })
+          this.dialogAddFormVisible = false
+          Object.assign(this.addForm, this.$options.data().addForm)
+        }).catch((err)=>{
+          this.$message({
+            type: "info",
+            message: "已取消操作"
+          });
+        })
+      },
+      handleAddCurrentChange(val) {
+        this.addCurrentPage = val
+        this.initBusinessCommodityTagList()
+      },
+      handleAddSizeChange(val) {
+        this.addPageSize = val
+        this.initBusinessCommodityTagList()
+      },
+      closeDialogTag() {
+        this.selectDataArrL = []
+        this.dialogAddFormVisible = false
+      },
+      handleClose(row) {
+        let item = row
+        let supermarketTagId = item.id
+        let tname = item.tname
+        this.$confirm(`确认解除名为${tname}的标签?`, "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "info"
+        }).then(res => {
+          this.$http({
+            url: this.$http.adornUrl(`/supermarketTagBindSupermarket/remove`),
+            method: 'get',
+            params: this.$http.adornParams({
+              supermarketTagId: supermarketTagId,
+              supermarketId: this.supermarketId
+            })
+          }).then(({data}) => {
+            if (data && data.code === 0) {
+              this.$message({
+                message: "删除成功",
+                type: "success"
+              })
+              this.initSupermarketTagBindCommodityList()
+            } else {
+              this.$message.error(data.msg);
+            }
+          })
+        }).catch(()=>{
+          this.$message({
+            type: "info",
+            message: "已取消操作"
+          });
+        })
+      },
+      initSupermarketTagBindCommodityList() {
+        this.$http({
+          url: this.$http.adornUrl(`/supermarketTagBindSupermarket/list`),
+          method: 'get',
+          params: this.$http.adornParams({
+            supermarketId: this.supermarketId
+          })
+        }).then(({data}) => {
+          if (data && data.code === 0) {
+            this.businessTags = data.list
+          } else {
+            this.$message.error(data.msg);
+          }
+        })
       },
       querySearchAsync(queryString) {},
       handleCheckedWeekTimesChange(value) {
@@ -494,26 +885,30 @@
             dayOperateTimeJson.forEach(item => {
               dayOperateTimeArr.push(item.startTime + '-' + item.endTime)
             })
+            let supermarketBuyEnoughReductionId = []
+            this.supermarketEnough.forEach(item => {
+              supermarketBuyEnoughReductionId.push(item.id)
+            })
             //图片上传
             let submitFormData = new FormData();
+            submitFormData.append(
+              "supermarketBuyEnoughReductionId",supermarketBuyEnoughReductionId
+            );
+            // submitFormData.append(
+            //   "bavatar",this.bavatar
+            // );
+            if (this.bavatarFile){
+              submitFormData.append(
+                "bavatarFile",this.bavatarFile
+              );
+            }
+
+            // submitFormData.append(
+            //   "operateLicense",this.operateLicense
+            // );
             if (this.operateLicenseFile){
               submitFormData.append(
                 "operateLicenseFile",this.operateLicenseFile
-              );
-            }
-            if (this.bavatar){
-              submitFormData.append(
-                "bavatar",this.bavatar
-              );
-            }
-            if (this.detailImage){
-              submitFormData.append(
-                "detailContentImages",this.detailImage
-              );
-            }
-            if (this.operateLicense){
-              submitFormData.append(
-                "operateLicense",this.operateLicense
               );
             }
             if (this.healthLicenseFile){
@@ -521,19 +916,16 @@
                 "healthLicenseFile",this.healthLicenseFile
               );
             }
-            if (this.healthLicense){
-              submitFormData.append(
-                "healthLicense",this.healthLicense
-              );
-            }
-            if (this.bavatarFile){
-              submitFormData.append(
-                "bavatarFile",this.bavatarFile
-              );
-            }
+            // submitFormData.append(
+            //   "healthLicense",this.healthLicense
+            // );
+            //
+            // submitFormData.append(
+            //   "detailContentImages",this.detailImage
+            // );
             if (this.detailFile){
               submitFormData.append(
-                "detailContentImages",this.detailFile
+                "detailContentImagesFile",this.detailFile
               );
             }
             submitFormData.append(
@@ -607,6 +999,14 @@
                 this.supermarket.detailContentImages = ''
                 this.supermarket.operateLicense = ''
                 this.supermarket.healthLicense = ''
+                this.operateLicense = ""
+                this.operateLicenseFile = ""
+                this.healthLicense= ""
+                this.healthLicenseFile= ""
+                this.bavatarFile=''
+                this.bavatar=''
+                this.detailImage=''
+                this.detailFile=''
               } else {
                 this.$message.error(res.data.msg);
               }
